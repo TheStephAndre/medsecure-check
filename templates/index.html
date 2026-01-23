@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% block content %}
+
+<section>
+  <h2>Cybersicherheit verständlich erklärt – in 5 Minuten</h2>
+
+  <p>
+    Ein einfacher, nicht-technischer Cybersecurity-Check für
+    <strong>Schweizer Kleinunternehmen, Praxen und Selbständige</strong>.
+  </p>
+
+  <p>
+    Sie erhalten eine klare Ersteinschätzung Ihrer Cybersicherheitslage – ohne
+    IT-Fachsprache, ohne Verkaufsdruck.
+  </p>
+
+  <p>
+    <strong>CHF 49</strong> für einen persönlichen Bericht mit konkreten,
+    priorisierten Handlungsempfehlungen.
+  </p>
+
+  <a class="contrast" href="{{ url_for('audit') }}">
+    Jetzt 5-Minuten-Check starten
+  </a>
+
+  <p style="margin-top: 1rem; font-size: 0.9em">
+    Entwickelt für Schweizer Unternehmen · Keine Beratungspflicht · Kein Verkauf
+    von IT-Dienstleistungen
+  </p>
+</section>
+
+{% endblock %}

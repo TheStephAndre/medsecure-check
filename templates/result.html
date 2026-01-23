@@ -1,0 +1,72 @@
+{% extends "base.html" %} {% block content %}
+
+<h2>Ihr Ergebnis</h2>
+
+<div>
+  <p class="score-badge">{{ submission.score }}/100</p>
+
+  <p>
+    {% if submission.score < 40 %}
+    <strong>Hohes Risiko:</strong> Hohes Risiko: Es besteht akuter
+    Handlungsbedarf. {% elif submission.score < 70 %}
+    <strong>Mittleres Risiko:</strong> Die wichtigsten Massnahmen sollten
+    priorisiert umgesetzt werden. {% else %}
+    <strong>Geringes Risiko:</strong> Gute Basis, weiterhin regelmässig prüfen.
+    {% endif %}
+  </p>
+</div>
+
+<h3>Ihr persönlicher Sicherheitsbericht & Aktionsplan (CHF 49)</h3>
+
+<ul>
+  <li>✔ Übersichtliche Einordnung Ihres Cyber-Risikos</li>
+  <li>✔ Priorisierte Massnahmen nach Wirkung & Dringlichkeit</li>
+  <li>✔ Konkrete Empfehlungen ohne IT-Fachsprache</li>
+  <li>✔ Geeignet für kleine Schweizer Unternehmen</li>
+</ul>
+
+<p>
+  Dieser Bericht richtet sich an kleine Schweizer Unternehmen ohne eigene
+  IT-Abteilung. Er ist bewusst praxisnah und verständlich gehalten.
+</p>
+
+<p>
+  Der detaillierte Bericht enthält priorisierte Massnahmen und klare
+  Empfehlungen.
+</p>
+
+<p>
+  <strong>Warum kostet der Bericht CHF 49?</strong>
+</p>
+
+<p>
+  Der Bericht wurde speziell für kleine Schweizer Unternehmen entwickelt und
+  ersetzt kein Gespräch, sondern unnötige Beratungsstunden.
+</p>
+
+<p>
+  Zum Vergleich: Eine kurze IT- oder Sicherheitsberatung kostet in der Regel
+  mehrere hundert Franken. Dieser Bericht gibt Ihnen eine fundierte, unabhängige
+  Ersteinschätzung zu einem festen Preis.
+</p>
+
+<p>
+  <strong
+    >Zahlung per Rechnung / Banküberweisung (üblich in der Schweiz):</strong
+  ><br />
+  IBAN: <code>{{ IBAN }}</code><br />
+  Verwendungszweck: E-Mail-Adresse oder Firmenname
+</p>
+
+<p>
+  Nach Zahlungseingang erhalten Sie Ihren persönlichen PDF-Bericht per E-Mail
+  (in der Regel innerhalb von 24 Stunden).
+</p>
+
+<p>
+  <a href="{{ url_for('pdf', submission_id=submission_id) }}" target="_blank">
+    PDF-Bericht anzeigen
+  </a>
+</p>
+
+{% endblock %}
