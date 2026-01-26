@@ -1,14 +1,14 @@
 {% extends "base.html" %} {% block content %}
 
-<h2>Ihr Ergebnis</h2>
+<h2>Ihre Auswertung</h2>
 
 <div>
   <p class="score-badge">{{ submission.score }}/100</p>
 
   <p>
     {% if submission.score < 40 %}
-    <strong>Hohes Risiko:</strong> Hohes Risiko: Es besteht akuter
-    Handlungsbedarf. {% elif submission.score < 70 %}
+    <strong>Erhöhtes Risiko:</strong> Es bestehen relevante Schwachstellen, die
+    priorisiert überprüft werden sollten. {% elif submission.score < 70 %}
     <strong>Mittleres Risiko:</strong> Die wichtigsten Massnahmen sollten
     priorisiert umgesetzt werden. {% else %}
     <strong>Geringes Risiko:</strong> Gute Basis, weiterhin regelmässig prüfen.
@@ -16,18 +16,18 @@
   </p>
 </div>
 
-<h3>Ihr persönlicher Sicherheitsbericht & Aktionsplan (CHF 49)</h3>
+<h3>Persönlicher IT-Sicherheitsbericht für Ihre Praxis (CHF 49.–)</h3>
 
 <ul>
-  <li>✔ Übersichtliche Einordnung Ihres Cyber-Risikos</li>
-  <li>✔ Priorisierte Massnahmen nach Wirkung & Dringlichkeit</li>
-  <li>✔ Konkrete Empfehlungen ohne IT-Fachsprache</li>
-  <li>✔ Geeignet für kleine Schweizer Unternehmen</li>
+  <li>✔ Übersichtliche Einordnung Ihrer IT-Sicherheitslage</li>
+  <li>✔ Priorisierte Massnahmen mit Fokus auf Patientendaten</li>
+  <li>✔ Verständlich für Praxen ohne eigene IT-Abteilung</li>
+  <li>✔ Berücksichtigung typischer Abläufe in Arztpraxen</li>
 </ul>
 
 <p>
-  Dieser Bericht richtet sich an kleine Schweizer Unternehmen ohne eigene
-  IT-Abteilung. Er ist bewusst praxisnah und verständlich gehalten.
+  Dieser Bericht richtet sich an Arztpraxen und kleinere medizinische
+  Einrichtungen ohne eigene IT-Abteilung.
 </p>
 
 <p>
@@ -36,23 +36,25 @@
 </p>
 
 <p>
-  <strong>Warum kostet der Bericht CHF 49?</strong>
+  <strong>Leistungsumfang</strong>
 </p>
 
 <p>
-  Der Bericht wurde speziell für kleine Schweizer Unternehmen entwickelt und
-  ersetzt kein Gespräch, sondern unnötige Beratungsstunden.
+  Der Bericht wurde speziell für medizinische Einrichtungen in der Schweiz
+  entwickelt. Er ersetzt keine Fachberatung, bietet jedoch eine fundierte und
+  unabhängige Ersteinschätzung.
 </p>
 
 <p>
-  Zum Vergleich: Eine kurze IT- oder Sicherheitsberatung kostet in der Regel
-  mehrere hundert Franken. Dieser Bericht gibt Ihnen eine fundierte, unabhängige
-  Ersteinschätzung zu einem festen Preis.
+  Zum Vergleich: Bereits eine kurze IT-Sicherheitsberatung verursacht häufig
+  Kosten im dreistelligen Bereich. Dieser Bericht ermöglicht eine strukturierte
+  Standortbestimmung zu einem fixen, transparenten Preis.
 </p>
 
 <p>
   <strong
-    >Zahlung per Rechnung / Banküberweisung (üblich in der Schweiz):</strong
+    >Die Rechnung wird ohne Mehrwertsteuer ausgestellt (nicht
+    mehrwertsteuerpflichtig). :</strong
   ><br />
   IBAN: <code>{{ IBAN }}</code><br />
   Verwendungszweck: E-Mail-Adresse oder Firmenname
@@ -64,6 +66,7 @@
 </p>
 
 <p>
+  <em>Hinweis: Dies ist eine Vorschau-Version.</em><br />
   <a href="{{ url_for('pdf', submission_id=submission_id) }}" target="_blank">
     PDF-Bericht anzeigen
   </a>

@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-      {% if submission is defined %} {{ submission.business_name }} -
-      Cybersecurity-Bericht" {% else %} "Cybersecurity-Check für Schweizer KMU"
-      {% endif %}
+      {% if submission is defined %} {{ submission.business_name }} - Schutz
+      sensibler Patientendaten-Bericht" {% else %} "Schutz sensibler
+      Patientendaten-Check für Schweizer KMU" {% endif %}
     </title>
     <link rel="stylesheet" href="/static/pico.min.css" />
     <style>
@@ -109,7 +109,9 @@
     </style>
   </head>
   <body>
-    <div class="print-header">{{ company }} — Cybersecurity-Bericht</div>
+    <div class="print-header">
+      {{ company }} — Schutz sensibler Patientendaten-Bericht
+    </div>
     {% if submission is defined %}
     <div class="print-footer">
       Erstellt am {{ submission.created_at_human }} · Vertraulich · Seite
@@ -118,12 +120,15 @@
     {% endif %}
     <main class="container">
       <header>
-        <h1>{{ company if company else "Cybersecurity-Check Schweiz"}}</h1>
+        <h1>
+          {{ company if company else "Schutz sensibler Patientendaten-Check
+          Schweiz"}}
+        </h1>
       </header>
       {% block content %}{% endblock%}
       <footer>
         <p style="font-size: 0.9rem; color: #666">
-          Dieser Check bietet allgemeine Hinweise zur Cybersicherheit und stellt
+          Dieser Check bietet allgemeine Hinweise zur IT-Sicherheit und stellt
           keine rechtliche oder regulatorische Beratung dar.
         </p>
       </footer>

@@ -9,13 +9,16 @@
 
   <p><strong>Datum:</strong> {{ submission.created_at_human }}</p>
 
-  <h3>Cybersecurity-Score: {{ submission.score }}/100</h3>
+  <h3>IT-Sicherheitsbewertung: {{ submission.score }}/100</h3>
   <hr />
 
   <section>
     <h4>Einordnung</h4>
     {% if submission.score < 40 %}
-    <p>Hohes Risiko - dringende Massnahmen empfohlen.</p>
+    <p>
+      Erhöhtes Risiko - es bestehen relevante Schwachstellen, die überprüft und
+      priorisiert adressiert werden sollten.
+    </p>
     {% elif submission.score < 70 %}
     <p>
       Mittleres Risiko - die wichtigsten Punkte sollten zeitnah umgesetzt
@@ -67,7 +70,7 @@
     {% else %}
     <p>
       Die folgenden Massnahmen haben den grössten Einfluss auf Ihre
-      Cybersicherheit:
+      IT-Sicherheit:
     </p>
 
     <ol>
@@ -88,11 +91,11 @@
     <h4>Nächste Schritte</h4>
     <p>
       Dieser Bericht bietet eine erste Orientierung zur Verbesserung der
-      Cybersicherheit und ersetzt keine individuelle Fachberatung.
+      IT-Sicherheit und ersetzt keine individuelle Fachberatung.
     </p>
     <p>
-      Für viele Unternehmen reicht es aus, diese Punkte intern schrittweise
-      umzusetzen.
+      Für viele Arztpraxen und kleinere medizinische Einrichtungen reicht es
+      aus, diese Punkte intern schrittweise umzusetzen.
     </p>
   </section>
 </article>
