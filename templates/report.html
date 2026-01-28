@@ -1,84 +1,66 @@
 {% extends "base.html" %} {% block content %}
 
 <div class="print-actions">
-  <button onclick="window.print()">Als PDF speichern</button>
+  <button onclick="window.print()">{{ REPORT.print_cta }}</button>
 </div>
 
 <article>
   <h2>{{ submission.business_name }}</h2>
 
-  <p><strong>Datum:</strong> {{ submission.created_at_human }}</p>
+  <p>
+    <strong>{{ REPORT.date_label }}:</strong>
+    {{ submission.created_at_human }}
+  </p>
 
-  <h3>IT-Sicherheitsbewertung: {{ submission.score }}/100</h3>
+  <h3>{{ REPORT.score_title }}: {{ submission.score }}/100</h3>
   <hr />
 
   <section>
-    <h4>Einordnung</h4>
+    <h4>{{ REPORT.sections.classification }}</h4>
+
     {% if submission.score < 40 %}
-    <p>
-      Erhöhtes Risiko - es bestehen relevante Schwachstellen, die überprüft und
-      priorisiert adressiert werden sollten.
-    </p>
+    <p>{{ REPORT.risk_levels.high }}</p>
     {% elif submission.score < 70 %}
-    <p>
-      Mittleres Risiko - die wichtigsten Punkte sollten zeitnah umgesetzt
-      werden.
-    </p>
+    <p>{{ REPORT.risk_levels.medium }}</p>
     {% else %}
-    <p>Geringes Risiko - gute Grundlagen, weiterhin regelmässig überprüfen.</p>
+    <p>{{ REPORT.risk_levels.low }}</p>
     {% endif %}
   </section>
 
   <div class="page-break"></div>
 
   <section>
-    <h4>Empfohlene Massnahmen</h4>
+    <h4>{{ REPORT.sections.measures }}</h4>
 
     {% if submission.na_count is defined and submission.na_count > 5 %}
-    <p>
-      <strong>Unklare Risikolage.</strong><br />
-      Auf Basis Ihrer Angaben konnte keine zuverlässige Bewertung erstellt
-      werden.
-    </p>
-    <p>
-      <strong>Hinweis:</strong> Viele Fragen wurden als „nicht zutreffend“
-      beantwortet. Das Ergebnis ist daher nur eingeschränkt aussagekräftig.
-    </p>
-    <p>
-      <strong>Empfehlung:</strong> Beantworten Sie den Check erneut mit
-      möglichst konkreten Angaben, um eine aussagekräftige Bewertung zu
-      erhalten.
-    </p>
+    <p><strong>{{ REPORT.unclear.title }}.</strong></p>
+    <p>{{ REPORT.unclear.description }}</p>
+    <p><strong>Hinweis:</strong> {{ REPORT.unclear.note }}</p>
+    <p><strong>Empfehlung:</strong> {{ REPORT.unclear.recommendation }}</p>
 
     {% elif submission.failed|length == 0 %}
     <p>
-      <strong>Sehr gut.</strong> In diesem Check wurden keine kritischen
-      Schwachstellen festgestellt.
+      <strong>{{ REPORT.no_findings.title }}</strong>
+      {{ REPORT.no_findings.description }}
     </p>
 
-    <p>
-      Wir empfehlen, die bestehenden Sicherheitsmassnahmen beizubehalten und
-      diesen Check mindestens einmal pro Jahr oder nach grösseren Änderungen (z.
-      B. neue Mitarbeitende, neue Software) erneut durchzuführen.
-    </p>
+    <p>{{ REPORT.no_findings.maintenance }}</p>
 
     <ul>
-      <li>Regelmässige Software-Updates sicherstellen</li>
-      <li>Backups weiterhin regelmässig testen</li>
-      <li>Mitarbeitende fortlaufend für Phishing sensibilisieren</li>
+      {% for item in REPORT.no_findings.examples %}
+      <li>{{ item }}</li>
+      {% endfor %}
     </ul>
+
     {% else %}
-    <p>
-      Die folgenden Massnahmen haben den grössten Einfluss auf Ihre
-      IT-Sicherheit:
-    </p>
+    <p>{{ REPORT.findings_intro }}</p>
 
     <ol>
       {% for f in submission.failed %}
       <li>
         <strong>{{ f.text }}</strong><br />
         {{ f.remedy }}
-        <em>(Priorität: {{ f.severity }})</em>
+        <em> ({{ REPORT.priority_label }}: {{ f.severity }}) </em>
       </li>
       {% endfor %}
     </ol>
@@ -88,15 +70,9 @@
   <div class="page-break"></div>
 
   <section>
-    <h4>Nächste Schritte</h4>
-    <p>
-      Dieser Bericht bietet eine erste Orientierung zur Verbesserung der
-      IT-Sicherheit und ersetzt keine individuelle Fachberatung.
-    </p>
-    <p>
-      Für viele Arztpraxen und kleinere medizinische Einrichtungen reicht es
-      aus, diese Punkte intern schrittweise umzusetzen.
-    </p>
+    <h4>{{ REPORT.sections.next_steps }}</h4>
+    <p>{{ REPORT.next_steps.orientation }}</p>
+    <p>{{ REPORT.next_steps.feasibility }}</p>
   </section>
 </article>
 

@@ -1,74 +1,51 @@
 {% extends "base.html" %} {% block content %}
 
-<h2>Ihre Auswertung</h2>
+<h2>{{ RESULT.title }}</h2>
 
 <div>
   <p class="score-badge">{{ submission.score }}/100</p>
 
   <p>
     {% if submission.score < 40 %}
-    <strong>Erhöhtes Risiko:</strong> Es bestehen relevante Schwachstellen, die
-    priorisiert überprüft werden sollten. {% elif submission.score < 70 %}
-    <strong>Mittleres Risiko:</strong> Die wichtigsten Massnahmen sollten
-    priorisiert umgesetzt werden. {% else %}
-    <strong>Geringes Risiko:</strong> Gute Basis, weiterhin regelmässig prüfen.
-    {% endif %}
+    <strong>{{ RESULT.risk_levels.high.label }}:</strong>
+    {{ RESULT.risk_levels.high.description }} {% elif submission.score < 70 %}
+    <strong>{{ RESULT.risk_levels.medium.label }}:</strong>
+    {{ RESULT.risk_levels.medium.description }} {% else %}
+    <strong>{{ RESULT.risk_levels.low.label }}:</strong>
+    {{ RESULT.risk_levels.low.description }} {% endif %}
   </p>
 </div>
 
-<h3>Persönlicher IT-Sicherheitsbericht für Ihre Praxis (CHF 49.–)</h3>
+<h3>{{ RESULT.offer_title }} ({{ RESULT.offer_price }})</h3>
 
 <ul>
-  <li>✔ Übersichtliche Einordnung Ihrer IT-Sicherheitslage</li>
-  <li>✔ Priorisierte Massnahmen mit Fokus auf Patientendaten</li>
-  <li>✔ Verständlich für Praxen ohne eigene IT-Abteilung</li>
-  <li>✔ Berücksichtigung typischer Abläufe in Arztpraxen</li>
+  {% for item in RESULT.benefits %}
+  <li>✔ {{ item }}</li>
+  {% endfor %}
 </ul>
 
-<p>
-  Dieser Bericht richtet sich an Arztpraxen und kleinere medizinische
-  Einrichtungen ohne eigene IT-Abteilung.
-</p>
+<p>{{ RESULT.audience }}</p>
+
+<p>{{ RESULT.scope }}</p>
+
+<p><strong>Leistungsumfang</strong></p>
+
+<p>{{ RESULT.value_explanation }}</p>
+
+<p>{{ RESULT.price_context }}</p>
 
 <p>
-  Der detaillierte Bericht enthält priorisierte Massnahmen und klare
-  Empfehlungen.
-</p>
-
-<p>
-  <strong>Leistungsumfang</strong>
-</p>
-
-<p>
-  Der Bericht wurde speziell für medizinische Einrichtungen in der Schweiz
-  entwickelt. Er ersetzt keine Fachberatung, bietet jedoch eine fundierte und
-  unabhängige Ersteinschätzung.
-</p>
-
-<p>
-  Zum Vergleich: Bereits eine kurze IT-Sicherheitsberatung verursacht häufig
-  Kosten im dreistelligen Bereich. Dieser Bericht ermöglicht eine strukturierte
-  Standortbestimmung zu einem fixen, transparenten Preis.
-</p>
-
-<p>
-  <strong
-    >Die Rechnung wird ohne Mehrwertsteuer ausgestellt (nicht
-    mehrwertsteuerpflichtig). :</strong
-  ><br />
+  <strong>{{ RESULT.payment_note }}</strong><br />
   IBAN: <code>{{ IBAN }}</code><br />
   Verwendungszweck: E-Mail-Adresse oder Firmenname
 </p>
 
-<p>
-  Nach Zahlungseingang erhalten Sie Ihren persönlichen PDF-Bericht per E-Mail
-  (in der Regel innerhalb von 24 Stunden).
-</p>
+<p>{{ RESULT.delivery }}</p>
 
 <p>
-  <em>Hinweis: Dies ist eine Vorschau-Version.</em><br />
+  <em>{{ RESULT.preview_note }}</em><br />
   <a href="{{ url_for('pdf', submission_id=submission_id) }}" target="_blank">
-    PDF-Bericht anzeigen
+    {{ RESULT.preview_cta }}
   </a>
 </p>
 

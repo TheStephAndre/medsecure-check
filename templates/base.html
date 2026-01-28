@@ -4,9 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-      {% if submission is defined %} {{ submission.business_name }} - Schutz
-      sensibler Patientendaten-Bericht" {% else %} "Schutz sensibler
-      Patientendaten-Check für Schweizer KMU" {% endif %}
+      {% if submission is defined %} {{ submission.business_name }} - {{
+      PRODUCT.report_name }} {% else %} {{ PRODUCT.short_name }} {% endif %}
     </title>
     <link rel="stylesheet" href="/static/pico.min.css" />
     <style>
@@ -110,7 +109,7 @@
   </head>
   <body>
     <div class="print-header">
-      {{ company }} — Schutz sensibler Patientendaten-Bericht
+      {{ PRODUCT.name }} — {{ PRODUCT.report_name }}
     </div>
     {% if submission is defined %}
     <div class="print-footer">
@@ -120,17 +119,12 @@
     {% endif %}
     <main class="container">
       <header>
-        <h1>
-          {{ company if company else "Schutz sensibler Patientendaten-Check
-          Schweiz"}}
-        </h1>
+        <h1>{{ PRODUCT.name }}</h1>
+        <p style="color: #666">{{ PRODUCT.tagline }}</p>
       </header>
       {% block content %}{% endblock%}
       <footer>
-        <p style="font-size: 0.9rem; color: #666">
-          Dieser Check bietet allgemeine Hinweise zur IT-Sicherheit und stellt
-          keine rechtliche oder regulatorische Beratung dar.
-        </p>
+        <p style="font-size: 0.9rem; color: #666">{{ DISCLAIMERS.website }}</p>
       </footer>
     </main>
   </body>

@@ -2,7 +2,10 @@
 <html lang="de">
   <head>
     <meta charset="utf-8" />
-    <title>{{ submission.business_name }} - IT-Sicherheitsbericht</title>
+    <title>
+      {{ submission.business_name }} - {{ REPORT_PDF.title_suffix }}
+    </title>
+
     <style>
       /* A4 Base */
       @page {
@@ -44,12 +47,6 @@
         margin-bottom: 2mm;
       }
 
-      h3 {
-        font-size: 12pt;
-        margin-top: 6mm;
-        margin-bottom: 2mm;
-      }
-
       section {
         margin-top: 6mm;
         margin-bottom: 6mm;
@@ -74,44 +71,46 @@
 
   <body>
     <div class="header">
-      <div>
-        {{ company }} - IT-Sicherheitsbericht für medizinische Einrichtungen
-      </div>
-      <div>Erstellt am {{ submission.created_at_human }}</div>
+      <div>{{ company }} - {{ REPORT_PDF.header_suffix }}</div>
+      <div>{{ REPORT_PDF.generated_on }} {{ submission.created_at_human }}</div>
     </div>
 
-    <h1>{{ submission.business_name}}</h1>
+    <h1>{{ submission.business_name }}</h1>
 
     <div class="score">
-      Bewertung zum Schutz sensibler Patientendaten: {{ submission.score }}/100
+      {{ REPORT_PDF.score_label }}: {{ submission.score }}/100
     </div>
 
     <section>
-      <h2>Einordnung</h2>
+      <h2>{{ REPORT.sections.classification }}</h2>
+
       {% if submission.score < 40 %}
-      <p>
-        Erhöhtes Risiko - es bestehen relevante Schwachstellen, die überprüft
-        und priorisiert adressiert werden sollten.
-      </p>
+      <p>{{ RISK_LEVELS.high.pdf_text }}</p>
       {% elif submission.score < 70 %}
-      <p>Mittleres Risiko - priorisierte Massnahmen umsetzen.</p>
+      <p>{{ RISK_LEVELS.medium.pdf_text }}</p>
       {% else %}
-      <p>Geringes Risiko - gute Grundlagen vorhanden.</p>
+      <p>{{ RISK_LEVELS.low.pdf_text }}</p>
       {% endif %}
     </section>
 
     <section>
-      <h2>Empfohlene Massnahmen</h2>
+      <h2>{{ REPORT.sections.measures }}</h2>
+
       {% if submission.na_count is defined and submission.na_count > 5 %}
-      <p><strong>Unklare Risikolage:</strong> Zu viele „nicht zutreffend“.</p>
+      <p>
+        <strong>{{ REPORT.unclear.title }}.</strong>
+        {{ REPORT.unclear.description }}
+      </p>
+
       {% elif submission.failed|length == 0 %}
-      <p>Keine kritischen Schwachstellen festgestellt.</p>
+      <p>{{ REPORT.no_findings.description }}</p>
+
       {% else %}
       <ol>
         {% for f in submission.failed %}
         <li>
-          <strong>{{ f.text }}</strong>: {{ f.remedy }} (Priorität: {{
-          f.severity }})
+          <strong>{{ f.text }}</strong>: {{ f.remedy }} ({{
+          REPORT.priority_label }}: {{ f.severity }})
         </li>
         {% endfor %}
       </ol>
@@ -119,15 +118,10 @@
     </section>
 
     <section>
-      <h2>Nächste Schritte</h2>
-      <p>
-        Dieser Bericht bietet eine Orientierung und ersetzt keine Fachberatung.
-      </p>
+      <h2>{{ REPORT.sections.next_steps }}</h2>
+      <p>{{ REPORT.next_steps.orientation }}</p>
     </section>
 
-    <div class="footer-note">
-      Dieser Bericht dient ausschliesslich als Orientierungshilfe und ersetzt
-      keine individuelle IT- oder Rechtsberatung.
-    </div>
+    <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>
   </body>
 </html>

@@ -1,33 +1,23 @@
 {% extends "base.html" %} {% block content %}
 
 <section>
-  <h2>IT-Sicherheit für Arztpraxen - verständlich geprüft</h2>
+  <h2>{{ LANDING.headline }}</h2>
 
   <p>
-    Ein strukturierter IT-Sicherheits-Check für Arztpraxen und medizinische
-    Einrichtungen in der Schweiz.<br />
-    In wenigen Minuten erhalten Sie eine erste Einschätzung Ihrer
-    Datensicherheits- und IT-Risiken.
+    {{ LANDING.intro }}<br />
+    {{ LANDING.promise }}
   </p>
+
+  <p>{{ LANDING.value_statement }}</p>
 
   <p>
-    Sie erhalten eine klare Ersteinschätzung Ihrer IT-Sicherheitslage -
-    verständlich aufbereitet und ohne kommerziellen Verkaufsansatz.
+    <strong>{{ LANDING.price_label }}</strong>
+    für einen persönlichen Bericht mit priorisierten Handlungsempfehlungen.
   </p>
 
-  <p>
-    <strong>CHF 49.-</strong> für einen persönlichen Bericht mit priorisierten
-    Handlungsempfehlungen.
-  </p>
+  <a class="contrast" href="{{ url_for('audit') }}"> {{ LANDING.cta }} </a>
 
-  <a class="contrast" href="{{ url_for('audit') }}">
-    IT-Sicherheits-Check starten
-  </a>
-
-  <p style="font-size: 0.9rem; color: #666">
-    Dieser Check stellt keine rechtliche, regulatorische oder medizinische
-    Beratung dar.
-  </p>
+  <p style="font-size: 0.9rem; color: #666">{{ DISCLAIMERS.website }}</p>
 </section>
 
 {% endblock %}

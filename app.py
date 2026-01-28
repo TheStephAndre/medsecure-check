@@ -13,6 +13,18 @@ from weasyprint import HTML
 
 import config
 from scoring import QUESTIONS, compute_score
+from wording import (
+    AUDIT,
+    DISCLAIMERS,
+    LANDING,
+    PAYMENT,
+    PRODUCT,
+    REPORT,
+    REPORT_PDF,
+    RESULT,
+    RISK_LEVELS,
+    SCOPE,
+)
 
 app = Flask(__name__)
 app.config.from_prefixed_env()
@@ -72,7 +84,7 @@ def send_report_email(to_email, pdf_path):
     msg = EmailMessage()
     msg["Subject"] = "Ihr MedSecure-Bericht"
     msg["From"] = config.EMAIL_FROM
-    msg["To"] = email
+    msg["To"] = to_email
     msg.set_content(
         "Vielen Dank für Ihr Vertrauen.\n\n"
         "Im Anhang finden Sie Ihren persönlichen Datensicherheits-Bericht."
@@ -89,6 +101,23 @@ def send_report_email(to_email, pdf_path):
     with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT) as s:
         s.login(config.SMTP_USER, config.SMTP_PASS)
         s.send_message(msg)
+
+
+# Use the sentences from "wording.py" to have a Swiss medical tone.
+@app.context_processor
+def inject_wording():
+    return {
+        "PRODUCT": PRODUCT,
+        "LANDING": LANDING,
+        "AUDIT": AUDIT,
+        "RISK_LEVELS": RISK_LEVELS,
+        "RESULT": RESULT,
+        "REPORT": REPORT,
+        "REPORT_PDF": REPORT_PDF,
+        "DISCLAIMERS": DISCLAIMERS,
+        "PAYMENT": PAYMENT,
+        "SCOPE": SCOPE,
+    }
 
 
 @app.route("/")
