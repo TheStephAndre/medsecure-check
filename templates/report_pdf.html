@@ -66,6 +66,16 @@
         color: #666;
         margin-top: 10mm;
       }
+
+      .handwriting-lines {
+        margin-top: 6mm;
+      }
+
+      .handwriting-lines div {
+        border-bottom: 0.5pt solid #ccc;
+        height: 10mm;
+        margin-bottom: 4mm;
+      }
     </style>
   </head>
 
@@ -119,7 +129,14 @@
 
     <section>
       <h2>{{ REPORT.sections.next_steps }}</h2>
+
       <p>{{ REPORT.next_steps.orientation }}</p>
+
+      <div class="handwriting-lines">
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     </section>
 
     <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>

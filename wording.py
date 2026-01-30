@@ -216,8 +216,8 @@ REPORT = {
     "priority_label": "Priorität",
     "next_steps": {
         "orientation": (
-            "Dieser Bericht bietet eine erste Orientierung zur Verbesserung "
-            "der IT-Sicherheit und ersetzt keine individuelle Fachberatung."
+            "Dieser Abschnitt dient als Platz für Ihre internen nächsten Schritte "
+            "oder für die Abstimmung mit Ihrem IT-Dienstleister."
         ),
         "feasibility": (
             "Für viele Arztpraxen und kleinere medizinische Einrichtungen "
@@ -231,7 +231,7 @@ REPORT_PDF = {
     "title_suffix": "IT-Sicherheitsbericht",
     "header_suffix": "IT-Sicherheitsbericht für medizinische Einrichtungen",
     "score_label": "Bewertung zum Schutz sensibler Patientendaten",
-    "generated_on": "Erstellt am",
+    "generated_on": "Bewertung basierend auf Angaben vom",
     "footer_note": (
         "Dieser Bericht dient ausschliesslich als Orientierungshilfe "
         "und ersetzt keine individuelle IT- oder Rechtsberatung."
