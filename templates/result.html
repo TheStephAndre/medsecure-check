@@ -3,16 +3,13 @@
 <h2>{{ RESULT.title }}</h2>
 
 <div>
-  <p class="score-badge">{{ submission.score }}/100</p>
+  <p class="assessment-badge">{{ submission.assessment }}/100</p>
 
   <p>
-    {% if submission.score < 40 %}
-    <strong>{{ RESULT.risk_levels.high.label }}:</strong>
-    {{ RESULT.risk_levels.high.description }} {% elif submission.score < 70 %}
-    <strong>{{ RESULT.risk_levels.medium.label }}:</strong>
-    {{ RESULT.risk_levels.medium.description }} {% else %}
-    <strong>{{ RESULT.risk_levels.low.label }}:</strong>
-    {{ RESULT.risk_levels.low.description }} {% endif %}
+    <!--Variable 'level' is a fail-safe  -->
+    {% set level = submission.risk_level or 'medium' %}
+    <strong>{{ RESULT.risk_levels[level].label }}:</strong>
+    {{ RESULT.risk_levels[level].description }}
   </p>
 </div>
 

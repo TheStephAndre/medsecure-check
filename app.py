@@ -12,7 +12,7 @@ from flask import Flask, Response, render_template, request
 from weasyprint import HTML
 
 import config
-from scoring import QUESTIONS, compute_score
+from scoring import QUESTIONS, compute_assessment
 from wording import (
     AUDIT,
     DISCLAIMERS,
@@ -142,7 +142,7 @@ def submit():
         answers[q["id"]] = request.form.get(q["id"], "na")
     na_count = sum(1 for a in answers.values() if a == "na")
 
-    result = compute_score(answers)
+    result = compute_assessment(answers)
     submission_id = generate_submission_id(business, email)
 
     submission = {
@@ -150,7 +150,8 @@ def submit():
         "business_name": business,
         "email": email,
         "answers": answers,
-        "score": result["score"],
+        "assessment": result["assessment"],
+        "risk_level": result["risk_level"],
         "failed": result["failed"],
         "na_count": na_count,
         "paid": False,

@@ -161,7 +161,7 @@ RESULT = {
 REPORT = {
     "print_cta": "Als PDF speichern",
     "date_label": "Datum",
-    "score_title": "IT-Sicherheitsbewertung",
+    "assessment_title": "IT-Sicherheits-Einordnung",
     "sections": {
         "classification": "Einordnung",
         "measures": "Empfohlene Massnahmen",
@@ -230,7 +230,7 @@ REPORT = {
 REPORT_PDF = {
     "title_suffix": "IT-Sicherheitsbericht",
     "header_suffix": "IT-Sicherheitsbericht für medizinische Einrichtungen",
-    "score_label": "Bewertung zum Schutz sensibler Patientendaten",
+    "assessment_label": "IT-Sicherheits-Einordnung",
     "generated_on": "Bewertung basierend auf Angaben vom",
     "footer_note": (
         "Dieser Bericht dient ausschliesslich als Orientierungshilfe "

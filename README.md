@@ -1,4 +1,4 @@
-# Small Business Schutz sensibler Patientendaten Score (Switzerland)
+# Small Business Schutz sensibler Patientendaten assessment (Switzerland)
 
 ## Product Positioning — Phase 0 Lock
 
@@ -9,7 +9,7 @@ If a future idea, feature, or request conflicts with this README, the idea is wr
 
 ## 1. One-Sentence Product Definition
 
-> **A 5-minute Schutz sensibler Patientendaten check designed for Swiss small businesses, delivering a clear score and practical fixes — no IT jargon, no sales calls.**
+> **A 5-minute Schutz sensibler Patientendaten check designed for Swiss small businesses, delivering a clear assessment and practical fixes — no IT jargon, no sales calls.**
 
 This sentence is the primary filter for:
 

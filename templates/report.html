@@ -12,19 +12,13 @@
     {{ submission.created_at_human }}
   </p>
 
-  <h3>{{ REPORT.score_title }}: {{ submission.score }}/100</h3>
+  <h3>{{ REPORT.assessment_title }}: {{ submission.assessment }}/100</h3>
   <hr />
 
   <section>
     <h4>{{ REPORT.sections.classification }}</h4>
 
-    {% if submission.score < 40 %}
-    <p>{{ REPORT.risk_levels.high }}</p>
-    {% elif submission.score < 70 %}
-    <p>{{ REPORT.risk_levels.medium }}</p>
-    {% else %}
-    <p>{{ REPORT.risk_levels.low }}</p>
-    {% endif %}
+    <p>{{ RISK_LEVELS[submission.risk_level].pdf_text }}</p>
   </section>
 
   <div class="page-break"></div>

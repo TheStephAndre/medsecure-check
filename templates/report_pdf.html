@@ -53,7 +53,7 @@
         page-break-inside: avoid;
       }
 
-      .score {
+      .assessment {
         font-size: 24pt;
         font-weight: bold;
         margin-top: 4mm;
@@ -87,20 +87,14 @@
 
     <h1>{{ submission.business_name }}</h1>
 
-    <div class="score">
-      {{ REPORT_PDF.score_label }}: {{ submission.score }}/100
+    <div class="assessment">
+      {{ REPORT_PDF.assessment_label }}: {{ submission.assessment }}/100
     </div>
 
     <section>
       <h2>{{ REPORT.sections.classification }}</h2>
 
-      {% if submission.score < 40 %}
-      <p>{{ RISK_LEVELS.high.pdf_text }}</p>
-      {% elif submission.score < 70 %}
-      <p>{{ RISK_LEVELS.medium.pdf_text }}</p>
-      {% else %}
-      <p>{{ RISK_LEVELS.low.pdf_text }}</p>
-      {% endif %}
+      <p>{{ RISK_LEVELS[submission.risk_level].pdf_text }}</p>
     </section>
 
     <section>

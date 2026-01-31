@@ -1,4 +1,3 @@
-# scoring.py
 # Minimal scoring engine and remediation templates(DE-CH).
 
 QUESTIONS = [
@@ -65,7 +64,16 @@ QUESTIONS = [
 ]
 
 
-def compute_score(answers: dict):
+def classify_risk(assessment: int) -> str:
+    if assessment < 40:
+        return "high"
+    elif assessment < 70:
+        return "medium"
+    else:
+        return "low"
+
+
+def compute_assessment(answers: dict):
     """answers: dict mapping question id to 'yes'/'no'/'na' {q1:"yes"}"""
 
     earned = 0.0
@@ -88,19 +96,33 @@ def compute_score(answers: dict):
                     "id": q["id"],
                     "text": q["text"],
                     "remedy": q["remedy"],
-                    "severity": "Hoch" if w >= 2 else "Mittel",
+                    "severity": "Erhöhte Priorität" if w >= 2 else "Normale Priorität",
                 }
             )
         elif ans == "na":
             # Count unclear answer.
             na_count += 1
-            # IMPORTNANT: remove from possible score.
+            # IMPORTNANT: remove from possible assessment.
             possible -= w
 
-    score = round((earned / possible) * 100) if possible > 0 else 0
+    raw_assessment = round((earned / possible) * 100) if possible > 0 else 0
+
+    # Confidence penalty based on N/A anwers
+    confidence_penalty = 0
+    if na_count >= 3 and na_count <= 5:
+        confidence_penalty = 5
+    elif na_count > 5:
+        confidence_penalty = 10
+
+    adjusted_assessment = max(raw_assessment - confidence_penalty, 0)
+
+    risk_level = classify_risk(adjusted_assessment)
 
     return {
-        "score": int(score),
+        "assessment": adjusted_assessment,
+        "assessment_raw": raw_assessment,
+        "confidence_penalty": confidence_penalty,
+        "risk_level": risk_level,
         "failed": failed,
         "na_count": na_count,
     }
