@@ -80,27 +80,77 @@ def generate_pdf(submission_id):
         return None
 
 
-def send_report_email(to_email, pdf_path):
+def generate_invoice_pdf(submission_id):
+    submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
+
+    if not os.path.exists(submission_path):
+        return None
+
+    try:
+        with open(submission_path, "r", encoding="utf-8") as f:
+            submission = json.load(f)
+
+        utc = datetime.fromisoformat(submission["created_at"])
+        ch = utc.astimezone(ZoneInfo("Europe/Zurich"))
+        submission["created_at_human"] = ch.strftime("%d.%m.%Y")
+
+        html = render_template(
+            "invoice_pdf.html",
+            submission=submission,
+            company=config.COMPANY_NAME,
+            IBAN=config.IBAN,
+        )
+
+        filename = f"invoice_{submission_id}.pdf"
+        path = os.path.join(config.PDF_DIR, filename)
+
+        HTML(string=html).write_pdf(path)
+        return path
+
+    except Exception:
+        app.logger.exception("generate_invoice_pdf failed")
+        return None
+
+
+def send_report_and_invoice_email(to_email, report_path, invoice_path, submission):
     msg = EmailMessage()
-    msg["Subject"] = "Ihr MedSecure-Bericht"
+    msg["Subject"] = (
+        f"Ihre MedSecure-Einordnung - Rechnung {submission['invoice_number']}"
+    )
     msg["From"] = config.EMAIL_FROM
     msg["To"] = to_email
+
     msg.set_content(
-        "Vielen Dank für Ihr Vertrauen.\n\n"
-        "Im Anhang finden Sie Ihren persönlichen Datensicherheits-Bericht."
+        f"""Guten Tag
+
+Vielen Dank für die Nutzung von MedSecure.
+
+Im Anhang finden Sie:
+- Ihren IT-Sicherheitsbericht
+- die zugehörige Rechnung ({submission['invoice_number']})
+
+Freundliche Grüsse
+{config.COMPANY_NAME}
+"""
     )
 
-    with open(pdf_path, "rb") as f:
-        msg.add_attachment(
-            f.read(),
-            maintype="application",
-            subtype="pdf",
-            filename=os.path.basename(pdf_path),
-        )
+    for path in [report_path, invoice_path]:
+        with open(path, "rb") as f:
+            msg.add_attachment(
+                f.read(),
+                maintype="application",
+                subtype="pdf",
+                filename=os.path.basename(path),
+            )
 
     with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT) as s:
         s.login(config.SMTP_USER, config.SMTP_PASS)
         s.send_message(msg)
+
+
+def generate_invoice_number(submission_id):
+    date_part = datetime.now().strftime("%Y%m")
+    return f"MS-{date_part}-{submission_id[:6].upper()}"
 
 
 # Use the sentences from "wording.py" to have a Swiss medical tone.
@@ -144,9 +194,11 @@ def submit():
 
     result = compute_assessment(answers)
     submission_id = generate_submission_id(business, email)
+    invoice_number = generate_invoice_number(submission_id)
 
     submission = {
         "id": submission_id,
+        "invoice_number": invoice_number,
         "business_name": business,
         "email": email,
         "answers": answers,
@@ -158,7 +210,19 @@ def submit():
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
+    submission["email_sent_at"] = datetime.now(timezone.utc).isoformat()
     save_submission(submission)
+
+    report_pdf = generate_pdf(submission_id)
+    invoice_pdf = generate_invoice_pdf(submission_id)
+
+    if report_pdf and invoice_pdf:
+        send_report_and_invoice_email(
+            submission["email"],
+            report_pdf,
+            invoice_pdf,
+            submission,
+        )
 
     return render_template(
         "result.html",
