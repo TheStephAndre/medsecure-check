@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from email.message import EmailMessage
 from zoneinfo import ZoneInfo
 
+from dotenv import load_dotenv
 from flask import Flask, Response, render_template, request
 from weasyprint import HTML
 
@@ -25,6 +26,9 @@ from wording import (
     RISK_LEVELS,
     SCOPE,
 )
+
+# Load the content of the .env file before launch Flask.
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_prefixed_env()
@@ -80,6 +84,11 @@ def generate_pdf(submission_id):
         return None
 
 
+def generate_invoice_number(submission_id):
+    date_part = datetime.now().strftime("%Y%m")
+    return f"MS-{date_part}-{submission_id[:6].upper()}"
+
+
 def generate_invoice_pdf(submission_id):
     submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
 
@@ -110,6 +119,18 @@ def generate_invoice_pdf(submission_id):
     except Exception:
         app.logger.exception("generate_invoice_pdf failed")
         return None
+
+
+def smtp_config_is_valid():
+    return all(
+        [
+            config.SMTP_HOST,
+            config.SMTP_PORT,
+            config.SMTP_USER,
+            config.SMTP_PASS,
+            config.EMAIL_FROM,
+        ]
+    )
 
 
 def send_report_and_invoice_email(to_email, report_path, invoice_path, submission):
@@ -146,11 +167,6 @@ Freundliche Grüsse
     with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT) as s:
         s.login(config.SMTP_USER, config.SMTP_PASS)
         s.send_message(msg)
-
-
-def generate_invoice_number(submission_id):
-    date_part = datetime.now().strftime("%Y%m")
-    return f"MS-{date_part}-{submission_id[:6].upper()}"
 
 
 # Use the sentences from "wording.py" to have a Swiss medical tone.
@@ -210,19 +226,42 @@ def submit():
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
-    submission["email_sent_at"] = datetime.now(timezone.utc).isoformat()
+    # Submission is saved even if email fails.
+    # Email failure:
+    #  - does not crash the request.
+    #  - is recorded for later inspection.
+    # "email_sent_at" means what it says.
+
+    # Save the submission before sending the email.
     save_submission(submission)
 
     report_pdf = generate_pdf(submission_id)
     invoice_pdf = generate_invoice_pdf(submission_id)
 
-    if report_pdf and invoice_pdf:
-        send_report_and_invoice_email(
-            submission["email"],
-            report_pdf,
-            invoice_pdf,
-            submission,
-        )
+    if smtp_config_is_valid() and report_pdf and invoice_pdf:
+        if (
+            config.ENV == "production"  # check .env file.
+            and smtp_config_is_valid()
+            and report_pdf
+            and invoice_pdf
+        ):
+
+            try:
+                send_report_and_invoice_email(
+                    submission["email"],
+                    report_pdf,
+                    invoice_pdf,
+                    submission,
+                )
+                submission["email_sent_at"] = datetime.now(timezone.utc).isoformat()
+            except Exception:
+                app.logger.exception("Email sending failed")
+                submission["email_error"] = "smtp_failed"
+        else:
+            submission["email_error"] = "email_disabled_or_not_configured"
+
+    # save the submission with the state of the email.
+    save_submission(submission)
 
     return render_template(
         "result.html",
