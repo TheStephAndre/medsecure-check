@@ -38,14 +38,42 @@ os.makedirs(config.PDF_DIR, exist_ok=True)
 os.makedirs("logs", exist_ok=True)
 
 
-def save_submission(sub):
-    # append to a log file as a simple flat store for MVP
-    with open(config.LOG_FILE, "a", encoding="utf-8") as f:
-        f.write(json.dumps(sub, ensure_ascii=False) + "\n")
+# List of events for the submissions. Save in logs/submissions.log.
+# - logs/submissions.log => Immutable history of what happened.
+def log_event(event, submission):
+    record = {
+        "event": event,
+        "event_at": datetime.now(timezone.utc).isoformat(),
+        "submission_id": submission["id"],
+        "data": submission,  # submission_id.json
+    }
 
-    path = os.path.join(config.SUBMISSIONS_DIR, f"{sub['id']}.json")
+    with open(config.LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+# A submission has ONE current state(save in data/submission),
+# but MANY events(save in logs).
+# - data/submissions/<id>.json => Latest known state.
+def save_submission(submission):
+    path = os.path.join(config.SUBMISSIONS_DIR, f"{submission['id']}.json")
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(sub, f, ensure_ascii=False, indent=2)
+        json.dump(submission, f, ensure_ascii=False, indent=2)
+
+
+# It prevents the "forgot to save" bugs for important cases:
+# - paid.
+# - future payment_* fields
+# - email_sent_at.
+# - email_error.
+# Not use it for initial submission creation or pure read operations.
+def update_submission(submission, **changes):
+    for key in changes:
+        if key not in submission:
+            # A warning if it writes a field that did not previously exist.
+            app.logger.warning(f"New field added: {key}")
+    submission.update(changes)
+    save_submission(submission)
 
 
 def generate_submission_id(business, email):
@@ -234,18 +262,23 @@ def submit():
 
     # Save the submission before sending the email.
     save_submission(submission)
+    # Save the event of the submission before sending email.
+    log_event("submission_created", submission)
 
+    # Documents generation(PDFs).
     report_pdf = generate_pdf(submission_id)
     invoice_pdf = generate_invoice_pdf(submission_id)
 
-    if smtp_config_is_valid() and report_pdf and invoice_pdf:
-        if (
-            config.ENV == "production"  # check .env file.
-            and smtp_config_is_valid()
-            and report_pdf
-            and invoice_pdf
-        ):
+    # Log documents generation events.
+    if report_pdf:
+        log_event("report_generated", submission)
 
+    if invoice_pdf:
+        log_event("invoice_generated", submission)
+
+    # The email is sent in production, not in development.
+    if smtp_config_is_valid() and report_pdf and invoice_pdf:
+        if config.ENV == "production":
             try:
                 send_report_and_invoice_email(
                     submission["email"],
@@ -253,15 +286,24 @@ def submit():
                     invoice_pdf,
                     submission,
                 )
-                submission["email_sent_at"] = datetime.now(timezone.utc).isoformat()
+
+                update_submission(
+                    submission,
+                    email_sent_at=datetime.now(timezone.utc).isoformat(),
+                )
+                log_event("email_sent", submission)
+
             except Exception:
                 app.logger.exception("Email sending failed")
-                submission["email_error"] = "smtp_failed"
-        else:
-            submission["email_error"] = "email_disabled_or_not_configured"
+                update_submission(submission, email_error="smtp_failed")
+                log_event("email_failed", submission)
 
-    # save the submission with the state of the email.
-    save_submission(submission)
+        else:
+
+            update_submission(
+                submission, email_error="email_disabled_or_not_configured"
+            )
+            log_event("email_skipped_dev", submission)
 
     return render_template(
         "result.html",
