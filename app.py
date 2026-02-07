@@ -81,15 +81,22 @@ def generate_submission_id(business, email):
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
-def generate_pdf(submission_id):
+def generate_report_pdf(submission_id):
     submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
-
     if not os.path.exists(submission_path):
         return None
 
+    with open(submission_path, "r", encoding="utf-8") as f:
+        submission = json.load(f)
+
+    # HARD SAFETY GUARD
+    if submission.get("report_filename"):
+        app.logger.warning(
+            f"Report already exists for {submission_id}, refusing regeneration"
+        )
+        return None
+
     try:
-        with open(submission_path, "r", encoding="utf-8") as f:
-            submission = json.load(f)
 
         utc = datetime.fromisoformat(submission["created_at"])
         ch = utc.astimezone(ZoneInfo("Europe/Zurich"))
@@ -101,14 +108,55 @@ def generate_pdf(submission_id):
             company=config.COMPANY_NAME,
         )
 
-        filename = f"{submission_id}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
+        # Report name.
+        filename = f"report_{submission_id}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
         pdf_path = os.path.join(config.PDF_DIR, filename)
 
         HTML(string=html).write_pdf(pdf_path)
-        return pdf_path
+
+        return {
+            "path": pdf_path,
+            "filename": filename,
+        }
 
     except Exception:
-        app.logger.exception("generate_pdf failed")
+        app.logger.exception("generate_report_pdf failed")
+        return None
+
+
+def generate_report_pdf_force(submission_id):
+    submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
+    if not os.path.exists(submission_path):
+        return None
+
+    with open(submission_path, "r", encoding="utf-8") as f:
+        submission = json.load(f)
+
+    try:
+
+        utc = datetime.fromisoformat(submission["created_at"])
+        ch = utc.astimezone(ZoneInfo("Europe/Zurich"))
+        submission["created_at_human"] = ch.strftime("%d.%m.%Y %H:%M (CH)")
+
+        html = render_template(
+            "report_pdf.html",
+            submission=submission,
+            company=config.COMPANY_NAME,
+        )
+
+        # Report name.
+        filename = f"report_{submission_id}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
+        pdf_path = os.path.join(config.PDF_DIR, filename)
+
+        HTML(string=html).write_pdf(pdf_path)
+
+        return {
+            "path": pdf_path,
+            "filename": filename,
+        }
+
+    except Exception:
+        app.logger.exception("generate_report_pdf failed")
         return None
 
 
@@ -119,8 +167,17 @@ def generate_invoice_number(submission_id):
 
 def generate_invoice_pdf(submission_id):
     submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
-
     if not os.path.exists(submission_path):
+        return None
+
+    with open(submission_path, "r", encoding="utf-8") as f:
+        submission = json.load(f)
+
+    # HARD SAFETY GUARD (missing today)
+    if submission.get("invoice_filename"):
+        app.logger.warning(
+            f"Invoice already exists for {submission_id}, refusing regeneration"
+        )
         return None
 
     try:
@@ -138,15 +195,39 @@ def generate_invoice_pdf(submission_id):
             IBAN=config.IBAN,
         )
 
-        filename = f"invoice_{submission_id}.pdf"
-        path = os.path.join(config.PDF_DIR, filename)
+        # Invoice name.
+        filename = (
+            f"invoice_{submission_id}_{datetime.now().strftime('%Y%m%d%H%M')}.pdf"
+        )
+        pdf_path = os.path.join(config.PDF_DIR, filename)
 
-        HTML(string=html).write_pdf(path)
-        return path
+        HTML(string=html).write_pdf(pdf_path)
+
+        return {
+            "path": pdf_path,
+            "filename": filename,
+        }
 
     except Exception:
         app.logger.exception("generate_invoice_pdf failed")
         return None
+
+
+# Read-only PDF function
+def get_report_pdf_path(submission_id):
+    submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
+    if not os.path.exists(submission_path):
+        return None
+
+    with open(submission_path, "r", encoding="utf-8") as f:
+        submission = json.load(f)
+
+    filename = submission.get("report_filename")
+    if not filename:
+        return None
+
+    path = os.path.join(config.PDF_DIR, filename)
+    return path if os.path.exists(path) else None
 
 
 def smtp_config_is_valid():
@@ -265,16 +346,42 @@ def submit():
     # Save the event of the submission before sending email.
     log_event("submission_created", submission)
 
-    # Documents generation(PDFs).
-    report_pdf = generate_pdf(submission_id)
+    # Documents generation (one time only)
+    # data/submissions/<id>.json is the authority.
+    report_pdf = generate_report_pdf(submission_id)
     invoice_pdf = generate_invoice_pdf(submission_id)
+
+    # Add the report and invoice file name to submission(dict)
+    if report_pdf:
+        update_submission(
+            submission,
+            report_filename=report_pdf["filename"],
+        )
+
+    if invoice_pdf:
+        update_submission(
+            submission,
+            invoice_filename=invoice_pdf["filename"],
+        )
 
     # Log documents generation events.
     if report_pdf:
-        log_event("report_generated", submission)
+        log_event(
+            "report_generated",
+            {
+                **submission,
+                "report_filename": report_pdf["filename"],
+            },
+        )
 
     if invoice_pdf:
-        log_event("invoice_generated", submission)
+        log_event(
+            "invoice_generated",
+            {
+                **submission,
+                "invoice_filename": invoice_pdf["filename"],
+            },
+        )
 
     # The email is sent in production, not in development.
     if smtp_config_is_valid() and report_pdf and invoice_pdf:
@@ -282,8 +389,8 @@ def submit():
             try:
                 send_report_and_invoice_email(
                     submission["email"],
-                    report_pdf,
-                    invoice_pdf,
+                    report_pdf["path"],
+                    invoice_pdf["path"],
                     submission,
                 )
 
@@ -315,33 +422,43 @@ def submit():
 
 @app.route("/admin/generate_pdf/<submission_id>")
 def admin_generate_pdf(submission_id):
-    pdf_path = generate_pdf(submission_id)
-    if not pdf_path:
+    pdf = generate_report_pdf_force(submission_id)
+    submission = load_submission(submission_id)
+
+    if not pdf:
         return "Submission not found", 404
-    return f"PDF generated: {pdf_path}"
+
+    update_submission(
+        submission,
+        report_filename=pdf["filename"],
+    )
+
+    log_event(
+        "report_regenerated",
+        {
+            "id": submission_id,
+            "previous_report": submission.get("report_filename"),
+            "new_report": pdf["filename"],
+        },
+    )
+
+    return f"PDF regenerated: {pdf['filename']}"
 
 
 @app.route("/pdf/<submission_id>")
-def pdf(submission_id):
-    try:
-        pdf_path = generate_pdf(submission_id)
-        if not pdf_path:
-            return "Submission not found", 404
+def serve_pdf(submission_id):
+    path = get_report_pdf_path(submission_id)
+    if not path:
+        return "PDF not available", 404
 
-        with open(pdf_path, "rb") as f:
-            return Response(
-                f.read(),
-                mimetype="application/pdf",
-                headers={
-                    "Content-Disposition": (
-                        f"inline; filename={os.path.basename(pdf_path)}"
-                    )
-                },
-            )
-
-    except Exception as e:
-        app.logger.exception("PDF generation failed")
-        return f"PDF generation error: {str(e)}", 500
+    with open(path, "rb") as f:
+        return Response(
+            f.read(),
+            mimetype="application/pdf",
+            headers={
+                "Content-Disposition": f"inline; filename={os.path.basename(path)}"
+            },
+        )
 
 
 if __name__ == "__main__":

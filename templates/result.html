@@ -41,7 +41,10 @@
 
 <p>
   <em>{{ RESULT.preview_note }}</em><br />
-  <a href="{{ url_for('pdf', submission_id=submission_id) }}" target="_blank">
+  <a
+    href="{{ url_for('serve_pdf', submission_id=submission_id) }}"
+    target="_blank"
+  >
     {{ RESULT.preview_cta }}
   </a>
 </p>
