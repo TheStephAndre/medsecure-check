@@ -173,7 +173,7 @@ def generate_invoice_pdf(submission_id):
     with open(submission_path, "r", encoding="utf-8") as f:
         submission = json.load(f)
 
-    # HARD SAFETY GUARD (missing today)
+    # HARD SAFETY GUARD.
     if submission.get("invoice_filename"):
         app.logger.warning(
             f"Invoice already exists for {submission_id}, refusing regeneration"
@@ -231,6 +231,9 @@ def get_report_pdf_path(submission_id):
 
 
 def smtp_config_is_valid():
+    if config.ENV == "development":
+        return bool(config.SMTP_HOST and config.SMTP_PORT and config.EMAIL_FROM)
+
     return all(
         [
             config.SMTP_HOST,
@@ -273,9 +276,16 @@ Freundliche Grüsse
                 filename=os.path.basename(path),
             )
 
-    with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT) as s:
-        s.login(config.SMTP_USER, config.SMTP_PASS)
-        s.send_message(msg)
+    # DEVELOPMENT → MailHog (no SSL, no auth)
+    if config.ENV == "development":
+        with smtplib.SMTP(config.SMTP_HOST, config.SMTP_PORT) as s:
+            s.send_message(msg)
+
+    # PRODUCTION → real SMTP (SSL + auth)
+    else:
+        with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT) as s:
+            s.login(config.SMTP_USER, config.SMTP_PASS)
+            s.send_message(msg)
 
 
 # Use the sentences from "wording.py" to have a Swiss medical tone.
@@ -383,30 +393,28 @@ def submit():
             },
         )
 
-    # The email is sent in production, not in development.
     if smtp_config_is_valid() and report_pdf and invoice_pdf:
-        if config.ENV == "production":
-            try:
-                send_report_and_invoice_email(
-                    submission["email"],
-                    report_pdf["path"],
-                    invoice_pdf["path"],
-                    submission,
-                )
+        try:
+            send_report_and_invoice_email(
+                submission["email"],
+                report_pdf["path"],
+                invoice_pdf["path"],
+                submission,
+            )
 
-                update_submission(
-                    submission,
-                    email_sent_at=datetime.now(timezone.utc).isoformat(),
-                )
-                log_event("email_sent", submission)
+            update_submission(
+                submission,
+                email_sent_at=datetime.now(timezone.utc).isoformat(),
+            )
+            log_event("email_sent", submission)
 
-            except Exception:
-                app.logger.exception("Email sending failed")
-                update_submission(submission, email_error="smtp_failed")
-                log_event("email_failed", submission)
+        except Exception:
+            app.logger.exception("Email sending failed")
+            update_submission(submission, email_error="smtp_failed")
+            log_event("email_failed", submission)
 
-        else:
-
+        # If the email is intentionally disabled(develpment environment).
+        if not smtp_config_is_valid():
             update_submission(
                 submission, email_error="email_disabled_or_not_configured"
             )
@@ -420,13 +428,39 @@ def submit():
     )
 
 
+# This administrative function is used to:
+# - Fix a typo in wording.
+# - Update legal disclaimers.
+# - Correct a scoring bug.
+# - A regulator asks for a corrected report.
+# By:
+# - Regenerate documents.
+# - Preserve history.
+# - Prove what changed and when.
+# !!! IT DOES NOT CHANGE THE SCORE CALCULATION
+# BECAUSE IT DOES NOT CALL "compute_assessment(answers)"
+# IT IS ONLY A PRESENTATION CHANGE !!!!
+
+
 @app.route("/admin/generate_pdf/<submission_id>")
 def admin_generate_pdf(submission_id):
+
+    # Environment check(condition IF to imporve).
+    # if config.ENV != "production":
+    # abort(403)
+
     pdf = generate_report_pdf_force(submission_id)
-    submission = load_submission(submission_id)
+    submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
+    if not os.path.exists(submission_path):
+        return "Submission not found", 404
+
+    with open(submission_path, "r", encoding="utf-8") as f:
+        submission = json.load(f)
 
     if not pdf:
-        return "Submission not found", 404
+        return "Submission not found", 500
+
+    previous = submission.get("report_filename")
 
     update_submission(
         submission,
@@ -437,7 +471,7 @@ def admin_generate_pdf(submission_id):
         "report_regenerated",
         {
             "id": submission_id,
-            "previous_report": submission.get("report_filename"),
+            "previous_report": previous,
             "new_report": pdf["filename"],
         },
     )
