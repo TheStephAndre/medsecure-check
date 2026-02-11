@@ -9,7 +9,11 @@ from email.message import EmailMessage
 from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
-from flask import Flask, Response, render_template, request
+
+# Load the content of the .env file before launch Flask.
+load_dotenv()
+import stripe
+from flask import Flask, Response, abort, redirect, render_template, request, url_for
 from weasyprint import HTML
 
 import config
@@ -27,9 +31,6 @@ from wording import (
     SCOPE,
 )
 
-# Load the content of the .env file before launch Flask.
-load_dotenv()
-
 app = Flask(__name__)
 app.config.from_prefixed_env()
 
@@ -38,14 +39,18 @@ os.makedirs(config.PDF_DIR, exist_ok=True)
 os.makedirs("logs", exist_ok=True)
 
 
+# Initialize Stripe key for payment.
+stripe.api_key = config.STRIPE_SECRET_KEY
+
+
 # List of events for the submissions. Save in logs/submissions.log.
 # - logs/submissions.log => Immutable history of what happened.
-def log_event(event, submission):
+def log_event(event, submission_id, data):
     record = {
         "event": event,
         "event_at": datetime.now(timezone.utc).isoformat(),
-        "submission_id": submission["id"],
-        "data": submission,  # submission_id.json
+        "submission_id": submission_id,
+        "data": data,
     }
 
     with open(config.LOG_FILE, "a", encoding="utf-8") as f:
@@ -59,6 +64,16 @@ def save_submission(submission):
     path = os.path.join(config.SUBMISSIONS_DIR, f"{submission['id']}.json")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(submission, f, ensure_ascii=False, indent=2)
+
+
+# This function is used for payment through Stripe.
+def load_submission(submission_id):
+    path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
+    if not os.path.exists(path):
+        return None
+
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
 # It prevents the "forgot to save" bugs for important cases:
@@ -181,8 +196,6 @@ def generate_invoice_pdf(submission_id):
         return None
 
     try:
-        with open(submission_path, "r", encoding="utf-8") as f:
-            submission = json.load(f)
 
         utc = datetime.fromisoformat(submission["created_at"])
         ch = utc.astimezone(ZoneInfo("Europe/Zurich"))
@@ -343,6 +356,10 @@ def submit():
         "na_count": na_count,
         "paid": False,
         "created_at": datetime.now(timezone.utc).isoformat(),
+        "payment_status": "unpaid",  # unpaid | pending | paid | failed
+        "stripe_session_id": None,
+        "stripe_payment_intent": None,
+        "paid_at": None,
     }
 
     # Submission is saved even if email fails.
@@ -413,12 +430,19 @@ def submit():
             update_submission(submission, email_error="smtp_failed")
             log_event("email_failed", submission)
 
-        # If the email is intentionally disabled(develpment environment).
-        if not smtp_config_is_valid():
-            update_submission(
-                submission, email_error="email_disabled_or_not_configured"
-            )
-            log_event("email_skipped_dev", submission)
+    else:
+        update_submission(submission, email_error="email_disabled_or_not_configured")
+        log_event("email_skipped_dev", submission)
+
+    return redirect(url_for("result", submission_id=submission_id))
+
+
+# Display the result after calulation.
+@app.route("/result/<submission_id>")
+def result(submission_id):
+    submission = load_submission(submission_id)
+    if not submission:
+        abort(404)
 
     return render_template(
         "result.html",
@@ -440,14 +464,12 @@ def submit():
 # !!! IT DOES NOT CHANGE THE SCORE CALCULATION
 # BECAUSE IT DOES NOT CALL "compute_assessment(answers)"
 # IT IS ONLY A PRESENTATION CHANGE !!!!
-
-
 @app.route("/admin/generate_pdf/<submission_id>")
 def admin_generate_pdf(submission_id):
 
     # Environment check(condition IF to imporve).
-    # if config.ENV != "production":
-    # abort(403)
+    if config.ENV != "development":
+        abort(403)
 
     pdf = generate_report_pdf_force(submission_id)
     submission_path = os.path.join(config.SUBMISSIONS_DIR, f"{submission_id}.json")
@@ -481,6 +503,10 @@ def admin_generate_pdf(submission_id):
 
 @app.route("/pdf/<submission_id>")
 def serve_pdf(submission_id):
+    submission = load_submission(submission_id)
+    if not submission or submission.get("payment_status") != "paid":
+        abort(403)
+
     path = get_report_pdf_path(submission_id)
     if not path:
         return "PDF not available", 404
@@ -493,6 +519,135 @@ def serve_pdf(submission_id):
                 "Content-Disposition": f"inline; filename={os.path.basename(path)}"
             },
         )
+
+
+# Create a payment route (Stripe Checkout)
+@app.route("/pay/<submission_id>")
+def pay(submission_id):
+
+    submission = load_submission(submission_id)
+
+    if not submission:
+        abort(404)
+
+    if submission.get("payment_status") == "paid":
+        return redirect(url_for("result", submission_id=submission_id))
+
+    session = stripe.checkout.Session.create(
+        mode="payment",
+        payment_method_types=["card"],
+        line_items=[
+            {
+                "price_data": {
+                    "currency": "chf",
+                    "unit_amount": config.STRIPE_PRICE_CHF,
+                    "product_data": {"name": "Cyber Risk Kurzbewertung"},
+                },
+                "quantity": 1,
+            }
+        ],
+        metadata={"submission_id": submission_id},
+        success_url=url_for(
+            "payment_success", submission_id=submission_id, _external=True
+        ),
+        cancel_url=url_for(
+            "payment_cancel", submission_id=submission_id, _external=True
+        ),
+    )
+
+    update_submission(
+        submission,
+        payment_status="pending",
+        stripe_session_id=session.id,
+    )
+
+    log_event("payment_session_created", submission_id, {"session": session.id})
+
+    return redirect(session.url)
+
+
+# Success payment route(Stripe)
+# 1) User pays. 2) Stripe redirect immediately(UX). 3) Webhook arrives 2 seconds later(Truth).
+# Secure version:
+# - Success page only shows if webhook marked paid.
+# - Direct access blocked.
+# - No trust in redirect.
+@app.route("/payment/success/<submission_id>")
+def payment_success(submission_id):
+
+    submission = load_submission(submission_id)
+    if not submission:
+        abort(404)
+
+    if submission.get("payment_status") != "paid":
+        # Payment not confirmed yet
+        return redirect(url_for("result", submission_id=submission_id))
+
+    return render_template(
+        "payment_success.html",
+        submission=submission,
+    )
+
+
+# Cancel payment route(Stripe)
+@app.route("/payment/cancel/<submission_id>")
+def payment_cancel(submission_id):
+    return render_template("payment_cancel.html")
+
+
+# Webhook endpoint(Stripe)
+@app.route("/stripe/webhook", methods=["POST"])
+def stripe_webhook():
+    payload = request.data
+    sig_header = request.headers.get("Stripe-Signature")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload,
+            sig_header,
+            config.STRIPE_WEBHOOK_SECRET,
+        )
+    except Exception:
+        return "Invalid signature", 400
+
+    # Only handle events you care about
+    if event["type"] == "checkout.session.completed":
+
+        session = event["data"]["object"]
+        submission_id = session["metadata"].get("submission_id")
+
+        if not submission_id:
+            return "", 200  # Ignore silently
+
+        submission = load_submission(submission_id)
+
+        if not submission:
+            # Do NOT crash. Log and ignore.
+            log_event(
+                "payment_webhook_submission_missing",
+                submission_id,
+                {"stripe_session": session["id"]},
+            )
+            return "", 200
+
+        # Idempotency guard
+        if submission.get("payment_status") == "paid":
+            return "", 200
+
+        update_submission(
+            submission,
+            payment_status="paid",
+            stripe_payment_intent=session["payment_intent"],
+            paid_at=datetime.now(timezone.utc).isoformat(),
+        )
+
+        log_event(
+            "payment_succeeded",
+            submission_id,
+            {"intent": session["payment_intent"]},
+        )
+
+    return "", 200
 
 
 if __name__ == "__main__":
