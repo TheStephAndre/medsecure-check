@@ -1,38 +1,44 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+<article>
+  <h2>{{ AUDIT.title }}</h2>
+  
+  <form action="{{ url_for('submit') }}" method="post">
+    <div class="grid">
+      <label for="business_name">
+        {{ AUDIT.fields.business_name }}
+        <input type="text" id="business_name" name="business_name" placeholder="Praxis Muster" required />
+      </label>
+      
+      <label for="email">
+        {{ AUDIT.fields.email }}
+        <input type="email" id="email" name="email" placeholder="info@praxis.ch" required />
+      </label>
+    </div>
 
-<h2>{{ AUDIT.title }}</h2>
+    <hr />
 
-<form action="{{ url_for('submit') }}" method="post">
-  <label for="business_name"> {{ AUDIT.fields.business_name }} </label>
-  <input id="business_name" name="business_name" required />
+    {% for q in questions %}
+    <fieldset id="group-{{ q.id }}">
+      <legend><strong>{{ loop.index }}. {{ q.text }}</strong></legend>
+      <div class="grid">
+        <label for="{{ q.id }}-yes">
+          <input type="radio" id="{{ q.id }}-yes" name="{{ q.id }}" value="yes" required>
+          {{ AUDIT.answers.yes }}
+        </label>
+        <label for="{{ q.id }}-no">
+          <input type="radio" id="{{ q.id }}-no" name="{{ q.id }}" value="no">
+          {{ AUDIT.answers.no }}
+        </label>
+        <label for="{{ q.id }}-na">
+          <input type="radio" id="{{ q.id }}-na" name="{{ q.id }}" value="na">
+          {{ AUDIT.answers.na }}
+        </label>
+      </div>
+    </fieldset>
+    {% endfor %}
 
-  <label for="email"> {{ AUDIT.fields.email }} </label>
-  <input id="email" name="email" type="email" required />
-
-  <hr />
-
-  {% for q in questions %}
-  <fieldset>
-    <legend>{{ loop.index }}. {{ q.text }}</legend>
-
-    <label>
-      <input type="radio" name="{{ q.id }}" value="yes" required />
-      {{ AUDIT.answers.yes }}
-    </label>
-
-    <label>
-      <input type="radio" name="{{ q.id }}" value="no" />
-      {{ AUDIT.answers.no }}
-    </label>
-
-    <label>
-      <input type="radio" name="{{ q.id }}" value="na" />
-      {{ AUDIT.answers.na }}
-    </label>
-  </fieldset>
-  {% endfor %}
-
-  <button type="submit">{{ AUDIT.submit }}</button>
-</form>
-
+    <button type="submit" class="primary">{{ AUDIT.submit }}</button>
+  </form>
+</article>
 {% endblock %}
