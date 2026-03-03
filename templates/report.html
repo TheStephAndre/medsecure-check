@@ -1,73 +1,59 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 
-<div class="print-actions">
-  <button onclick="window.print()">{{ REPORT.print_cta }}</button>
+<div class="container no-print" style="margin-bottom: 2rem;">
+  <nav aria-label="breadcrumb">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li>Bericht: {{ submission.business_name }}</li>
+    </ul>
+    <ul>
+      <li><button class="outline" onclick="window.print()">{{ REPORT.print_cta }}</button></li>
+    </ul>
+  </nav>
 </div>
 
-<article>
-  <h2>{{ submission.business_name }}</h2>
-
-  <p>
-    <strong>{{ REPORT.date_label }}:</strong>
-    {{ submission.created_at_human }}
-  </p>
-
-  <h3>{{ REPORT.assessment_title }}: {{ submission.assessment }}/100</h3>
-  <hr />
+<article id="report-content">
+  <header>
+    <h2>{{ submission.business_name }}</h2>
+    <p><strong>{{ REPORT.date_label }}:</strong> {{ submission.created_at_human }}</p>
+    <h3>{{ REPORT.assessment_title }}: {{ submission.assessment }}/100</h3>
+  </header>
 
   <section>
     <h4>{{ REPORT.sections.classification }}</h4>
-
     <p>{{ RISK_LEVELS[submission.risk_level].pdf_text }}</p>
   </section>
 
-  <div class="page-break"></div>
-
-  <section>
+  <section class="page-break">
     <h4>{{ REPORT.sections.measures }}</h4>
 
-    {% if submission.na_count is defined and submission.na_count > 5 %}
-    <p><strong>{{ REPORT.unclear.title }}.</strong></p>
-    <p>{{ REPORT.unclear.description }}</p>
-    <p><strong>Hinweis:</strong> {{ REPORT.unclear.note }}</p>
-    <p><strong>Empfehlung:</strong> {{ REPORT.unclear.recommendation }}</p>
-
+    {% if submission.na_count > 5 %}
+      <div style="border: 2px solid var(--secondary); padding: 1rem;">
+        <p><strong>{{ REPORT.unclear.title }}</strong></p>
+        <p>{{ REPORT.unclear.description }}</p>
+        <small>{{ REPORT.unclear.note }}</small>
+      </div>
     {% elif submission.failed|length == 0 %}
-    <p>
-      <strong>{{ REPORT.no_findings.title }}</strong>
-      {{ REPORT.no_findings.description }}
-    </p>
-
-    <p>{{ REPORT.no_findings.maintenance }}</p>
-
-    <ul>
-      {% for item in REPORT.no_findings.examples %}
-      <li>{{ item }}</li>
-      {% endfor %}
-    </ul>
-
+      <p><strong>{{ REPORT.no_findings.title }}</strong> {{ REPORT.no_findings.description }}</p>
     {% else %}
-    <p>{{ REPORT.findings_intro }}</p>
-
-    <ol>
-      {% for f in submission.failed %}
-      <li>
-        <strong>{{ f.text }}</strong><br />
-        {{ f.remedy }}
-        <em> ({{ REPORT.priority_label }}: {{ f.severity }}) </em>
-      </li>
-      {% endfor %}
-    </ol>
+      <p>{{ REPORT.findings_intro }}</p>
+      <ol>
+        {% for f in submission.failed %}
+        <li style="margin-bottom: 1rem;">
+          <strong>{{ f.text }}</strong><br />
+          <small>🛠 {{ f.remedy }}</small><br />
+          <code style="font-size: 0.7rem;">{{ REPORT.priority_label }}: {{ f.severity }}</code>
+        </li>
+        {% endfor %}
+      </ol>
     {% endif %}
   </section>
 
-  <div class="page-break"></div>
-
-  <section>
+  <section class="page-break">
     <h4>{{ REPORT.sections.next_steps }}</h4>
     <p>{{ REPORT.next_steps.orientation }}</p>
     <p>{{ REPORT.next_steps.feasibility }}</p>
   </section>
 </article>
-
 {% endblock %}
