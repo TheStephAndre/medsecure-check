@@ -1,38 +1,53 @@
 # MedSecure-Check Schweiz 🇨🇭
-**A Professional Cyber-Security & Compliance Assessment Tool for Swiss Medical Practices.**
+**Automated Cyber-Security Assessment & Reporting for Swiss Medical Practices.**
 
 ![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
-![Flask](https://img.shields.io/badge/Framework-Flask-black.svg)
-![Market](https://img.shields.io/badge/Market-Switzerland-red.svg)
+![Framework](https://img.shields.io/badge/Flask-3.1.2-black.svg)
+![Stripe](https://img.shields.io/badge/Payments-Stripe-6772e5.svg)
+![Security](https://img.shields.io/badge/Compliance-nDSG_Ready-red.svg)
 
-## 🚀 Product Vision
-A high-precision, 5-minute IT security assessment designed specifically for Swiss medical and health practices (physiotherapists, dentists, chiropractors). It delivers a professional PDF report and actionable insights without technical jargon.
+## 🎯 Product Vision
+MedSecure-Check is a professional Micro-SaaS prototype designed to solve "compliance anxiety" for small Swiss medical clinics (dentists, physiotherapists, chiropractors). It automates the gap between a security audit and a formal, actionable PDF report, specifically aligned with the Swiss **nDSG** (Federal Act on Data Protection) expectations.
 
-### 🎯 Strategic Positioning
-* **Target Persona:** Non-technical owners of Swiss SMEs (1-10 employees).
-* **Core Value:** Converting anxiety over DSG/nDSG (Swiss Data Protection Act) into clarity and peace of mind.
-* **Trust First:** Built with a "Swiss-native" feel—CHF pricing, DD.MM.YYYY formats, and neutral, factual language.
+### Why this project stands out:
+* **Domain Specific**: Built for a high-stakes niche (Healthcare) with strict data privacy requirements.
+* **Zero-Touch Automation**: 100% automated flow from user input to Stripe payment and PDF delivery.
+* **Swiss-Native UX**: Handles CHF currency, Swiss date formats (DD.MM.YYYY), and localized High German (de-CH).
 
 
 
-## 🛠️ Tech Stack & Architecture
-* **Backend:** Python 3.12 / Flask (Clean Architecture).
-* **Logic Engine:** Decoupled scoring system with confidence-penalty algorithms (`scoring.py`).
-* **Payments:** Full Stripe API integration (Checkout + Webhooks for idempotency).
-* **Document Generation:** Server-side PDF generation using WeasyPrint.
-* **Deployment:** Production-ready for Heroku/Render via Gunicorn.
+## 🏗️ Technical Architecture
+The application follows **Clean Architecture** principles, ensuring that business logic remains independent of the web framework.
+
+* **Logic Engine (`scoring.py`)**: A decoupled, Object-Oriented engine that identifies vulnerabilities and applies a *Confidence Penalty* algorithm (adjusting scores based on "N/A" answer frequency).
+* **Single Source of Truth (`wording.py`)**: A centralized localization system. A single change here updates the Web UI, PDF reports, and Invoices simultaneously.
+* **Document Orchestration**: Server-side PDF generation using **WeasyPrint** with custom CSS optimized for A4 print standards.
+* **Secure Payment Flow**: Integration with **Stripe Checkout** utilizing **Webhooks** for secure, asynchronous payment confirmation and state management.
+
+
+
+## 🛠️ Tech Stack
+| Layer | Technology |
+| :--- | :--- |
+| **Backend** | Python 3.12, Flask |
+| **Server** | Gunicorn (optimized worker/thread configuration) |
+| **PDF Engine** | WeasyPrint, Jinja2, HTML5/CSS3 |
+| **Payments** | Stripe API (v14.0+) |
+| **Frontend** | Pico.css (Semantic HTML & Minimalist UI) |
+| **DevOps** | Pathlib (OS-agnostic paths), Dotenv (Secret masking) |
 
 ## 📂 Project Structure
-* `app.py`: Clean routing and request handling.
-* `scoring.py`: Professional scoring engine (Object-Oriented).
-* `wording.py`: Centralized Source of Truth for all Swiss-German localized content.
-* `config.py`: Environment-based secure configuration using `pathlib`.
+* `app.py`: Web routing and payment orchestration.
+* `scoring.py`: Core risk-assessment logic (Decoupled from Flask).
+* `wording.py`: SSOT (Single Source of Truth) for all UI and legal copy.
+* `config.py`: Secure environment-based configuration using `pathlib`.
+* `gunicorn_config.py`: Production-grade server tuning (Timeouts & Workers).
 
-## 🛡️ Founders' Boundary Contract
-This project is built as a **Scalable Micro-SaaS**.
-* **Automated:** No manual intervention needed for report delivery.
-* **Secure:** No hardcoded secrets; strictly follows `.env` patterns.
-* **Action-Oriented:** Every line of code serves the goal of providing the "3 most important actions" to the user.
+## 🛡️ Security & Reliability
+* **Secret Isolation**: Total masking of API keys and credentials via environment variables.
+* **Privacy by Design**: Strict `.gitignore` policy ensuring no user data or generated reports enter version control.
+* **Idempotency**: Stripe Webhook integration ensures payments are processed reliably even in case of network interruptions.
+* **Scalability**: Designed as a stateless application, ready for containerization or PaaS deployment (Heroku, Render).
 
 ---
 *Disclaimer: This tool provides general guidance aligned with Swiss standards. It does not replace professional legal or IT advice.*
