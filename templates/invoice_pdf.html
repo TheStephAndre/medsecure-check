@@ -3,57 +3,54 @@
   <head>
     <meta charset="utf-8" />
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        font-size: 11pt;
-      }
-      h1 {
-        font-size: 16pt;
-      }
-      table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
-      }
-      td,
-      th {
-        padding: 6px;
-        border-bottom: 1px solid #ddd;
-      }
+      body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.6; padding: 40px; }
+      .header { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
+      .company-info { float: left; }
+      .invoice-meta { float: right; text-align: right; }
+      .clear { clear: both; }
+      table { width: 100%; border-collapse: collapse; margin: 40px 0; }
+      th { background: #f8f8f8; text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
+      td { padding: 10px; border-bottom: 1px solid #eee; }
+      .total { font-size: 1.4rem; font-weight: bold; text-align: right; }
+      .footer { margin-top: 60px; font-size: 0.9rem; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
     </style>
   </head>
   <body>
-    <h1>Rechnung</h1>
-
-    <p>
-      <strong>{{ company }}</strong><br />
-      {{ PRODUCT.name }}
-    </p>
-
-    <p>
-      Rechnungsnummer: {{ submission.invoice_number }}<br />
-      Datum: {{ submission.created_at_human }}
-    </p>
+    <div class="header">
+      <div class="company-info">
+        <strong>{{ company }}</strong><br />
+        {{ PRODUCT.name }}
+      </div>
+      <div class="invoice-meta">
+        <h1>RECHNUNG</h1>
+        Nr: {{ submission.invoice_number }}<br />
+        Datum: {{ submission.created_at_human }}
+      </div>
+      <div class="clear"></div>
+    </div>
 
     <table>
-      <tr>
-        <th>Leistung</th>
-        <th>Betrag</th>
-      </tr>
-      <tr>
-        <td>IT-Sicherheits-Einordnung (MedSecure)</td>
-        <td>CHF 49.-</td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Leistung</th>
+          <th style="text-align: right;">Betrag</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ PRODUCT.report_name }} (Individuelle Analyse)</td>
+          <td style="text-align: right;">CHF 49.00</td>
+        </tr>
+      </tbody>
     </table>
 
-    <p>
-      <strong>Total: CHF 49.-</strong><br />
-      Nicht mehrwertsteuerpflichtig.
-    </p>
+    <p class="total">Gesamtbetrag: CHF 49.00</p>
+    <p><em>Zahlbar innerhalb von 10 Tagen ohne Abzug. Nicht MWST-pflichtig.</em></p>
 
-    <p>
+    <div class="footer">
+      <strong>Zahlungsinformationen:</strong><br />
       IBAN: {{ IBAN }}<br />
-      Zahlungsfrist: 10 Tage
-    </p>
+      Bitte geben Sie die Rechnungsnummer {{ submission.invoice_number }} als Referenz an.
+    </div>
   </body>
 </html>
