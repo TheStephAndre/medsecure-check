@@ -1,52 +1,56 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+<article>
+  <header style="text-align: center;">
+    <h2>{{ RESULT.title }}</h2>
+    <div style="font-size: 3rem; font-weight: 800; color: var(--primary);">
+      {{ submission.assessment }}/100
+    </div>
+    <p>
+      {% set level = submission.risk_level or 'medium' %}
+      <mark><strong>{{ RESULT.risk_levels[level].label }}:</strong></mark>
+      {{ RESULT.risk_levels[level].description }}
+    </p>
+  </header>
 
-<h2>{{ RESULT.title }}</h2>
+  <section>
+    <h3>{{ RESULT.offer_title }}</h3>
+    <ul>
+      {% for item in RESULT.benefits %}
+      <li><strong>✓</strong> {{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
 
-<div>
-  <p class="assessment-badge">{{ submission.assessment }}/100</p>
+  <section>
+    <details>
+      <summary><strong>{{ RESULT.scope }}</strong></summary>
+      <p>{{ RESULT.value_explanation }}</p>
+      <p>{{ RESULT.price_context }}</p>
+    </details>
+  </section>
 
-  <p>
-    <!--Variable 'level' is a fail-safe  -->
-    {% set level = submission.risk_level or 'medium' %}
-    <strong>{{ RESULT.risk_levels[level].label }}:</strong>
-    {{ RESULT.risk_levels[level].description }}
-  </p>
-</div>
+  <footer>
+    <div class="grid">
+      <div>
+        <strong>{{ RESULT.payment_note }}</strong><br />
+        <small>IBAN: <code>{{ IBAN }}</code></small>
+      </div>
+      <div style="text-align: right;">
+        <ins>{{ RESULT.offer_price }}</ins>
+      </div>
+    </div>
+    
+    <p style="margin-top: 1rem;">{{ RESULT.delivery }}</p>
 
-<h3>{{ RESULT.offer_title }} ({{ RESULT.offer_price }})</h3>
-
-<ul>
-  {% for item in RESULT.benefits %}
-  <li>✔ {{ item }}</li>
-  {% endfor %}
-</ul>
-
-<p>{{ RESULT.audience }}</p>
-
-<p>{{ RESULT.scope }}</p>
-
-<p><strong>Leistungsumfang</strong></p>
-
-<p>{{ RESULT.value_explanation }}</p>
-
-<p>{{ RESULT.price_context }}</p>
-
-<p>
-  <strong>{{ RESULT.payment_note }}</strong><br />
-  IBAN: <code>{{ IBAN }}</code><br />
-  Verwendungszweck: E-Mail-Adresse oder Firmenname
-</p>
-
-<p>{{ RESULT.delivery }}</p>
-
-<p>
-  <em>{{ RESULT.preview_note }}</em><br />
-  <a
-    href="{{ url_for('serve_pdf', submission_id=submission_id) }}"
-    target="_blank"
-  >
-    {{ RESULT.preview_cta }}
-  </a>
-</p>
-
+    <div class="grid">
+      <a href="{{ url_for('pay', submission_id=submission_id) }}" role="button" class="primary">
+        Jetzt Sicher bezahlen (Stripe)
+      </a>
+      <a href="{{ url_for('report', submission_id=submission_id) }}" role="button" class="secondary outline">
+        {{ RESULT.preview_cta }}
+      </a>
+    </div>
+  </footer>
+</article>
 {% endblock %}
