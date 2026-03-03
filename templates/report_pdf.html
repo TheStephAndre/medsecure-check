@@ -2,135 +2,75 @@
 <html lang="de">
   <head>
     <meta charset="utf-8" />
-    <title>
-      {{ submission.business_name }} - {{ REPORT_PDF.title_suffix }}
-    </title>
-
+    <title>{{ submission.business_name }} - {{ REPORT_PDF.title_suffix }}</title>
     <style>
-      /* A4 Base */
       @page {
         size: A4;
-        margin:
-          24mm 18mm,
-          24mm 18mm;
-        @bottom-center {
+        margin: 25mm 20mm;
+        @bottom-right {
           content: "Seite " counter(page) " von " counter(pages);
           font-size: 9pt;
-          color: #666;
+          color: #888;
         }
       }
-
-      body {
-        font-family: "Helvetica", "Arial", sans-serif;
-        font-size: 11pt;
-        line-height: 1.5;
-        margin: 0;
-        padding: 0;
-        color: #111;
-      }
-
-      .header {
-        text-align: center;
-        font-size: 10pt;
-        color: #333;
-        margin-bottom: 10mm;
-      }
-
-      h1 {
-        font-size: 20pt;
-        margin-bottom: 4mm;
-      }
-
-      h2 {
-        font-size: 14pt;
-        margin-top: 8mm;
-        margin-bottom: 2mm;
-      }
-
-      section {
-        margin-top: 6mm;
-        margin-bottom: 6mm;
-        page-break-inside: avoid;
-      }
-
-      .assessment {
-        font-size: 24pt;
-        font-weight: bold;
-        margin-top: 4mm;
-        margin-bottom: 6mm;
-        text-align: center;
-      }
-
-      .footer-note {
-        font-size: 9pt;
-        color: #666;
-        margin-top: 10mm;
-      }
-
-      .handwriting-lines {
-        margin-top: 6mm;
-      }
-
-      .handwriting-lines div {
-        border-bottom: 0.5pt solid #ccc;
-        height: 10mm;
-        margin-bottom: 4mm;
-      }
+      body { font-family: "Helvetica", "Arial", sans-serif; line-height: 1.6; color: #222; }
+      .header { border-bottom: 1pt solid #eee; padding-bottom: 10mm; margin-bottom: 10mm; font-size: 9pt; color: #666; }
+      .title-block { text-align: center; margin-bottom: 15mm; }
+      .score-box { background: #f4f4f4; padding: 20px; text-align: center; border-radius: 5px; margin: 10mm 0; }
+      .score-value { font-size: 32pt; font-weight: bold; display: block; }
+      h2 { border-left: 4pt solid #000; padding-left: 10px; margin-top: 15mm; font-size: 16pt; }
+      .findings-list { list-style: none; padding: 0; }
+      .finding-item { margin-bottom: 8mm; padding-bottom: 4mm; border-bottom: 0.5pt solid #eee; }
+      .finding-item strong { font-size: 12pt; display: block; margin-bottom: 2mm; }
+      .severity-tag { font-size: 8pt; text-transform: uppercase; background: #eee; padding: 2px 6px; }
+      .lines { margin-top: 5mm; border-bottom: 0.5pt solid #ddd; height: 8mm; }
+      .footer-note { font-size: 8pt; color: #999; margin-top: 20mm; font-style: italic; }
     </style>
   </head>
-
   <body>
     <div class="header">
-      <div>{{ company }} - {{ REPORT_PDF.header_suffix }}</div>
-      <div>{{ REPORT_PDF.generated_on }} {{ submission.created_at_human }}</div>
+      <div style="float: left;">{{ company }} — {{ REPORT_PDF.header_suffix }}</div>
+      <div style="float: right;">{{ REPORT_PDF.generated_on }} {{ submission.created_at_human }}</div>
+      <div style="clear: both;"></div>
     </div>
 
-    <h1>{{ submission.business_name }}</h1>
-
-    <div class="assessment">
-      {{ REPORT_PDF.assessment_label }}: {{ submission.assessment }}/100
+    <div class="title-block">
+      <h1>{{ submission.business_name }}</h1>
+      <div class="score-box">
+        <span class="score-value">{{ submission.assessment }}/100</span>
+        {{ REPORT_PDF.assessment_label }}
+      </div>
     </div>
 
     <section>
       <h2>{{ REPORT.sections.classification }}</h2>
-
       <p>{{ RISK_LEVELS[submission.risk_level].pdf_text }}</p>
     </section>
 
     <section>
       <h2>{{ REPORT.sections.measures }}</h2>
-
-      {% if submission.na_count is defined and submission.na_count > 5 %}
-      <p>
-        <strong>{{ REPORT.unclear.title }}.</strong>
-        {{ REPORT.unclear.description }}
-      </p>
-
-      {% elif submission.failed|length == 0 %}
-      <p>{{ REPORT.no_findings.description }}</p>
-
+      {% if submission.failed|length == 0 %}
+        <p>{{ REPORT.no_findings.description }}</p>
       {% else %}
-      <ol>
-        {% for f in submission.failed %}
-        <li>
-          <strong>{{ f.text }}</strong>: {{ f.remedy }} ({{
-          REPORT.priority_label }}: {{ f.severity }})
-        </li>
-        {% endfor %}
-      </ol>
+        <div class="findings-list">
+          {% for f in submission.failed %}
+          <div class="finding-item">
+            <strong>{{ f.text }}</strong>
+            <p>{{ f.remedy }}</p>
+            <span class="severity-tag">{{ REPORT.priority_label }}: {{ f.severity }}</span>
+          </div>
+          {% endfor %}
+        </div>
       {% endif %}
     </section>
 
-    <section>
+    <section style="page-break-before: always;">
       <h2>{{ REPORT.sections.next_steps }}</h2>
-
       <p>{{ REPORT.next_steps.orientation }}</p>
-
-      <div class="handwriting-lines">
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
+      <div class="lines"></div>
+      <div class="lines"></div>
+      <div class="lines"></div>
+      <div class="lines"></div>
     </section>
 
     <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>
