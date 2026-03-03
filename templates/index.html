@@ -1,21 +1,20 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+<article>
+  <header>
+    <h2>{{ LANDING.headline }}</h2>
+  </header>
+  
+  <p>{{ LANDING.intro }}</p>
+  <p><strong>{{ LANDING.promise }}</strong></p>
+  
+  <blockquote>
+    {{ LANDING.value_statement }}
+  </blockquote>
 
-<section>
-  <h2>{{ LANDING.headline }}</h2>
-
-  <p>
-    {{ LANDING.intro }}<br />
-    {{ LANDING.promise }}
-  </p>
-
-  <p>{{ LANDING.value_statement }}</p>
-
-  <p>
-    <strong>{{ LANDING.price_label }}</strong>
-    für einen persönlichen Bericht mit priorisierten Handlungsempfehlungen.
-  </p>
-
-  <a class="contrast" href="{{ url_for('audit') }}"> {{ LANDING.cta }} </a>
-</section>
-
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <span class="badge" style="font-size: 1.5rem; color: var(--primary);">{{ LANDING.price_label }}</span>
+    <a role="button" class="contrast" href="{{ url_for('audit') }}">{{ LANDING.cta }}</a>
+  </div>
+</article>
 {% endblock %}
