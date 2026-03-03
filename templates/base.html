@@ -4,127 +4,47 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-      {% if submission is defined %} {{ submission.business_name }} - {{
-      PRODUCT.report_name }} {% else %} {{ PRODUCT.short_name }} {% endif %}
+      {% if submission is defined %}{{ submission.business_name }} - {{ PRODUCT.report_name }}{% else %}{{ PRODUCT.short_name }}{% endif %}
     </title>
-    <link rel="stylesheet" href="/static/pico.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
     <style>
-      /* ==========
-         Screen(Web)      
-         ==========  */
-      .assessment-badge {
-        font-size: 2.2rem;
-        font-weight: 700;
-      }
-
-      .print-actions {
-        margin-bottom: 1.5rem;
-      }
-
-      article {
-        max-width: 780px;
-        margin: 0 auto;
-      }
-
-      .print-header,
-      .print-footer {
-        display: none;
-      }
-
-      /* ==========
-         Print (A4 PDF)
-         ========== */
-
-      @page {
-        size: A4;
-        margin: 32mm 18mm 28mm 18mm;
-      }
-
+      :root { --spacing: 1.5rem; }
+      article { max-width: 800px; margin: 2rem auto; }
+      .print-header, .print-footer { display: none; }
+      
+      /* --- PDF & Print Optimization --- */
       @media print {
-        body {
-          font-size: 11pt;
-          line-height: 1.45;
-        }
-
-        main.container {
-          max-width: none;
-          padding: 0;
-        }
-
-        header,
-        footer,
-        .print-actions {
-          display: none !important;
-        }
-
-        .print-header,
-        .print-footer {
-          display: block;
-        }
-
-        body {
-          counter-reset: page;
-        }
-
-        .page-counter::after {
-          content: counter(page) + 1;
-        }
-
-        /* Prevent ugly breaks */
-        section {
-          page-break-inside: avoid;
-        }
-
-        h2,
-        h3,
-        h4 {
-          page-break-after: avoid;
-        }
-
-        .page-break {
-          page-break-before: always;
-        }
-
-        /* Fixed header/footer */
-        .print-header {
-          position: fixed;
-          top: 12mm;
-          left: 0;
-          right: 0;
-          text-align: center;
-          font-size: 9pt;
-          font-weight: 600;
-        }
-
-        .print-footer {
-          position: fixed;
-          bottom: 12mm;
-          left: 0;
-          right: 0;
-          text-align: center;
-          font-size: 9pt;
-        }
+        header, footer, .no-print { display: none !important; }
+        .print-header, .print-footer { display: block; position: fixed; width: 100%; text-align: center; font-size: 9pt; color: #666; }
+        .print-header { top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .print-footer { bottom: 0; border-top: 1px solid #eee; padding-top: 5px; }
+        body { font-size: 11pt; line-height: 1.5; }
+        section { page-break-inside: avoid; }
       }
     </style>
   </head>
   <body>
-    <div class="print-header">
-      {{ PRODUCT.name }} — {{ PRODUCT.report_name }}
-    </div>
+    <div class="print-header">{{ PRODUCT.name }} — {{ PRODUCT.report_name }}</div>
+    
     {% if submission is defined %}
     <div class="print-footer">
-      Erstellt am {{ submission.created_at_human }} · Vertraulich · Seite
-      <span class="page-counter"></span>
+      {{ submission.business_name }} · {{ submission.created_at_human }} · Seite <span class="page"></span>
     </div>
     {% endif %}
+
     <main class="container">
-      <header>
-        <h1>{{ PRODUCT.name }}</h1>
-        <p style="color: #666">{{ PRODUCT.tagline }}</p>
+      <header class="no-print">
+        <hgroup>
+          <h1>{{ PRODUCT.name }}</h1>
+          <h2>{{ PRODUCT.tagline }}</h2>
+        </hgroup>
       </header>
-      {% block content %}{% endblock%}
-      <footer>
-        <p style="font-size: 0.9rem; color: #666">{{ DISCLAIMERS.website }}</p>
+
+      {% block content %}{% endblock %}
+
+      <footer class="no-print">
+        <hr />
+        <small>{{ DISCLAIMERS.website }}</small>
       </footer>
     </main>
   </body>
