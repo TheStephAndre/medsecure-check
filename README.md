@@ -1,133 +1,38 @@
-# Small Business Schutz sensibler Patientendaten assessment (Switzerland)
+# MedSecure-Check Schweiz 🇨🇭
+**A Professional Cyber-Security & Compliance Assessment Tool for Swiss Medical Practices.**
 
-## Product Positioning — Phase 0 Lock
+![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
+![Flask](https://img.shields.io/badge/Framework-Flask-black.svg)
+![Market](https://img.shields.io/badge/Market-Switzerland-red.svg)
 
-This document defines the **non-negotiable positioning** of the product.
-If a future idea, feature, or request conflicts with this README, the idea is wrong — not the document.
+## 🚀 Product Vision
+A high-precision, 5-minute IT security assessment designed specifically for Swiss medical and health practices (physiotherapists, dentists, chiropractors). It delivers a professional PDF report and actionable insights without technical jargon.
 
----
+### 🎯 Strategic Positioning
+* **Target Persona:** Non-technical owners of Swiss SMEs (1-10 employees).
+* **Core Value:** Converting anxiety over DSG/nDSG (Swiss Data Protection Act) into clarity and peace of mind.
+* **Trust First:** Built with a "Swiss-native" feel—CHF pricing, DD.MM.YYYY formats, and neutral, factual language.
 
-## 1. One-Sentence Product Definition
 
-> **A 5-minute Schutz sensibler Patientendaten check designed for Swiss small businesses, delivering a clear assessment and practical fixes — no IT jargon, no sales calls.**
 
-This sentence is the primary filter for:
+## 🛠️ Tech Stack & Architecture
+* **Backend:** Python 3.12 / Flask (Clean Architecture).
+* **Logic Engine:** Decoupled scoring system with confidence-penalty algorithms (`scoring.py`).
+* **Payments:** Full Stripe API integration (Checkout + Webhooks for idempotency).
+* **Document Generation:** Server-side PDF generation using WeasyPrint.
+* **Deployment:** Production-ready for Heroku/Render via Gunicorn.
 
-- Features
-- Copy
-- Pricing
-- Distribution
-- Customer requests
+## 📂 Project Structure
+* `app.py`: Clean routing and request handling.
+* `scoring.py`: Professional scoring engine (Object-Oriented).
+* `wording.py`: Centralized Source of Truth for all Swiss-German localized content.
+* `config.py`: Environment-based secure configuration using `pathlib`.
 
----
-
-## 2. Primary Buyer Persona (Locked)
-
-**Target customer (for the next 3 months):**
-
-> **Swiss medical and health practices** (e.g. dentists, physiotherapists, chiropractors) with **1–10 employees**, run by **non-technical owners**.
-
-Why this persona:
-
-- Handles sensitive personal data
-- High awareness of DSG / nDSG risk
-- Low internal IT maturity
-- Willingness to pay for clarity and reassurance
-- Strong local word-of-mouth referrals
-
-Expansion to other Swiss SME segments happens **only after traction here**.
+## 🛡️ Founders' Boundary Contract
+This project is built as a **Scalable Micro-SaaS**.
+* **Automated:** No manual intervention needed for report delivery.
+* **Secure:** No hardcoded secrets; strictly follows `.env` patterns.
+* **Action-Oriented:** Every line of code serves the goal of providing the "3 most important actions" to the user.
 
 ---
-
-## 3. What This Product Is NOT
-
-This list is explicit and intentional.
-
-The product is:
-
-❌ Not legal advice  
-❌ Not DSG / nDSG certification  
-❌ Not a compliance guarantee  
-❌ Not managed IT or security services  
-❌ Not custom consulting by default
-
-**Legal & positioning disclaimer:**
-
-> This tool provides general Schutz sensibler Patientendaten guidance aligned with common Swiss expectations. It does not replace professional legal or IT advice.
-
-This disclaimer must appear:
-
-- In the footer
-- In the report
-- In the terms/privacy context
-
----
-
-## 4. Core Outcome (What the Customer Actually Buys)
-
-Customers do **not** buy tools or questionnaires.
-They buy clarity and peace of mind.
-
-**Core outcome:**
-
-> After 5 minutes, the customer knows their Schutz sensibler Patientendaten risk level and the **3 most important actions** they should take next.
-
-Implications:
-
-- Every question must contribute to risk assessment
-- Every report section must lead to action
-- Anything informational without action is removed or simplified
-
----
-
-## 5. Swiss Trust Positioning
-
-The product must feel **Swiss-native**, not imported.
-
-Trust principles:
-
-- Clear, neutral language
-- No hype or exaggerated claims
-- Familiar Swiss formatting and tone
-
-**Trust checklist (must remain true):**
-
-- CHF pricing
-- Swiss date format (DD.MM.YYYY)
-- References Swiss context (DSG / nDSG alignment, not compliance claims)
-- Neutral, factual language
-- Clear imprint / contact information
-
-**Public positioning sentence (landing page):**
-
-> **Schutz sensibler Patientendaten made simple for Swiss small businesses.**
-
----
-
-## 6. Founder Boundary Contract (Internal)
-
-This product is built as a **scalable micro-SaaS**, not a consulting job.
-
-Founder rule:
-
-> **I am building a product, not a consulting business.  
-> If a feature requires my live presence to scale, I do not build it.**
-
-Implications:
-
-- No default calls
-- No custom work promises
-- Value is delivered through the product itself (report, guidance, templates)
-
----
-
-## 7. Phase 0 Completion Criteria
-
-Phase 0 is considered complete only when all of the following are true:
-
-- [x] One-sentence Swiss product definition is written
-- [x] One buyer persona is locked
-- [x] Explicit “NOT” list exists
-- [x] Clear customer outcome is defined
-- [x] Swiss trust positioning is decided
-- [x] Founder boundaries are written
+*Disclaimer: This tool provides general guidance aligned with Swiss standards. It does not replace professional legal or IT advice.*
