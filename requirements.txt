@@ -1,8 +1,8 @@
-# --- Core Framework ---
-Flask==3.1.2
+# --- Core Framework (FastAPI Shift) ---
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
 python-dotenv==1.2.1
-Werkzeug==3.1.5
-gunicorn==25.0.3
 
 # --- Business Logic & Payments ---
 stripe==14.3.0
@@ -13,5 +13,10 @@ weasyprint==68.0
 Pillow==12.1.0
 
 # --- Template Engine ---
+# (Still needed for PDF HTML rendering)
 Jinja2==3.1.6
 MarkupSafe==3.0.3
+
+# --- Database & RaaS Infrastructure (New) ---
+sqlalchemy==2.0.35
+psycopg2-binary==2.9.10

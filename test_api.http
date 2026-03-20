@@ -1,0 +1,15 @@
+### Test the MedSecure RaaS API
+POST http://localhost:8000/api/v1/assess
+Content-Type: application/json
+
+{
+    "business_name": "Dr. Steiner Praxis",
+    "email": "steiner@hin.ch",
+    "answers": {
+        "q1": "yes",
+        "q2": "no",
+        "q3": "yes",
+        "q4": "yes",
+        "q5": "no"
+    }
+}

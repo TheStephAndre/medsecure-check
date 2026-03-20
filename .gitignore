@@ -1,14 +1,18 @@
 # Python
 .venv/
+.venv-fastapi/
 __pycache__/
 *.pyc
+.pytest_cache/
 
-# Environement variables
+# Environment variables
 .env
 
-# Logs and data
+# Logs and Data (nDSG Compliance: keep local data off GitHub)
 logs/
 data/
+*.db
+*.sqlite3
 
 # Editor
 .vscode/
