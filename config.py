@@ -5,6 +5,7 @@ Handles environment variables and directory mapping.
 
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Initialize environment variables
@@ -19,9 +20,10 @@ LOG_DIR = BASE_DIR / "logs"
 for folder in [DATA_DIR / "submissions", DATA_DIR / "pdfs", LOG_DIR]:
     folder.mkdir(parents=True, exist_ok=True)
 
+
 class Config:
     """Application configuration encapsulated in a class for Flask compatibility."""
-    
+
     # Environment & Branding
     ENV = os.getenv("ENV", "development")
     COMPANY_NAME = os.getenv("COMPANY_NAME", "MedSecure Schweiz")
@@ -42,4 +44,4 @@ class Config:
     # Stripe Integration
     STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
     STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
-    STRIPE_PRICE_CHF = int(os.getenv("STRIPE_PRICE_CHF", "5000")) # Amount in cents
+    STRIPE_PRICE_CHF = int(os.getenv("STRIPE_PRICE_CHF", "5000"))  # Amount in cents

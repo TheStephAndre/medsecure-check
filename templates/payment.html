@@ -1,0 +1,38 @@
+{% extends "base.html" %} {% block content %}
+<article>
+  <header>
+    <h2>{{ PRODUCT.report_name }}</h2>
+    <p>Einmalige Schutzgebühr: <strong>{{ PAYMENT.price }}</strong></p>
+  </header>
+
+  <p>{{ PAYMENT.method }}</p>
+
+  <div
+    style="
+      background: #f4f4f4;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+    "
+  >
+    <p><strong>Ihre Referenz:</strong> <code>{{ submission_id }}</code></p>
+    <p>
+      <small
+        >Bitte geben Sie diese Referenz bei einer manuellen Überweisung an oder
+        fahren Sie mit der Online-Zahlung fort.</small
+      >
+    </p>
+  </div>
+
+  <footer>
+    <a
+      href="{{ url_for('pay', submission_id=submission_id) }}"
+      role="button"
+      class="primary"
+    >
+      Jetzt Sicher bezahlen (Stripe / Twint)
+    </a>
+    <p><small>{{ PAYMENT.delivery }}</small></p>
+  </footer>
+</article>
+{% endblock %}

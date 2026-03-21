@@ -20,3 +20,9 @@ MarkupSafe==3.0.3
 # --- Database & RaaS Infrastructure (New) ---
 sqlalchemy==2.0.35
 psycopg2-binary==2.9.10
+
+# --- Email Validator ---
+email-validator>=2.0.0
+
+# --- Handles multipart/form-data for FastAPI ---
+python-multipart>=0.0.7
