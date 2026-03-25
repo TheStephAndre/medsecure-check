@@ -5,6 +5,7 @@
 ![Framework](https://img.shields.io/badge/FastAPI-0.115.0-black.svg)
 ![Stripe](https://img.shields.io/badge/Payments-Stripe-6772e5.svg)
 ![Security](https://img.shields.io/badge/Compliance-nDSG_Ready-red.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ## 🎯 Product Vision
 MedSecure-Check is a professional Micro-SaaS prototype designed to solve "compliance anxiety" for small Swiss medical clinics (dentists, physiotherapists, chiropractors). It automates the gap between a security audit and a formal, actionable PDF report, specifically aligned with the Swiss **nDSG** (Federal Act on Data Protection) expectations.
