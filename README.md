@@ -2,7 +2,7 @@
 **Automated Cyber-Security Assessment & Reporting for Swiss Medical Practices.**
 
 ![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)
-![Framework](https://img.shields.io/badge/Flask-3.1.2-black.svg)
+![Framework](https://img.shields.io/badge/FastAPI-0.115.0-black.svg)
 ![Stripe](https://img.shields.io/badge/Payments-Stripe-6772e5.svg)
 ![Security](https://img.shields.io/badge/Compliance-nDSG_Ready-red.svg)
 
