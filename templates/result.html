@@ -1,18 +1,25 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <article>
-  <header style="text-align: center;">
+  <header style="text-align: center">
     <h2>{{ RESULT.title }}</h2>
-    <div style="font-size: 3rem; font-weight: 800; color: var(--primary);">
+
+    {# Only show the score if the result is valid #} {% if submission.risk_level
+    != 'inconclusive' %}
+    <div style="font-size: 3rem; font-weight: 800; color: var(--primary)">
       {{ submission.assessment }}/100
     </div>
+    {% endif %}
+
     <p>
       {% set level = submission.risk_level or 'medium' %}
       <mark><strong>{{ RESULT.risk_levels[level].label }}:</strong></mark>
-      {{ RESULT.risk_levels[level].description }}
+      {# Use .summary to match your wording.py keys #} {{
+      RESULT.risk_levels[level].summary }}
     </p>
   </header>
 
+  {# Only show the offer and benefits if the result is actionable #} {% if
+  submission.risk_level != 'inconclusive' %}
   <section>
     <h3>{{ RESULT.offer_title }}</h3>
     <ul>
@@ -29,28 +36,53 @@
       <p>{{ RESULT.price_context }}</p>
     </details>
   </section>
+  {% endif %}
 
   <footer>
+    {% if submission.risk_level != 'inconclusive' %}
     <div class="grid">
       <div>
         <strong>{{ RESULT.payment_note }}</strong><br />
         <small>IBAN: <code>{{ IBAN }}</code></small>
       </div>
-      <div style="text-align: right;">
+      <div style="text-align: right">
         <ins>{{ RESULT.offer_price }}</ins>
       </div>
     </div>
-    
-    <p style="margin-top: 1rem;">{{ RESULT.delivery }}</p>
+
+    <p style="margin-top: 1rem">{{ RESULT.delivery }}</p>
 
     <div class="grid">
-      <a href="{{ url_for('pay', submission_id=submission_id) }}" role="button" class="primary">
+      <a
+        href="{{ url_for('pay', submission_id=submission_id) }}"
+        role="button"
+        class="primary"
+      >
         Jetzt Sicher bezahlen (Stripe)
       </a>
-      <a href="{{ url_for('report', submission_id=submission_id) }}" role="button" class="secondary outline">
+      <a
+        href="{{ url_for('report', submission_id=submission_id) }}"
+        role="button"
+        class="secondary outline"
+      >
         {{ RESULT.preview_cta }}
       </a>
     </div>
+    {% else %} {# --- INCONCLUSIVE STATE UI --- #}
+    <div class="warning-box">
+      <p>
+        <strong>Hinweis:</strong> Ihr Audit enthält zu viele "N/A" Antworten für
+        eine präzise Auswertung.
+      </p>
+      <p>
+        Bitte vervollständigen Sie das Audit, um ein aussagekräftiges Rating und
+        den PDF-Bericht zu erhalten.
+      </p>
+      <a href="{{ url_for('audit') }}" role="button" class="secondary">
+        Audit vervollständigen
+      </a>
+    </div>
+    {% endif %}
   </footer>
 </article>
 {% endblock %}

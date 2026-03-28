@@ -110,12 +110,14 @@ class AuditEngine:
         )
 
     def _finalize_results(self) -> dict:
-        """Applies penalties and determines risk level."""
+        """Applies penalties, determines risk level, and checks data density."""
+        # 1. Calculate raw score
         raw_score = (
             round((self.earned / self.possible) * 100) if self.possible > 0 else 0
         )
 
-        # Swiss Confidence Penalty Logic
+        # 2. Swiss Confidence Penalty Logic
+        # We still apply penalties, but we add a "Hard Stop" for N/A count
         penalty = 0
         if 3 <= self.na_count <= 5:
             penalty = 5
@@ -124,11 +126,19 @@ class AuditEngine:
 
         final_score = max(raw_score - penalty, 0)
 
+        # 3. Data Density Check (The "Insufficient Data" Flag)
+        # If > 70% of the audit is skipped, we flag the result as inconclusive.
+        is_inconclusive = self.na_count > 7
+
         return {
             "assessment": final_score,
             "assessment_raw": raw_score,
             "confidence_penalty": penalty,
-            "risk_level": self._classify_risk(final_score),
+            # If inconclusive, we override the classification
+            "risk_level": (
+                "inconclusive" if is_inconclusive else self._classify_risk(final_score)
+            ),
+            "is_valid": not is_inconclusive,
             "failed": self.failed_items,
             "na_count": self.na_count,
         }

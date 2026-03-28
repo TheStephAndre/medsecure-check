@@ -4,31 +4,85 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>
-      {% if submission is defined %}{{ submission.business_name }} - {{ PRODUCT.report_name }}{% else %}{{ PRODUCT.short_name }}{% endif %}
+      {% if submission is defined %}{{ submission.business_name }} - {{
+      PRODUCT.report_name }}{% else %}{{ PRODUCT.short_name }}{% endif %}
     </title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
+    />
+    <link rel="icon" href="https://fav.farm/🛡️" />
     <style>
-      :root { --spacing: 1.5rem; }
-      article { max-width: 800px; margin: 2rem auto; }
-      .print-header, .print-footer { display: none; }
-      
+      :root {
+        --spacing: 1.5rem;
+      }
+      article {
+        max-width: 800px;
+        margin: 2rem auto;
+      }
+      .print-header,
+      .print-footer {
+        display: none;
+      }
+
+      /* --- UI Warning Box --- */
+      .warning-box {
+        background-color: #fff3cd; /* Soft Yellow */
+        border-left: 5px solid #ffc107; /* Stronger Gold/Yellow edge */
+        padding: 1.25rem;
+        border-radius: 4px;
+        margin: 2rem 0;
+        color: #856404; /* Contrast Dark Brown/Yellow for readability */
+      }
+      .warning-box strong {
+        color: #533f03;
+      }
+
       /* --- PDF & Print Optimization --- */
       @media print {
-        header, footer, .no-print { display: none !important; }
-        .print-header, .print-footer { display: block; position: fixed; width: 100%; text-align: center; font-size: 9pt; color: #666; }
-        .print-header { top: 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .print-footer { bottom: 0; border-top: 1px solid #eee; padding-top: 5px; }
-        body { font-size: 11pt; line-height: 1.5; }
-        section { page-break-inside: avoid; }
+        header,
+        footer,
+        .no-print {
+          display: none !important;
+        }
+        .print-header,
+        .print-footer {
+          display: block;
+          position: fixed;
+          width: 100%;
+          text-align: center;
+          font-size: 9pt;
+          color: #666;
+        }
+        .print-header {
+          top: 0;
+          border-bottom: 1px solid #eee;
+          padding-bottom: 5px;
+        }
+        .print-footer {
+          bottom: 0;
+          border-top: 1px solid #eee;
+          padding-top: 5px;
+        }
+        body {
+          font-size: 11pt;
+          line-height: 1.5;
+        }
+        section {
+          page-break-inside: avoid;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="print-header">{{ PRODUCT.name }} — {{ PRODUCT.report_name }}</div>
-    
+    <div class="print-header">
+      {{ PRODUCT.name }} — {{ PRODUCT.report_name }}
+    </div>
+
     {% if submission is defined %}
     <div class="print-footer">
-      {{ submission.business_name }} · {{ submission.created_at_human }} · Seite <span class="page"></span>
+      {{ submission.business_name }} · {{ submission.created_at_human }} · Seite
+      <span class="page"></span>
     </div>
     {% endif %}
 

@@ -43,6 +43,11 @@ AUDIT = {
 
 # --- Risk Classifications (UI & PDF) ---
 RISK_LEVELS = {
+    "inconclusive": {
+        "label": "Nicht bewertbar",
+        "summary": "Es wurden zu viele Fragen mit 'N/A' beantwortet, um eine verlässliche Risikoanalyse zu erstellen.",
+        "pdf_text": "Aufgrund der hohen Anzahl an nicht beantworteten Fragen (N/A) kann keine abschliessende Beurteilung der IT-Sicherheit vorgenommen werden. Eine detaillierte manuelle Überprüfung wird empfohlen.",
+    },
     "high": {
         "label": "Erhöhtes Risiko",
         "summary": "Es bestehen relevante Schwachstellen, die überprüft und priorisiert adressiert werden sollten.",
