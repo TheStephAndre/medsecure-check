@@ -1,82 +1,64 @@
+import os
 import uuid
 from typing import Dict
 
 import stripe
-from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
+from sqlalchemy.orm import Session
 
 import core.wording as wording
-
-# Professional Import Path from our new /core folder
-from core.scoring import QUESTIONS, AuditEngine
+from core.database import get_db
+from core.models import AuditSubmission
+from core.scoring import AuditEngine
 from core.ui import templates
 
 router = APIRouter()
 
 
 # --- RaaS SCHEMA ---
-class AuditSubmission(BaseModel):
+class AuditSubmissionSchema(BaseModel):
     business_name: str
     email: EmailStr
     answers: Dict[str, str]
 
 
-# --- API ENDPOINT (The RaaS Product) ---
-@router.post("/assess")
-async def api_assess(submission: AuditSubmission):
-    """The core engine accessible via JSON for third-party integration."""
-    engine = AuditEngine(submission.answers)
-    results = engine.compute()
-    return {
-        "status": "success",
-        "submission_id": str(uuid.uuid4())[:8],
-        "results": results,
-    }
-
-
-# --- REPORT / PDF ENDPOINT ---
-@router.get("/report/{submission_id}", name="report")
-async def view_report(request: Request, submission_id: str):
-    """
-    Placeholder for viewing/downloading the PDF report.
-    In the future, this will return the actual PDF file.
-    """
-    return HTMLResponse(
-        content=f"<h1>Bericht Vorschau für ID: {submission_id}</h1><p>PDF-Generierung wird hier implementiert.</p>"
-    )
-
-
-# --- PAYMENT PLACEHOLDER ---
-@router.get("/pay/{submission_id}", response_class=HTMLResponse, name="pay_page")
-async def pay_page(request: Request, submission_id: str):
-    """Placeholder for the payment/checkout page."""
-    return templates.TemplateResponse(
-        "payment.html",
-        {
-            "request": request,
-            "submission_id": submission_id,
-            "PAYMENT": wording.PAYMENT,
-        },
-    )
-
-
 # --- WEB ENDPOINT (The UI Form) ---
 @router.post("/submit", response_class=HTMLResponse, name="submit")
 async def web_submit(
-    request: Request, business_name: str = Form(...), email: str = Form(...)
+    request: Request,
+    business_name: str = Form(...),
+    email: str = Form(...),
+    db: Session = Depends(get_db),
 ):
     form_data = await request.form()
     answers = {k: v for k, v in form_data.items() if k.startswith("q")}
 
+    # 1. Run the Scoring Engine
     engine = AuditEngine(answers)
     results = engine.compute()
 
-    # Create a unique ID (Replacing your hashlib logic for simplicity)
+    # 2. Generate persistent ID
     submission_id = str(uuid.uuid4())[:16]
 
-    # TODO: Save to PostgreSQL here (instead of json.dump)
-    # For now, we pass it to the result page
+    # 3. Save to PostgreSQL
+    db_entry = AuditSubmission(
+        id=submission_id,
+        business_name=business_name,
+        email=email,
+        score=results["assessment"],
+        risk_level=results["risk_level"],
+        failed_items=results["failed"],
+        is_paid=False,
+    )
+    db.add(db_entry)
+    db.commit()
+
+    # Pull IBAN from environment(.env)
+    iban_value = os.getenv("IBAN", "CHxx xxxx xxxx xxxx xxxx x")
+
+    # 4. Render UI
     return templates.TemplateResponse(
         "result.html",
         {
@@ -87,25 +69,59 @@ async def web_submit(
             "level": results.get("risk_level"),
             "RESULT": {**wording.RESULT, "risk_levels": wording.RISK_LEVELS},
             "PRODUCT": wording.PRODUCT,
+            "IBAN": iban_value,  # Use the variable from os.getenv
             "DISCLAIMERS": wording.DISCLAIMERS,
         },
     )
 
 
+# --- REPORT / PDF ENDPOINT ---
+@router.get("/report/{submission_id}", name="report")
+async def view_report(
+    request: Request, submission_id: str, db: Session = Depends(get_db)
+):
+    """Fetches the audit from DB to verify it exists before showing preview."""
+    audit = (
+        db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
+    )
+
+    if not audit:
+        raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
+
+    return HTMLResponse(
+        content=f"""
+        <h1>Bericht Vorschau für: {audit.business_name}</h1>
+        <p>ID: {audit.id}</p>
+        <p>Score: {audit.score}/100</p>
+        <p>Status: {"Bezahlt" if audit.is_paid else "Offen"}</p>
+        <hr>
+        <p>PDF-Generierung mit WeasyPrint wird hier implementiert.</p>
+        """
+    )
+
+
+# --- PAYMENT ---
 @router.get("/pay/{submission_id}", name="pay")
-async def pay(request: Request, submission_id: str):
-    """Refactored Stripe Checkout from your Flask app."""
+async def pay(request: Request, submission_id: str, db: Session = Depends(get_db)):
+    """Fetches real email/data from DB for Stripe Checkout."""
+    audit = (
+        db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
+    )
+
+    if not audit:
+        raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
+
     try:
-        # Note: In production, fetch the business_name/email from DB using submission_id
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
+            customer_email=audit.email,  # Professional touch: pre-fill email
             line_items=[
                 {
                     "price_data": {
                         "currency": "chf",
-                        "unit_amount": 4900,  # 49.00 CHF
+                        "unit_amount": 4900,
                         "product_data": {
-                            "name": "MedSecure-Check IT-Sicherheitsbericht"
+                            "name": f"IT-Sicherheitsbericht: {audit.business_name}"
                         },
                     },
                     "quantity": 1,
@@ -113,7 +129,6 @@ async def pay(request: Request, submission_id: str):
             ],
             mode="payment",
             metadata={"submission_id": submission_id},
-            # url_for in FastAPI requires the Request object
             success_url=str(
                 request.url_for("payment_success", submission_id=submission_id)
             ),
@@ -124,6 +139,7 @@ async def pay(request: Request, submission_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# --- PAYMENT SUCCESS ---
 @router.get("/payment/success/{submission_id}", name="payment_success")
 async def payment_success(request: Request, submission_id: str):
     return templates.TemplateResponse(
@@ -131,6 +147,7 @@ async def payment_success(request: Request, submission_id: str):
     )
 
 
+# --- STRIPE WEBHOOK ---
 @router.post("/stripe/webhook")
 async def stripe_webhook(request: Request):
     payload = await request.body()
