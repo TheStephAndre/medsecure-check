@@ -91,6 +91,9 @@ REPORT = {
         "measures": "Empfohlene Massnahmen",
         "next_steps": "Nächste Schritte",
     },
+    "next_steps": {
+        "orientation": "Notieren Sie hier Ihre nächsten geplanten Schritte oder Anmerkungen für Ihr Team:",
+    },
     "unclear": {
         "title": "Unklare Risikolage",
         "description": "Auf Basis Ihrer Angaben konnte keine zuverlässige Bewertung erstellt werden.",

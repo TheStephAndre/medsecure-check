@@ -3,7 +3,7 @@ import uuid
 from typing import Dict
 
 import stripe
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 import core.wording as wording
 from core.database import get_db
 from core.models import AuditSubmission
+from core.pdf import generate_pdf
 from core.scoring import AuditEngine
 from core.ui import templates
 
@@ -77,9 +78,7 @@ async def web_submit(
 
 # --- REPORT / PDF ENDPOINT ---
 @router.get("/report/{submission_id}", name="report")
-async def view_report(
-    request: Request, submission_id: str, db: Session = Depends(get_db)
-):
+async def view_report(submission_id: str, db: Session = Depends(get_db)):
     """Fetches the audit from DB to verify it exists before showing preview."""
     audit = (
         db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
@@ -88,15 +87,49 @@ async def view_report(
     if not audit:
         raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
 
-    return HTMLResponse(
-        content=f"""
-        <h1>Bericht Vorschau für: {audit.business_name}</h1>
-        <p>ID: {audit.id}</p>
-        <p>Score: {audit.score}/100</p>
-        <p>Status: {"Bezahlt" if audit.is_paid else "Offen"}</p>
-        <hr>
-        <p>PDF-Generierung mit WeasyPrint wird hier implementiert.</p>
-        """
+    # Generate the PDF in memory
+    pdf_buffer = generate_pdf(
+        template_name="report_pdf.html",
+        audit_record=audit,
+        company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
+        iban=os.getenv("IBAN", ""),
+    )
+
+    # Return as a PDF response
+    return Response(
+        content=pdf_buffer.getvalue(),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"inline; filename=MedSecure_Bericht_{submission_id}.pdf"
+        },
+    )
+
+
+# --- INVOICE / PDF ENDPOINT ---
+@router.get("/invoice/{submission_id}", name="invoice")
+async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
+    audit = (
+        db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
+    )
+
+    if not audit or not audit.is_paid:
+        raise HTTPException(
+            status_code=403, detail="Rechnung nur nach Zahlung verfügbar."
+        )
+
+    pdf_buffer = generate_pdf(
+        template_name="invoice_pdf.html",
+        audit_record=audit,
+        company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
+        iban=os.getenv("IBAN", ""),
+    )
+
+    return Response(
+        content=pdf_buffer.getvalue(),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=Rechnung_{submission_id}.pdf"
+        },
     )
 
 
