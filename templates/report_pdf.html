@@ -2,7 +2,7 @@
 <html lang="de">
   <head>
     <meta charset="utf-8" />
-    <title>{{ submission.business_name }} - {{ REPORT_PDF.title_suffix }}</title>
+    <title>IT-Sicherheitsbericht</title>
     <style>
       @page {
         size: A4;
@@ -13,32 +13,124 @@
           color: #888;
         }
       }
-      body { font-family: "Helvetica", "Arial", sans-serif; line-height: 1.6; color: #222; }
-      .header { border-bottom: 1pt solid #eee; padding-bottom: 10mm; margin-bottom: 10mm; font-size: 9pt; color: #666; }
-      .title-block { text-align: center; margin-bottom: 15mm; }
-      .score-box { background: #f4f4f4; padding: 20px; text-align: center; border-radius: 5px; margin: 10mm 0; }
-      .score-value { font-size: 32pt; font-weight: bold; display: block; }
-      h2 { border-left: 4pt solid #000; padding-left: 10px; margin-top: 15mm; font-size: 16pt; }
-      .findings-list { list-style: none; padding: 0; }
-      .finding-item { margin-bottom: 8mm; padding-bottom: 4mm; border-bottom: 0.5pt solid #eee; }
-      .finding-item strong { font-size: 12pt; display: block; margin-bottom: 2mm; }
-      .severity-tag { font-size: 8pt; text-transform: uppercase; background: #eee; padding: 2px 6px; }
-      .lines { margin-top: 5mm; border-bottom: 0.5pt solid #ddd; height: 8mm; }
-      .footer-note { font-size: 8pt; color: #999; margin-top: 20mm; font-style: italic; }
+      body {
+        font-family: "Helvetica", "Arial", sans-serif;
+        font-size: 11pt;
+        color: #1a1a1a;
+        line-height: 1.5;
+      }
+
+      /* New Header Layout */
+      .header {
+        text-align: left;
+        border-bottom: 0.5pt solid #eee;
+        padding-bottom: 5mm;
+        margin-bottom: 10mm;
+        font-size: 12pt;
+        color: #666;
+      }
+      .header-line {
+        display: block;
+        margin-bottom: 1mm;
+      }
+
+      /* Emphasized Score */
+      .title-block {
+        margin-bottom: 15mm;
+      }
+      h1 {
+        font-size: 24pt;
+        color: #0056b3;
+        margin-bottom: 2mm;
+      }
+      .score-display {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #333;
+        margin-top: 5mm;
+      }
+      .score-value {
+        color: #0056b3;
+      }
+
+      h2 {
+        border-bottom: 1.5pt solid #eee;
+        padding-bottom: 2mm;
+        margin-top: 10mm;
+        font-size: 14pt;
+        color: #0056b3;
+      }
+
+      .finding-item {
+        margin-bottom: 8mm;
+        padding: 4mm;
+        background-color: #fcfcfc;
+        border: 0.5pt solid #eee;
+        page-break-inside: avoid;
+      }
+      .question {
+        font-weight: bold;
+        font-size: 12pt;
+        display: block;
+        margin-bottom: 2mm;
+        color: #333;
+      }
+      .remedy {
+        color: #555;
+        font-style: italic;
+        margin-bottom: 2mm;
+      }
+
+      .severity-tag {
+        font-size: 8pt;
+        font-weight: bold;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 3px;
+        text-transform: uppercase;
+      }
+      .high-priority {
+        background-color: #d9534f;
+      }
+      .standard-priority {
+        background-color: #5bc0de;
+      }
+
+      .lines {
+        margin-top: 5mm;
+        border-bottom: 1pt solid #ddd;
+        height: 10mm;
+        width: 100%;
+        display: block;
+      }
+
+      /* Spacing for Footer */
+      .footer-spacer {
+        height: 15mm;
+      }
+      .footer-note {
+        font-size: 8.5pt;
+        color: #888;
+        font-style: italic;
+        border-top: 0.5pt solid #eee;
+        padding-top: 5mm;
+      }
     </style>
   </head>
   <body>
     <div class="header">
-      <div style="float: left;">{{ company }} — {{ REPORT_PDF.header_suffix }}</div>
-      <div style="float: right;">{{ REPORT_PDF.generated_on }} {{ submission.created_at_human }}</div>
-      <div style="clear: both;"></div>
+      <span class="header-line"><strong>{{ company }}</strong></span>
+      <span class="header-line">{{ REPORT_PDF.header_suffix }}</span>
+      <span class="header-line"
+        >{{ REPORT_PDF.generated_on }} {{ submission.created_at_human }}</span
+      >
     </div>
 
     <div class="title-block">
       <h1>{{ submission.business_name }}</h1>
-      <div class="score-box">
+      <div class="score-display">
+        Ihre Auswertung:
         <span class="score-value">{{ submission.assessment }}/100</span>
-        {{ REPORT_PDF.assessment_label }}
       </div>
     </div>
 
@@ -50,29 +142,31 @@
     <section>
       <h2>{{ REPORT.sections.measures }}</h2>
       {% if submission.failed|length == 0 %}
-        <p>{{ REPORT.no_findings.description }}</p>
+      <p>{{ REPORT.no_findings.description }}</p>
       {% else %}
-        <div class="findings-list">
-          {% for f in submission.failed %}
-          <div class="finding-item">
-            <strong>{{ f.text }}</strong>
-            <p>{{ f.remedy }}</p>
-            <span class="severity-tag">{{ REPORT.priority_label }}: {{ f.severity }}</span>
-          </div>
-          {% endfor %}
+      <div class="findings-list">
+        {% for f in submission.failed %}
+        <div class="finding-item">
+          <span class="question">{{ f.text }}</span>
+          <p class="remedy"><strong>Massnahme:</strong> {{ f.remedy }}</p>
+          <span class="severity-tag {{ f.severity.lower().replace(' ', '-') }}">
+            {{ REPORT.priority_label }}: {{ f.severity }}
+          </span>
         </div>
+        {% endfor %}
+      </div>
       {% endif %}
     </section>
 
-    <section style="page-break-before: always;">
+    <section style="page-break-inside: avoid">
       <h2>{{ REPORT.sections.next_steps }}</h2>
       <p>{{ REPORT.next_steps.orientation }}</p>
-      <div class="lines"></div>
-      <div class="lines"></div>
-      <div class="lines"></div>
-      <div class="lines"></div>
+      <div class="lines">&nbsp;</div>
+      <div class="lines">&nbsp;</div>
+      <div class="lines">&nbsp;</div>
     </section>
 
+    <div class="footer-spacer"></div>
     <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>
   </body>
 </html>

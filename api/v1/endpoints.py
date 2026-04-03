@@ -87,6 +87,14 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     if not audit:
         raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
 
+    # Create a clean slug for the filename
+    # Removes spaces and special characters from the business name
+    safe_business_name = "".join(x for x in audit.business_name if x.isalnum())
+    date_str = audit.created_at.strftime("%Y-%m-%d")
+
+    # Use a simple, professional filename
+    filename = f"Bericht_{safe_business_name}_{date_str}.pdf"
+
     # Generate the PDF in memory
     pdf_buffer = generate_pdf(
         template_name="report_pdf.html",
@@ -100,7 +108,9 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         content=pdf_buffer.getvalue(),
         media_type="application/pdf",
         headers={
-            "Content-Disposition": f"inline; filename=MedSecure_Bericht_{submission_id}.pdf"
+            # Using 'inline' allows it to open in the browser,
+            # but 'filename' specifies what it will be called when saved.
+            "Content-Disposition": f'inline; filename="{filename}"'
         },
     )
 
