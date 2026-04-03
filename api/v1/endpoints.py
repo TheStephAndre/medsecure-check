@@ -3,7 +3,7 @@ import uuid
 from typing import Dict
 
 import stripe
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -191,26 +191,49 @@ async def payment_success(request: Request, submission_id: str):
 
 
 # --- STRIPE WEBHOOK ---
-@router.post("/stripe/webhook")
-async def stripe_webhook(request: Request):
+
+# Ensure your Stripe API Key is set (Secret Key from Dashboard, starts with sk_test_)
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
+
+
+@router.post("/webhook/stripe")
+async def stripe_webhook(
+    request: Request,
+    stripe_signature: str = Header(None),
+    db: Session = Depends(get_db),
+):
     payload = await request.body()
-    sig_header = request.headers.get("stripe-signature")
 
     try:
+        # 1. Verify the event integrity
         event = stripe.Webhook.construct_event(
-            payload, sig_header, "whsec_..."  # Your Webhook Secret
+            payload, stripe_signature, STRIPE_WEBHOOK_SECRET
         )
-    except Exception:
-        return {"status": "invalid payload"}, 400
+    except ValueError:
+        # Invalid payload
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError:
+        # Invalid signature
+        raise HTTPException(status_code=400, detail="Invalid signature")
 
+    # 2. Handle the specific event
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
-        sid = session["metadata"]["submission_id"]
 
-        # TRIGGER BACKGROUND TASK HERE:
-        # 1. Update DB to 'paid'
-        # 2. Generate PDF with WeasyPrint
-        # 3. Send Email
-        print(f"Payment confirmed for {sid}")
+        # This ID must be passed when you create the Checkout Session initially
+        audit_id = session.get("client_reference_id")
+
+        if audit_id:
+            # 3. Update your PostgreSQL record
+            audit = (
+                db.query(AuditSubmission).filter(AuditSubmission.id == audit_id).first()
+            )
+            if audit:
+                audit.is_paid = True
+                db.commit()
+                print(f"Payment confirmed for Audit: {audit_id}")
+            else:
+                print(f"Webhook received for unknown Audit ID: {audit_id}")
 
     return {"status": "success"}
