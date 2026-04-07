@@ -77,7 +77,8 @@ RESULT = {
         "Berücksichtigung typischer Abläufe in Arztpraxen",
     ],
     "value_explanation": "Der Bericht wurde speziell für medizinische Einrichtungen in der Schweiz entwickelt. Er ersetzt keine Fachberatung, bietet jedoch eine fundierte und unabhängige Ersteinschätzung.",
-    "delivery": "Nach Zahlungseingang erhalten Sie Ihren persönlichen PDF-Bericht per E-Mail (in der Regel innerhalb von 24 Stunden).",
+    "delivery": "Sofortiger Download: Nach erfolgreicher Zahlung wird Ihr PDF-Bericht umgehend freigeschaltet.",
+    "payment_note": "Einmalzahlung für die vollständige Auswertung",
     "preview_cta": "PDF-Bericht anzeigen",
 }
 

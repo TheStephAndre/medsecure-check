@@ -10,110 +10,101 @@
         @bottom-right {
           content: "Seite " counter(page) " von " counter(pages);
           font-size: 9pt;
-          color: #888;
+          color: #666; /* Darkened from #888 */
         }
       }
       body {
         font-family: "Helvetica", "Arial", sans-serif;
         font-size: 11pt;
-        color: #1a1a1a;
+        color: #000000; /* Pure black for maximum legibility */
         line-height: 1.5;
       }
 
-      /* New Header Layout */
+      /* Header Layout */
       .header {
         text-align: left;
-        border-bottom: 0.5pt solid #eee;
+        border-bottom: 1pt solid #999; /* Darkened and thickened */
         padding-bottom: 5mm;
         margin-bottom: 10mm;
         font-size: 12pt;
-        color: #666;
-      }
-      .header-line {
-        display: block;
-        margin-bottom: 1mm;
+        color: #444; /* Darkened from #666 */
       }
 
-      /* Emphasized Score */
-      .title-block {
-        margin-bottom: 15mm;
-      }
+      /* Titles */
       h1 {
         font-size: 24pt;
-        color: #0056b3;
+        color: #004085; /* Deeper blue for print */
         margin-bottom: 2mm;
-      }
-      .score-display {
-        font-size: 18pt;
-        font-weight: bold;
-        color: #333;
-        margin-top: 5mm;
-      }
-      .score-value {
-        color: #0056b3;
       }
 
       h2 {
-        border-bottom: 1.5pt solid #eee;
+        border-bottom: 2pt solid #999; /* Much stronger line */
         padding-bottom: 2mm;
         margin-top: 10mm;
         font-size: 14pt;
-        color: #0056b3;
+        color: #004085;
       }
 
+      /* Finding Items (The "Cards") */
       .finding-item {
         margin-bottom: 8mm;
         padding: 4mm;
-        background-color: #fcfcfc;
-        border: 0.5pt solid #eee;
+        background-color: #f2f2f2; /* Darkened background from #fcfcfc */
+        border: 1pt solid #ccc; /* Darkened border from #eee */
         page-break-inside: avoid;
       }
+
       .question {
         font-weight: bold;
         font-size: 12pt;
         display: block;
         margin-bottom: 2mm;
-        color: #333;
+        color: #000;
       }
+
       .remedy {
-        color: #555;
+        color: #333; /* Darkened from #555 */
         font-style: italic;
         margin-bottom: 2mm;
       }
 
+      /* Severity Tags - High contrast for print */
       .severity-tag {
         font-size: 8pt;
         font-weight: bold;
         color: white;
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: 3px;
         text-transform: uppercase;
+        /* Standard property first, then the prefixed one, for PDF layout compatibility (printers)*/
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact; /* Forces background color in some engines */
       }
       .high-priority {
-        background-color: #d9534f;
+        background-color: #a94442; /* Deeper red */
       }
       .standard-priority {
-        background-color: #5bc0de;
+        background-color: #31708f; /* Deeper blue/teal */
       }
 
+      /* Input Lines for handwritten notes */
       .lines {
-        margin-top: 5mm;
-        border-bottom: 1pt solid #ddd;
-        height: 10mm;
+        border-bottom: 1.5pt solid #888;
+        height: 0; /* Let the margin handle the height */
         width: 100%;
         display: block;
+        clear: both;
       }
 
-      /* Spacing for Footer */
-      .footer-spacer {
-        height: 15mm;
-      }
       .footer-note {
         font-size: 8.5pt;
-        color: #888;
+        color: #444;
         font-style: italic;
-        border-top: 0.5pt solid #eee;
+        border-top: 1pt solid #999;
         padding-top: 5mm;
+        margin-top: 10mm; /* Extra safety gap */
+        display: block;
+        width: 100%;
       }
     </style>
   </head>
@@ -158,15 +149,18 @@
       {% endif %}
     </section>
 
-    <section style="page-break-inside: avoid">
+    <section style="page-break-inside: avoid; margin-bottom: 10mm">
       <h2>{{ REPORT.sections.next_steps }}</h2>
-      <p>{{ REPORT.next_steps.orientation }}</p>
-      <div class="lines">&nbsp;</div>
-      <div class="lines">&nbsp;</div>
-      <div class="lines">&nbsp;</div>
+      <p style="margin-bottom: 8mm">{{ REPORT.next_steps.orientation }}</p>
+
+      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
+      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
+      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
+      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
     </section>
 
-    <div class="footer-spacer"></div>
+    <div style="clear: both; margin-top: 20mm"></div>
+
     <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>
   </body>
 </html>

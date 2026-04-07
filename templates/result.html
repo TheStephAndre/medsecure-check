@@ -40,19 +40,14 @@
 
   <footer>
     {% if submission.risk_level != 'inconclusive' %}
-    <div class="grid">
-      <div>
-        <strong>{{ RESULT.payment_note }}</strong><br />
-        <small>IBAN: <code>{{ IBAN }}</code></small>
-      </div>
-      <div style="text-align: right">
-        <ins>{{ RESULT.offer_price }}</ins>
-      </div>
+
+    <div style="text-align: center; margin-bottom: 2rem">
+      <h3 style="margin-bottom: 0">{{ RESULT.offer_price }}</h3>
+      <p><small>{{ RESULT.payment_note }}</small></p>
+      <p>{{ RESULT.delivery }}</p>
     </div>
 
-    <p style="margin-top: 1rem">{{ RESULT.delivery }}</p>
-
-    <div style="text-align: center; margin-top: 2rem">
+    <div style="text-align: center">
       <a
         href="{{ url_for('pay', submission_id=submission_id) }}"
         role="button"
@@ -62,6 +57,7 @@
         Vollständigen Bericht jetzt freischalten (Stripe)
       </a>
     </div>
+
     {% else %} {# --- INCONCLUSIVE STATE UI --- #}
     <div class="warning-box">
       <p>

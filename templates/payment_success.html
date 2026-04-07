@@ -1,24 +1,34 @@
-<!doctype html>
-<html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Zahlung Erfolgreich</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
-    />
-  </head>
-  <body>
-    <h1>Vielen Dank für Ihre Zahlung!</h1>
+{% extends "base.html" %} {% block content %}
+<article>
+  <header style="text-align: center">
+    <h2 style="color: var(--ins-color)">✓ Zahlung Erfolgreich</h2>
+    <p>Vielen Dank, Ihr Bericht wurde freigeschaltet.</p>
+  </header>
+
+  <section style="text-align: center; padding: 2rem 0">
     <p>
-      Ihre Transaktion war erfolgreich. Sie können nun Ihren vollständigen
-      Bericht herunterladen.
+      Die Transaktion für <strong>{{ PRODUCT.name }}</strong> wurde erfolgreich
+      abgeschlossen.
     </p>
 
-    <a href="/api/v1/report/{{ submission_id }}" class="button"
-      >Bericht jetzt herunterladen (PDF)</a
-    >
-    <br /><br />
-    <a href="/">Zurück zur Startseite</a>
-  </body>
-</html>
+    <div style="margin-top: 2rem">
+      <a
+        href="/api/v1/report/{{ submission_id }}"
+        role="button"
+        class="primary"
+      >
+        Bericht jetzt als PDF herunterladen
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <p style="text-align: center">
+      <small>Eine Kopie der Rechnung wird für Ihre Unterlagen erstellt.</small>
+    </p>
+    <div style="text-align: center">
+      <a href="/" class="secondary">Zurück zur Startseite</a>
+    </div>
+  </footer>
+</article>
+{% endblock %}
