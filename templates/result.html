@@ -52,20 +52,14 @@
 
     <p style="margin-top: 1rem">{{ RESULT.delivery }}</p>
 
-    <div class="grid">
+    <div style="text-align: center; margin-top: 2rem">
       <a
         href="{{ url_for('pay', submission_id=submission_id) }}"
         role="button"
         class="primary"
+        style="width: 100%"
       >
-        Jetzt Sicher bezahlen (Stripe)
-      </a>
-      <a
-        href="{{ url_for('report', submission_id=submission_id) }}"
-        role="button"
-        class="secondary outline"
-      >
-        {{ RESULT.preview_cta }}
+        Vollständigen Bericht jetzt freischalten (Stripe)
       </a>
     </div>
     {% else %} {# --- INCONCLUSIVE STATE UI --- #}

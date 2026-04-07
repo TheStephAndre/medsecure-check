@@ -87,11 +87,15 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     if not audit:
         raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
 
+    # The Gatekeeper Logic if it is not paid
+    if not audit.is_paid:
+        # Redirect to the pay route if they haven't paid yet
+        return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
+
     # Create a clean slug for the filename
     # Removes spaces and special characters from the business name
     safe_business_name = "".join(x for x in audit.business_name if x.isalnum())
     date_str = audit.created_at.strftime("%Y-%m-%d")
-
     # Use a simple, professional filename
     filename = f"Bericht_{safe_business_name}_{date_str}.pdf"
 
@@ -115,34 +119,6 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     )
 
 
-# --- INVOICE / PDF ENDPOINT ---
-@router.get("/invoice/{submission_id}", name="invoice")
-async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
-    audit = (
-        db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
-    )
-
-    if not audit or not audit.is_paid:
-        raise HTTPException(
-            status_code=403, detail="Rechnung nur nach Zahlung verfügbar."
-        )
-
-    pdf_buffer = generate_pdf(
-        template_name="invoice_pdf.html",
-        audit_record=audit,
-        company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
-        iban=os.getenv("IBAN", ""),
-    )
-
-    return Response(
-        content=pdf_buffer.getvalue(),
-        media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=Rechnung_{submission_id}.pdf"
-        },
-    )
-
-
 # --- PAYMENT ---
 @router.get("/pay/{submission_id}", name="pay")
 async def pay(request: Request, submission_id: str, db: Session = Depends(get_db)):
@@ -158,6 +134,8 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             customer_email=audit.email,  # Professional touch: pre-fill email
+            # Add client_reference_id so the Webhook knows which audit to update
+            client_reference_id=submission_id,
             line_items=[
                 {
                     "price_data": {
@@ -237,3 +215,31 @@ async def stripe_webhook(
                 print(f"Webhook received for unknown Audit ID: {audit_id}")
 
     return {"status": "success"}
+
+
+# --- INVOICE / PDF ENDPOINT ---
+@router.get("/invoice/{submission_id}", name="invoice")
+async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
+    audit = (
+        db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
+    )
+
+    if not audit or not audit.is_paid:
+        raise HTTPException(
+            status_code=403, detail="Rechnung nur nach Zahlung verfügbar."
+        )
+
+    pdf_buffer = generate_pdf(
+        template_name="invoice_pdf.html",
+        audit_record=audit,
+        company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
+        iban=os.getenv("IBAN", ""),
+    )
+
+    return Response(
+        content=pdf_buffer.getvalue(),
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f"attachment; filename=Rechnung_{submission_id}.pdf"
+        },
+    )

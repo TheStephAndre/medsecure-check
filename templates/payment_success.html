@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Zahlung Erfolgreich</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+  </head>
+  <body>
+    <h1>Vielen Dank für Ihre Zahlung!</h1>
+    <p>
+      Ihre Transaktion war erfolgreich. Sie können nun Ihren vollständigen
+      Bericht herunterladen.
+    </p>
+
+    <a href="/api/v1/report/{{ submission_id }}" class="button"
+      >Bericht jetzt herunterladen (PDF)</a
+    >
+    <br /><br />
+    <a href="/">Zurück zur Startseite</a>
+  </body>
+</html>
