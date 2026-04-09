@@ -1,22 +1,29 @@
 import os
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-import core.models as models  # New: Ensure models are loaded
+import core.models as models  # Ensure models are loaded
 import core.wording as wording
 from api.v1.endpoints import router as api_v1_router
 from core.database import Base, engine  # New: Database imports
 from core.ui import templates
 
-# Initialize Database Tables (Automatic Migration for MVP)
+# Initialize Database Tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="MedSecure-Check RaaS", version="2.0.0")
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+# --- HELPER FUNCTION ---
+def get_lexicon(lang: str = "de-CH"):
+    """Fetch the correct language dictionary from core.wording"""
+    # Fallback to German if the requested language doesn't exist
+    return wording.LEXICON.get(lang, wording.LEXICON["de-CH"])
 
 
 # --- FAVICON FIX ---
@@ -36,30 +43,40 @@ async def favicon():
 app.include_router(api_v1_router, prefix="/api/v1")
 
 
-@app.get("/")
-async def index(request: Request):
+# --- HOME ROUTE ---
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request, lang: str = "de-CH"):
+
+    # Get the correct dictionary based on the URL parameter
+    lex = get_lexicon(lang)
+
     return templates.TemplateResponse(
         "index.html",
         {
             "request": request,
-            "LANDING": wording.LANDING,
-            "PRODUCT": wording.PRODUCT,
-            "DISCLAIMERS": wording.DISCLAIMERS,
+            "current_lang": lang,
+            "LANDING": lex["LANDING"],
+            "PRODUCT": lex["PRODUCT"],
+            "DISCLAIMERS": lex["DISCLAIMERS"],
         },
     )
 
 
-@app.get("/audit")
-async def audit(request: Request):
+# --- AUDIT ROUTE ---
+@app.get("/audit", response_class=HTMLResponse, name="audit")
+async def audit(request: Request, lang: str = "de-CH"):
     from core.scoring import QUESTIONS
+
+    lex = get_lexicon(lang)
 
     return templates.TemplateResponse(
         "audit.html",
         {
             "request": request,
             "questions": QUESTIONS,
-            "AUDIT": wording.AUDIT,
-            "PRODUCT": wording.PRODUCT,
-            "DISCLAIMERS": wording.DISCLAIMERS,
+            "current_lang": lang,
+            "AUDIT": lex["AUDIT"],
+            "PRODUCT": lex["PRODUCT"],
+            "DISCLAIMERS": lex["DISCLAIMERS"],
         },
     )

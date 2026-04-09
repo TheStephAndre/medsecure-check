@@ -1,9 +1,18 @@
 import os
 import uuid
-from typing import Dict
+from typing import Dict, Optional
 
 import stripe
-from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request, Response
+from fastapi import (
+    APIRouter,
+    Depends,
+    Form,
+    Header,
+    HTTPException,
+    Query,
+    Request,
+    Response,
+)
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -25,12 +34,20 @@ class AuditSubmissionSchema(BaseModel):
     answers: Dict[str, str]
 
 
+# --- Get Lexicon for a specific language ---
+def get_lexicon(lang: str = "de-CH"):
+    """Returns the dictionary for the requested language, fallback to German."""
+    return wording.LEXICON.get(lang, wording.LEXICON["de-CH"])
+
+
 # --- WEB ENDPOINT (The UI Form) ---
 @router.post("/submit", response_class=HTMLResponse, name="submit")
 async def web_submit(
     request: Request,
     business_name: str = Form(...),
     email: str = Form(...),
+    # Capture language form a hidden form field
+    lang: str = Form("de-CH"),
     db: Session = Depends(get_db),
 ):
     form_data = await request.form()
@@ -48,6 +65,7 @@ async def web_submit(
         id=submission_id,
         business_name=business_name,
         email=email,
+        lang=lang,  # language
         score=results["assessment"],
         risk_level=results["risk_level"],
         failed_items=results["failed"],
@@ -56,21 +74,22 @@ async def web_submit(
     db.add(db_entry)
     db.commit()
 
-    # Pull IBAN from environment(.env)
-    iban_value = os.getenv("IBAN", "CHxx xxxx xxxx xxxx xxxx x")
+    # Get the specific wording
+    lex = get_lexicon(lang)
 
     # 4. Render UI
     return templates.TemplateResponse(
         "result.html",
         {
+            "current_lang": lang,
             "request": request,
             "submission_id": submission_id,
             "business_name": business_name,
             "submission": results,
             "level": results.get("risk_level"),
-            "RESULT": {**wording.RESULT, "risk_levels": wording.RISK_LEVELS},
-            "PRODUCT": wording.PRODUCT,
-            "IBAN": iban_value,  # Use the variable from os.getenv
+            # Use the local lexicon instead of wording.RESULT
+            "RESULT": {**lex["RESULT"], "risk_levels": lex["RISK_LEVELS"]},
+            "PRODUCT": lex["PRODUCT"],
             "DISCLAIMERS": wording.DISCLAIMERS,
         },
     )
@@ -92,19 +111,33 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         # Redirect to the pay route if they haven't paid yet
         return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
 
-    # Create a clean slug for the filename
+    # Pylance check (ensures audit is not None)
+    if not bool(audit.is_paid):
+        return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
+
+    # Use the language stored in the DB for the PDF
+    lang = getattr(audit, "lang", "de-CH")
+    lex = get_lexicon(lang)
+
+    # Create a clean slug for the filename (cast business_name to string for alnum check)
     # Removes spaces and special characters from the business name
-    safe_business_name = "".join(x for x in audit.business_name if x.isalnum())
+    biz_name = str(audit.business_name)
+    safe_business_name = "".join(x for x in biz_name if x.isalnum())
     date_str = audit.created_at.strftime("%Y-%m-%d")
+    # Localize filename prefix
+    report_prefix = str(lex["PRODUCT"]["report_name"]).replace(" ", "_")
     # Use a simple, professional filename
-    filename = f"Bericht_{safe_business_name}_{date_str}.pdf"
+    filename = f"{report_prefix}_{safe_business_name}_{date_str}.pdf"
+
+    lex = get_lexicon(current_lang)  # Returns the full DE/FR/IT dict
 
     # Generate the PDF in memory
     pdf_buffer = generate_pdf(
         template_name="report_pdf.html",
         audit_record=audit,
+        # Pass the whole localized lexicon to the PDF generator(core/pdf.py)
+        lexicon=lex,
         company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
-        iban=os.getenv("IBAN", ""),
     )
 
     # Return as a PDF response
@@ -130,7 +163,17 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
     if not audit:
         raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
 
+    # Define 'lex' here so it is not undefined
+    lang = str(audit.lang) if audit.lang else "de-CH"
+    lex = get_lexicon(lang)
+
     try:
+        # request.url_for can return NoneType, cast to str()
+        success_url = str(
+            request.url_for("payment_success", submission_id=submission_id)
+        )
+        cancel_url = str(request.url_for("submit"))
+
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             customer_email=audit.email,  # Professional touch: pre-fill email
@@ -142,18 +185,16 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
                         "currency": "chf",
                         "unit_amount": 4900,
                         "product_data": {
-                            "name": f"IT-Sicherheitsbericht: {audit.business_name}"
+                            # Localized Stripe product name
+                            "name": f"{lex['PRODUCT']['report_name']}: {audit.business_name}"
                         },
                     },
                     "quantity": 1,
                 }
             ],
             mode="payment",
-            metadata={"submission_id": submission_id},
-            success_url=str(
-                request.url_for("payment_success", submission_id=submission_id)
-            ),
-            cancel_url=str(request.url_for("submit")),
+            success_url=success_url,
+            cancel_url=cancel_url,
         )
         return RedirectResponse(url=checkout_session.url, status_code=303)
     except Exception as e:
@@ -191,7 +232,7 @@ async def stripe_webhook(
     except ValueError:
         # Invalid payload
         raise HTTPException(status_code=400, detail="Invalid payload")
-    except stripe.error.SignatureVerificationError:
+    except stripe.SignatureVerificationError:
         # Invalid signature
         raise HTTPException(status_code=400, detail="Invalid signature")
 

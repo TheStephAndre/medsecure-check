@@ -12,6 +12,9 @@ class AuditSubmission(Base):
     business_name = Column(String, nullable=False)
     email = Column(String, nullable=False)
 
+    # Language of the user - 'fr-CH', 'it-CH'
+    lang = Column(String, default="de-CH", nullable=False)
+
     score = Column(Integer)
     risk_level = Column(String)
     failed_items = Column(JSON)  # Stores the list of security gaps
