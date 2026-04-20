@@ -1,6 +1,6 @@
 import os
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -8,7 +8,9 @@ import core.models as models  # Ensure models are loaded
 import core.wording as wording
 from api.v1.endpoints import router as api_v1_router
 from core.database import Base, engine  # New: Database imports
+from core.scoring import QUESTION_CONFIG
 from core.ui import templates
+from core.wording import get_lexicon
 
 # Initialize Database Tables
 Base.metadata.create_all(bind=engine)
@@ -17,13 +19,6 @@ app = FastAPI(title="MedSecure-Check RaaS", version="2.0.0")
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-
-# --- HELPER FUNCTION ---
-def get_lexicon(lang: str = "de-CH"):
-    """Fetch the correct language dictionary from core.wording"""
-    # Fallback to German if the requested language doesn't exist
-    return wording.LEXICON.get(lang, wording.LEXICON["de-CH"])
 
 
 # --- FAVICON FIX ---
@@ -65,15 +60,22 @@ async def index(request: Request, lang: str = "de-CH"):
 # --- AUDIT ROUTE ---
 @app.get("/audit", response_class=HTMLResponse, name="audit")
 async def audit(request: Request, lang: str = "de-CH"):
-    from core.scoring import QUESTIONS
 
+    # Get the localized text
     lex = get_lexicon(lang)
+
+    # Combine them for the template
+    # We create a list of questions that have both the ID and the localized text
+    localized_questions = []
+    for cfg in QUESTION_CONFIG:
+        q_id = cfg["id"]
+        localized_questions.append({"id": q_id, "text": lex["QUESTIONS"][q_id]["text"]})
 
     return templates.TemplateResponse(
         "audit.html",
         {
             "request": request,
-            "questions": QUESTIONS,
+            "questions": localized_questions,  # Pass the translated questions
             "current_lang": lang,
             "AUDIT": lex["AUDIT"],
             "PRODUCT": lex["PRODUCT"],

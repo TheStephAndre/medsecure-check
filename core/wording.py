@@ -5,6 +5,50 @@ Locale: de-CH, fr-CH, it-CH
 
 LEXICON = {
     "de-CH": {
+        # --- Questions for audit ---
+        "QUESTIONS": {
+            "q1": {
+                "text": "Verwenden Sie für geschäftliche Konten starke und einzigartige Passwörter?",
+                "remedy": "Verwenden Sie einen Passwort-Manager und für jedes Konto ein eigenes Passwort.",
+            },
+            "q2": {
+                "text": "Nutzen Sie einen Passwort-Manager?",
+                "remedy": "Setzen Sie einen etablierten Passwort-Manager für sich und Ihre Mitarbeitenden ein.",
+            },
+            "q3": {
+                "text": "Werden Passwörter bei Mitarbeiteraustritt oder Verdacht auf Missbrauch geändert?",
+                "remedy": "Definieren Sie klare Regeln für Passwortänderungen bei Personalwechsel oder Sicherheitsvorfällen.",
+            },
+            "q4": {
+                "text": "Werden Kunden- und Patientendaten sicher gespeichert?",
+                "remedy": "Speichern Sie nur notwendige Personendaten und verwenden Sie wenn möglich verschlüsselte Systeme.",
+            },
+            "q5": {
+                "text": "Erstellen Sie regelmässig automatische Backups Ihrer Geschäftsdaten?",
+                "remedy": "Richten Sie tägliche automatische Backups ein und bewahren Sie mindestens eine Kopie extern auf.",
+            },
+            "q6": {
+                "text": "Werden Backups regelmässig getestet?",
+                "remedy": "Testen Sie mindestens vierteljährlich, ob sich Ihre Backups wiederherstellen lassen.",
+            },
+            "q7": {
+                "text": "Ist auf allen Computern ein aktueller Viren- oder Endpunktschutz installiert?",
+                "remedy": "Installieren Sie einen etablierten Endpunktschutz und halten Sie diesen aktuell.",
+            },
+            "q8": {
+                "text": "Ist das Kunden-WLAN vom internen Geschäftsnetz getrennt?",
+                "remedy": "Richten Sie ein separates Gäste-WLAN ein.",
+            },
+            "q9": {
+                "text": "Werden Software-Updates und Sicherheitsupdates regelmässig installiert?",
+                "remedy": "Aktivieren Sie automatische Updates oder planen Sie regelmässige Wartungsfenster ein.",
+            },
+            "q10": {
+                "text": "Nutzen Sie Zwei-Faktor-Authentifizierung (2FA) für E-Mail- und Administrationskonten?",
+                "remedy": "Aktivieren Sie 2FA für E-Mail-, Cloud- und Administrationszugänge.",
+            },
+        },
+        # --- Product Identity ---
         "PRODUCT": {
             "name": "MedSecure-Check",
             "short_name": "MedSecure-Check Schweiz",
@@ -15,6 +59,7 @@ LEXICON = {
                 "und kleinere medizinische Einrichtungen in der Schweiz."
             ),
         },
+        # --- Landing Page Content ---
         "LANDING": {
             "headline": "IT-Sicherheit für Arztpraxen - verständlich geprüft",
             "intro": "Ein strukturierter IT-Sicherheits-Check für Arztpraxen und medizinische Einrichtungen in der Schweiz.",
@@ -23,6 +68,7 @@ LEXICON = {
             "price_label": "CHF 49.-",
             "cta": "IT-Sicherheits-Check starten",
         },
+        # --- Audit Interface --
         "AUDIT": {
             "title": "Strukturierter IT-Sicherheits-Check für medizinische Einrichtungen (ca. 5 Minuten)",
             "fields": {
@@ -36,6 +82,7 @@ LEXICON = {
             },
             "submit": "IT-Sicherheitsbewertung erstellen",
         },
+        # --- Risk Classifications (UI & PDF) ---
         "RISK_LEVELS": {
             "inconclusive": {
                 "label": "Nicht bewertbar",
@@ -58,6 +105,7 @@ LEXICON = {
                 "pdf_text": "Die IT-Sicherheitsgrundlagen sind weitgehend etabliert. Eine regelmässige Überprüfung und Aktualisierung der Massnahmen wird empfohlen.",
             },
         },
+        # --- Results & Sales Page ---
         "RESULT": {
             "title": "Ihre Auswertung",
             "offer_title": "Persönlicher IT-Sicherheitsbericht für Ihre Praxis",
@@ -69,10 +117,17 @@ LEXICON = {
                 "Berücksichtigung typischer Abläufe in Arztpraxen",
             ],
             "value_explanation": "Der Bericht wurde speziell für medizinische Einrichtungen in der Schweiz entwickelt. Er ersetzt keine Fachberatung, bietet jedoch eine fundierte und unabhängige Ersteinschätzung.",
+            "cta_button": "Vollständigen Bericht jetzt freischalten (Stripe)",
+            "inconclusive": {
+                "label": "Hinweis",
+                "text": "Ihr Audit enthält zu viele 'N/A' Antworten...",
+                "button": "Audit vervollständigen",
+            },
             "delivery": "Sofortiger Download: Nach erfolgreicher Zahlung wird Ihr PDF-Bericht umgehend freigeschaltet.",
             "payment_note": "Einmalzahlung für die vollständige Auswertung",
             "preview_cta": "PDF-Bericht anzeigen",
         },
+        # --- Report & PDF Generation Content ---
         "REPORT": {
             "print_cta": "Als PDF speichern",
             "date_label": "Datum",
@@ -93,12 +148,14 @@ LEXICON = {
             "findings_intro": "Die folgenden Massnahmen haben den grössten Einfluss auf Ihre IT-Sicherheit:",
             "priority_label": "Priorität",
         },
+        # --- Report & PDF Generation Content ---
         "REPORT_PDF": {
             "title_suffix": "IT-Sicherheitsbericht",
             "header_suffix": "IT-Sicherheitsbericht für medizinische Einrichtungen",
             "generated_on": "Bewertung basierend auf Angaben vom",
             "footer_note": "Dieser Bericht dient ausschliesslich als Orientierungshilfe und ersetzt keine individuelle IT- oder Rechtsberatung.",
         },
+        # --- Legal & Positioning ---
         "DISCLAIMERS": {
             "website": "Dieser Check stellt keine rechtliche, regulatorische oder medizinische Beratung dar.",
             "report": "Dieser Bericht dient ausschliesslich als Orientierungshilfe und ersetzt keine individuelle IT-, Rechts- oder Fachberatung.",
@@ -111,6 +168,49 @@ LEXICON = {
     },
     # ---- SWISS FRENCH ---
     "fr-CH": {
+        # --- Questions for audit ---
+        "QUESTIONS": {
+            "q1": {
+                "text": "Utilisez-vous des mots de passe forts et uniques pour vos comptes professionnels ?",
+                "remedy": "Utilisez un gestionnaire de mots de passe et un mot de passe distinct pour chaque compte.",
+            },
+            "q2": {
+                "text": "Utilisez-vous un gestionnaire de mots de passe au sein du cabinet ?",
+                "remedy": "Mettez en place un gestionnaire de mots de passe reconnu pour vous-même et vos collaborateurs.",
+            },
+            "q3": {
+                "text": "Les mots de passe sont-ils modifiés lors du départ d'un collaborateur ou en cas de suspicion d'abus ?",
+                "remedy": "Définissez des règles claires pour le changement des accès lors de changements de personnel ou d'incidents de sécurité.",
+            },
+            "q4": {
+                "text": "Les données des patients sont-elles stockées de manière sécurisée ?",
+                "remedy": "Ne conservez que les données personnelles nécessaires et utilisez, dans la mesure du possible, des systèmes cryptés.",
+            },
+            "q5": {
+                "text": "Effectuez-vous régulièrement des sauvegardes automatiques de vos données professionnelles ?",
+                "remedy": "Configurez des sauvegardes automatiques quotidiennes et conservez au moins une copie hors site.",
+            },
+            "q6": {
+                "text": "Les sauvegardes (backups) sont-elles testées régulièrement ?",
+                "remedy": "Testez au moins une fois par trimestre si vos sauvegardes peuvent être restaurées correctement.",
+            },
+            "q7": {
+                "text": "Une protection antivirus ou « endpoint » à jour est-elle installée sur tous les ordinateurs ?",
+                "remedy": "Installez une solution de protection reconnue et assurez-vous qu'elle soit constamment mise à jour.",
+            },
+            "q8": {
+                "text": "Le Wi-Fi destiné aux patients est-il séparé du réseau interne du cabinet ?",
+                "remedy": "Configurez un réseau Wi-Fi distinct pour les visiteurs et les patients.",
+            },
+            "q9": {
+                "text": "Les mises à jour logicielles et de sécurité sont-elles installées régulièrement ?",
+                "remedy": "Activez les mises à jour automatiques ou planifiez des fenêtres de maintenance régulières.",
+            },
+            "q10": {
+                "text": "Utilisez-vous l'authentification à deux facteurs (2FA) pour vos comptes e-mail et administratifs ?",
+                "remedy": "Activez la 2FA pour les accès e-mail, cloud et les comptes d'administration.",
+            },
+        },
         # --- Product Identity ---
         "PRODUCT": {
             "name": "MedSecure-Check",
@@ -180,6 +280,12 @@ LEXICON = {
                 "Prise en compte des processus typiques des cabinets médicaux",
             ],
             "value_explanation": "Le rapport a été spécialement conçu pour les institutions médicales en Suisse. Il ne remplace pas un conseil spécialisé, mais offre une première évaluation indépendante et fondée.",
+            "cta_button": "Débloquer le rapport complet maintenant (Stripe)",  # This fixes your button
+            "inconclusive": {
+                "label": "Remarque",
+                "text": "Votre audit contient trop de réponses 'N/A' pour une évaluation précise.",
+                "button": "Compléter l'audit",
+            },
             "delivery": "Téléchargement immédiat : après paiement, votre rapport PDF est débloqué instantanément.",
             "payment_note": "Paiement unique pour l'évaluation complète",
             "preview_cta": "Afficher le rapport PDF",
@@ -224,6 +330,49 @@ LEXICON = {
     },
     # --- SWISS ITALIAN ---
     "it-CH": {
+        # --- Questions for audit ---
+        "QUESTIONS": {
+            "q1": {
+                "text": "Utilizza password robuste e univoche per i Suoi account professionali?",
+                "remedy": "Utilizzi un gestore di password e una password diversa per ogni account.",
+            },
+            "q2": {
+                "text": "Utilizzate un gestore di password (password manager) nello studio?",
+                "remedy": "Adotti un gestore di password affidabile per Lei e per i Suoi collaboratori.",
+            },
+            "q3": {
+                "text": "Le password vengono modificate in caso di uscita di un collaboratore o sospetto abuso?",
+                "remedy": "Definisca regole chiare per la modifica delle password in caso di avvicendamento del personale o incidenti di sicurezza.",
+            },
+            "q4": {
+                "text": "I dati dei pazienti vengono archiviati in modo sicuro?",
+                "remedy": "Conservi solo i dati personali necessari e utilizzi, laddove possibile, sistemi crittografati.",
+            },
+            "q5": {
+                "text": "Esegue regolarmente backup automatici dei dati professionali?",
+                "remedy": "Imposti backup automatici giornalieri e conservi almeno una copia esternamente allo studio.",
+            },
+            "q6": {
+                "text": "I backup vengono testati regolarmente?",
+                "remedy": "Verifichi almeno trimestralmente se i backup possono essere ripristinati correttamente.",
+            },
+            "q7": {
+                "text": "Su tutti i computer è installata una protezione antivirus o endpoint aggiornata?",
+                "remedy": "Installi una protezione endpoint affidabile e la mantenga costantemente aggiornata.",
+            },
+            "q8": {
+                "text": "La rete Wi-Fi per i pazienti è separata dalla rete aziendale interna?",
+                "remedy": "Configuri una rete Wi-Fi separata per ospiti e pazienti.",
+            },
+            "q9": {
+                "text": "Gli aggiornamenti software e di sicurezza vengono installati regolarmente?",
+                "remedy": "Attivi gli aggiornamenti automatici o pianifichi finestre di manutenzione regolari.",
+            },
+            "q10": {
+                "text": "Utilizza l'autenticazione a due fattori (2FA) per l'e-mail e gli account amministrativi?",
+                "remedy": "Attivi la 2FA per gli accessi e-mail, i servizi cloud e gli account di amministrazione.",
+            },
+        },
         # --- Product Identity ---
         "PRODUCT": {
             "name": "MedSecure-Check",
@@ -336,6 +485,14 @@ LEXICON = {
         },
     },
 }
+
+
+# --- Helper function for the OS language of the user ---
+def get_lexicon(lang: str = "de-CH"):
+    """Fetch the correct language dictionary from core.wording"""
+    # Fallback to German if the requested language doesn't exist
+    return LEXICON.get(lang, LEXICON["de-CH"])
+
 
 # --- Default Pointers for Legacy Support ---
 PRODUCT = LEXICON["de-CH"]["PRODUCT"]

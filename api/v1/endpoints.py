@@ -23,6 +23,7 @@ from core.models import AuditSubmission
 from core.pdf import generate_pdf
 from core.scoring import AuditEngine
 from core.ui import templates
+from core.wording import get_lexicon
 
 router = APIRouter()
 
@@ -54,7 +55,7 @@ async def web_submit(
     answers = {k: v for k, v in form_data.items() if k.startswith("q")}
 
     # 1. Run the Scoring Engine
-    engine = AuditEngine(answers)
+    engine = AuditEngine(answers, lang=lang)
     results = engine.compute()
 
     # 2. Generate persistent ID
@@ -90,7 +91,7 @@ async def web_submit(
             # Use the local lexicon instead of wording.RESULT
             "RESULT": {**lex["RESULT"], "risk_levels": lex["RISK_LEVELS"]},
             "PRODUCT": lex["PRODUCT"],
-            "DISCLAIMERS": wording.DISCLAIMERS,
+            "DISCLAIMERS": lex["DISCLAIMERS"],
         },
     )
 
@@ -129,7 +130,7 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     # Use a simple, professional filename
     filename = f"{report_prefix}_{safe_business_name}_{date_str}.pdf"
 
-    lex = get_lexicon(current_lang)  # Returns the full DE/FR/IT dict
+    lex = get_lexicon(lang)  # Returns the full DE/FR/IT dict
 
     # Generate the PDF in memory
     pdf_buffer = generate_pdf(

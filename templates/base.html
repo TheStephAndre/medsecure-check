@@ -122,9 +122,31 @@
             <li><strong>{{ PRODUCT.name }}</strong></li>
           </ul>
           <ul>
-            <li><a href="{{ request.url.path }}?lang=de-CH">DE</a></li>
-            <li><a href="{{ request.url.path }}?lang=fr-CH">FR</a></li>
-            <li><a href="{{ request.url.path }}?lang=it-CH">IT</a></li>
+            {# Define the target path: if we are on results, go back to audit.
+            Otherwise, stay on current path. #} {% set target_path = "/audit" if
+            "submit" in request.url.path else request.url.path %}
+
+            <li>
+              <a
+                href="{{ target_path }}?lang=de-CH"
+                class="{{ 'active' if current_lang == 'de-CH' }}"
+                >DE</a
+              >
+            </li>
+            <li>
+              <a
+                href="{{ target_path }}?lang=fr-CH"
+                class="{{ 'active' if current_lang == 'fr-CH' }}"
+                >FR</a
+              >
+            </li>
+            <li>
+              <a
+                href="{{ target_path }}?lang=it-CH"
+                class="{{ 'active' if current_lang == 'it-CH' }}"
+                >IT</a
+              >
+            </li>
           </ul>
         </nav>
 

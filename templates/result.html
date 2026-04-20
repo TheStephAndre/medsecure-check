@@ -54,22 +54,23 @@
         class="primary"
         style="width: 100%"
       >
-        Vollständigen Bericht jetzt freischalten (Stripe)
+        {# Text for the Stripe button #} {{ RESULT.cta_button }}
       </a>
     </div>
 
     {% else %} {# --- INCONCLUSIVE STATE UI --- #}
     <div class="warning-box">
       <p>
-        <strong>Hinweis:</strong> Ihr Audit enthält zu viele "N/A" Antworten für
-        eine präzise Auswertung.
+        {# Text for not enough valid answers. #}
+        <strong>{{ RESULT.inconclusive.label }}:</strong> {{
+        RESULT.inconclusive.text }}
       </p>
-      <p>
-        Bitte vervollständigen Sie das Audit, um ein aussagekräftiges Rating und
-        den PDF-Bericht zu erhalten.
-      </p>
-      <a href="{{ url_for('audit') }}" role="button" class="secondary">
-        Audit vervollständigen
+      <a
+        href="{{ url_for('audit') }}?lang={{ current_lang }}"
+        role="button"
+        class="secondary"
+      >
+        {# Text to redo the audit #} {{ RESULT.inconclusive.button }}
       </a>
     </div>
     {% endif %}
