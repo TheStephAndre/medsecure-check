@@ -6,7 +6,9 @@ from weasyprint import HTML
 from core.ui import templates
 
 
-def generate_pdf(template_name: str, audit_record, lexicon, company_name: str):
+def generate_pdf(
+    template_name: str, audit_record, lexicon, company_name: str, **kwargs
+):
     """
     Generic PDF generator for Reports and Invoices.
     Maps SQLAlchemy model fields to Template expectations.
@@ -30,8 +32,14 @@ def generate_pdf(template_name: str, audit_record, lexicon, company_name: str):
         "PRODUCT": lexicon.get("PRODUCT"),
         "RESULT": lexicon.get("RESULT"),
         "RISK_LEVELS": lexicon.get("RISK_LEVELS"),
+        "REPORT": lexicon.get("REPORT"),
+        "REPORT_PDF": lexicon.get("REPORT_PDF"),
         "DISCLAIMERS": lexicon.get("DISCLAIMERS"),
+        **kwargs,  # Captures anything else like IBAN for invoices
     }
+
+    # This merges extra stuff (like IBAN) into the context IF it exists
+    context.update(kwargs)
 
     # 3. Render HTML
     template = templates.get_template(template_name)

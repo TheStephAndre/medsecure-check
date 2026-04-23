@@ -118,19 +118,17 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
 
     # Use the language stored in the DB for the PDF
     lang = getattr(audit, "lang", "de-CH")
-    lex = get_lexicon(lang)
+    lex = get_lexicon(lang)  # Returns the full DE/FR/IT dict
 
     # Create a clean slug for the filename (cast business_name to string for alnum check)
     # Removes spaces and special characters from the business name
-    biz_name = str(audit.business_name)
-    safe_business_name = "".join(x for x in biz_name if x.isalnum())
+    biz_name = str(audit.business_name).replace(".", "").replace(" ", "_")
+    safe_business_name = "".join(x for x in biz_name if x.isalnum() or x == "_")
     date_str = audit.created_at.strftime("%Y-%m-%d")
     # Localize filename prefix
-    report_prefix = str(lex["PRODUCT"]["report_name"]).replace(" ", "_")
+    report_prefix = str(lex["REPORT_PDF"]["title_suffix"]).replace(" ", "_")
     # Use a simple, professional filename
     filename = f"{report_prefix}_{safe_business_name}_{date_str}.pdf"
-
-    lex = get_lexicon(lang)  # Returns the full DE/FR/IT dict
 
     # Generate the PDF in memory
     pdf_buffer = generate_pdf(
@@ -170,8 +168,9 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
 
     try:
         # request.url_for can return NoneType, cast to str()
-        success_url = str(
-            request.url_for("payment_success", submission_id=submission_id)
+        success_url = (
+            str(request.url_for("payment_success", submission_id=submission_id))
+            + f"?lang={lang}"
         )
         cancel_url = str(request.url_for("submit"))
 
@@ -204,9 +203,28 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
 
 # --- PAYMENT SUCCESS ---
 @router.get("/payment/success/{submission_id}", name="payment_success")
-async def payment_success(request: Request, submission_id: str):
+async def payment_success(
+    request: Request, submission_id: str, db: Session = Depends(get_db)
+):
+    # Fetch the record to get the saved language
+    audit = (
+        db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
+    )
+
+    # Default to de-CH if not found, but use the record's lang if available
+    lang = audit.lang if audit else "de-CH"
+    lex = get_lexicon(lang)
+
     return templates.TemplateResponse(
-        "payment_success.html", {"request": request, "submission_id": submission_id}
+        "payment_success.html",
+        {
+            "request": request,
+            "submission_id": submission_id,
+            "current_lang": lang,
+            "PRODUCT": lex["PRODUCT"],
+            "SUCCESS": lex["SUCCESS"],
+            "DISCLAIMERS": lex["DISCLAIMERS"],
+        },
     )
 
 

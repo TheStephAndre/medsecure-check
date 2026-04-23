@@ -127,7 +127,17 @@ LEXICON = {
             "payment_note": "Einmalzahlung für die vollständige Auswertung",
             "preview_cta": "PDF-Bericht anzeigen",
         },
-        # --- Report & PDF Generation Content ---
+        # --- Payment successful ---
+        "SUCCESS": {
+            "title": "Zahlung Erfolgreich",
+            "message": "Vielen Dank, Ihr Bericht wurde freigeschaltet.",
+            "transaction_prefix": "Die Transaktion für",
+            "transaction_suffix": "wurde erfolgreich abgeschlossen.",
+            "download_button": "Bericht jetzt als PDF herunterladen",
+            "invoice_note": "Eine Kopie der Rechnung wird für Ihre Unterlagen erstellt.",
+            "back_home": "Zurück zur Startseite",
+        },
+        # --- Report  ---
         "REPORT": {
             "print_cta": "Als PDF speichern",
             "date_label": "Datum",
@@ -148,7 +158,7 @@ LEXICON = {
             "findings_intro": "Die folgenden Massnahmen haben den grössten Einfluss auf Ihre IT-Sicherheit:",
             "priority_label": "Priorität",
         },
-        # --- Report & PDF Generation Content ---
+        # --- PDF Generation Content ---
         "REPORT_PDF": {
             "title_suffix": "IT-Sicherheitsbericht",
             "header_suffix": "IT-Sicherheitsbericht für medizinische Einrichtungen",
@@ -290,7 +300,17 @@ LEXICON = {
             "payment_note": "Paiement unique pour l'évaluation complète",
             "preview_cta": "Afficher le rapport PDF",
         },
-        # --- Report & PDF Generation Content ---
+        # ---- Payment successful ---
+        "SUCCESS": {
+            "title": "Paiement réussi",
+            "message": "Merci, votre rapport a été débloqué.",
+            "transaction_prefix": "La transaction pour",
+            "transaction_suffix": "a été complétée avec succès.",
+            "download_button": "Télécharger le rapport PDF maintenant",
+            "invoice_note": "Une copie de la facture sera générée pour vos dossiers.",
+            "back_home": "Retour à l'accueil",
+        },
+        # --- Report ---
         "REPORT": {
             "print_cta": "Enregistrer en PDF",
             "date_label": "Date",
@@ -309,13 +329,19 @@ LEXICON = {
                 "note": "De nombreuses questions ont été marquées comme 'non applicables'.",
             },
             "findings_intro": "Les mesures suivantes ont le plus grand impact sur votre sécurité informatique :",
-            "priority_label": "Priorité",
+            "score_label": "Votre évaluation",
+            "measure_label": "Mesure",
+            "priority_label": "PRIORITÉ",
+            "priorities": {"high": "PRIORITÉ ÉLEVÉE", "standard": "PRIORITÉ STANDARD"},
         },
+        # ---  PDF Generation Content ---
         "REPORT_PDF": {
             "title_suffix": "Rapport de sécurité informatique",
             "header_suffix": "Rapport de sécurité informatique pour institutions médicales",
             "generated_on": "Évaluation basée sur les informations du",
             "footer_note": "Ce rapport sert exclusivement de guide d'orientation et ne remplace pas un conseil informatique ou juridique individuel.",
+            "page": "Page",
+            "of": "sur",
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
@@ -442,11 +468,22 @@ LEXICON = {
                 "Considerazione dei processi tipici degli studi medici",
             ],
             "value_explanation": "Il rapporto è stato sviluppato specificamente per le strutture sanitarie in Svizzera. Non sostituisce una consulenza specialistica, ma offre una prima valutazione indipendente.",
+            "cta_button": "Sblocca il rapporto completo ora (Stripe)",
             "delivery": "Download immediato: dopo il pagamento, il rapporto PDF sarà sbloccato istantaneamente.",
             "payment_note": "Pagamento unico per la valutazione completa",
             "preview_cta": "Visualizza il rapporto PDF",
         },
-        # --- Report & PDF Generation Content ---
+        # --- Payment successful ---
+        "SUCCESS": {
+            "title": "Pagamento riuscito",
+            "message": "Grazie, il Suo rapporto è stato sbloccato.",
+            "transaction_prefix": "La transazione per",
+            "transaction_suffix": "è stata completata con successo.",
+            "download_button": "Scarica il rapporto PDF ora",
+            "invoice_note": "Una copia della fattura sarà generata per i Suoi archivi.",
+            "back_home": "Torna alla pagina iniziale",
+        },
+        # --- Report  ---
         "REPORT": {
             "print_cta": "Salva come PDF",
             "date_label": "Data",
@@ -467,6 +504,7 @@ LEXICON = {
             "findings_intro": "Le seguenti misure hanno il maggiore impatto sulla vostra sicurezza informatica:",
             "priority_label": "Priorità",
         },
+        # --- PDF Generation Content ---
         "REPORT_PDF": {
             "title_suffix": "Rapporto sulla sicurezza informatica",
             "header_suffix": "Rapporto sulla sicurezza informatica per strutture sanitarie",

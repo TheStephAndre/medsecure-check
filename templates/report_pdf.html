@@ -2,13 +2,14 @@
 <html lang="de">
   <head>
     <meta charset="utf-8" />
-    <title>IT-Sicherheitsbericht</title>
+    <title>{{ REPORT_PDF.title_suffix }}</title>
     <style>
       @page {
         size: A4;
         margin: 25mm 20mm;
         @bottom-right {
-          content: "Seite " counter(page) " von " counter(pages);
+          content: "{{ REPORT_PDF.page }} " counter(page)
+            " {{ REPORT_PDF.of }} " counter(pages);
           font-size: 9pt;
           color: #666; /* Darkened from #888 */
         }
@@ -78,13 +79,16 @@
         text-transform: uppercase;
         /* Standard property first, then the prefixed one, for PDF layout compatibility (printers)*/
         print-color-adjust: exact;
-        -webkit-print-color-adjust: exact; /* Forces background color in some engines */
+        /* Forces background color in some engines */
+        -webkit-print-color-adjust: exact;
       }
-      .high-priority {
-        background-color: #a94442; /* Deeper red */
+      /* Deep Red*/
+      .high {
+        background-color: #a94442;
       }
-      .standard-priority {
-        background-color: #31708f; /* Deeper blue/teal */
+      /* Deeper blue/teal */
+      .standard {
+        background-color: #31708f;
       }
 
       /* Input Lines for handwritten notes */
@@ -120,7 +124,7 @@
     <div class="title-block">
       <h1>{{ submission.business_name }}</h1>
       <div class="score-display">
-        Ihre Auswertung:
+        {{ REPORT.score_label }}:
         <span class="score-value">{{ submission.assessment }}/100</span>
       </div>
     </div>
@@ -139,9 +143,11 @@
         {% for f in submission.failed %}
         <div class="finding-item">
           <span class="question">{{ f.text }}</span>
-          <p class="remedy"><strong>Massnahme:</strong> {{ f.remedy }}</p>
-          <span class="severity-tag {{ f.severity.lower().replace(' ', '-') }}">
-            {{ REPORT.priority_label }}: {{ f.severity }}
+          <p class="remedy">
+            <strong>{{ REPORT.measure_label }}:</strong> {{ f.remedy }}
+          </p>
+          <span class="severity-tag {{ f.severity_key }}">
+            {{ REPORT.priority_label }}: {{ REPORT.priorities[f.severity_key] }}
           </span>
         </div>
         {% endfor %}

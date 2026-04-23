@@ -65,7 +65,7 @@ class AuditEngine:
                 "id": q_id,
                 "text": text,
                 "remedy": remedy,
-                "severity": "High Priority" if weight >= 2 else "Standard Priority",
+                "severity_key": "high" if weight >= 2 else "standard",
             }
         )
 

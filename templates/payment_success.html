@@ -1,14 +1,14 @@
 {% extends "base.html" %} {% block content %}
 <article>
   <header style="text-align: center">
-    <h2 style="color: var(--ins-color)">✓ Zahlung Erfolgreich</h2>
-    <p>Vielen Dank, Ihr Bericht wurde freigeschaltet.</p>
+    <h2 style="color: var(--ins-color)">✓ {{ SUCCESS.title }}</h2>
+    <p>{{ SUCCESS.message }}</p>
   </header>
 
   <section style="text-align: center; padding: 2rem 0">
     <p>
-      Die Transaktion für <strong>{{ PRODUCT.name }}</strong> wurde erfolgreich
-      abgeschlossen.
+      {{ SUCCESS.transaction_prefix }} <strong>{{ PRODUCT.name }}</strong> {{
+      SUCCESS.transaction_suffix }}
     </p>
 
     <div style="margin-top: 2rem">
@@ -17,17 +17,19 @@
         role="button"
         class="primary"
       >
-        Bericht jetzt als PDF herunterladen
+        {{ SUCCESS.download_button }}
       </a>
     </div>
   </section>
 
   <footer>
     <p style="text-align: center">
-      <small>Eine Kopie der Rechnung wird für Ihre Unterlagen erstellt.</small>
+      <small>{{ SUCCESS.invoice_note }}</small>
     </p>
     <div style="text-align: center">
-      <a href="/" class="secondary">Zurück zur Startseite</a>
+      <a href="/?lang={{ current_lang }}" class="secondary"
+        >{{ SUCCESS.back_home }}</a
+      >
     </div>
   </footer>
 </article>
