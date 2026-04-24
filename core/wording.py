@@ -156,7 +156,10 @@ LEXICON = {
                 "note": "Viele Fragen wurden als „nicht zutreffend“ beantwortet.",
             },
             "findings_intro": "Die folgenden Massnahmen haben den grössten Einfluss auf Ihre IT-Sicherheit:",
-            "priority_label": "Priorität",
+            "score_label": "Ihre Bewertung",
+            "measure_label": "Massnahme",
+            "priority_label": "PRIORITÄT",
+            "priorities": {"high": "HOCH", "standard": "STANDARD"},
         },
         # --- PDF Generation Content ---
         "REPORT_PDF": {
@@ -164,6 +167,8 @@ LEXICON = {
             "header_suffix": "IT-Sicherheitsbericht für medizinische Einrichtungen",
             "generated_on": "Bewertung basierend auf Angaben vom",
             "footer_note": "Dieser Bericht dient ausschliesslich als Orientierungshilfe und ersetzt keine individuelle IT- oder Rechtsberatung.",
+            "page": "Seite",
+            "of": "von",
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
@@ -332,7 +337,7 @@ LEXICON = {
             "score_label": "Votre évaluation",
             "measure_label": "Mesure",
             "priority_label": "PRIORITÉ",
-            "priorities": {"high": "PRIORITÉ ÉLEVÉE", "standard": "PRIORITÉ STANDARD"},
+            "priorities": {"high": "ÉLEVÉE", "standard": "STANDARD"},
         },
         # ---  PDF Generation Content ---
         "REPORT_PDF": {
@@ -502,7 +507,10 @@ LEXICON = {
                 "note": "Molte domande hanno ricevuto la risposta 'non applicabile'.",
             },
             "findings_intro": "Le seguenti misure hanno il maggiore impatto sulla vostra sicurezza informatica:",
-            "priority_label": "Priorità",
+            "score_label": "La vostra valutazione",
+            "measure_label": "Misura",
+            "priority_label": "PRIORITÀ",
+            "priorities": {"high": "ELEVATA", "standard": "STANDARD"},
         },
         # --- PDF Generation Content ---
         "REPORT_PDF": {
@@ -510,6 +518,8 @@ LEXICON = {
             "header_suffix": "Rapporto sulla sicurezza informatica per strutture sanitarie",
             "generated_on": "Valutazione basata sui dati del",
             "footer_note": "Questo rapporto serve esclusivamente come guida orientativa e non sostituisce una consulenza informatica o legale individuale.",
+            "page": "Pagina",
+            "of": "di",
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
