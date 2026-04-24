@@ -51,7 +51,7 @@ LEXICON = {
         # --- Product Identity ---
         "PRODUCT": {
             "name": "MedSecure-Check",
-            "short_name": "MedSecure-Check Schweiz",
+            "short_name": "MedSecure-Check",
             "report_name": "IT-Sicherheitsbericht",
             "tagline": "IT-Sicherheitscheck für Arztpraxen in der Schweiz",
             "short_description": (
@@ -160,6 +160,10 @@ LEXICON = {
             "measure_label": "Massnahme",
             "priority_label": "PRIORITÄT",
             "priorities": {"high": "HOCH", "standard": "STANDARD"},
+            "no_findings": {
+                "title": "Keine kritischen Schwachstellen identifiziert",
+                "description": "Herzlichen Glückwunsch! Auf Basis Ihrer Antworten wurden keine kritischen Sicherheitslücken festgestellt. Ihre aktuelle Konfiguration entspricht den gängigen Best Practices.",
+            },
         },
         # --- PDF Generation Content ---
         "REPORT_PDF": {
@@ -355,6 +359,10 @@ LEXICON = {
             "measure_label": "Mesure",
             "priority_label": "PRIORITÉ",
             "priorities": {"high": "ÉLEVÉE", "standard": "STANDARD"},
+            "no_findings": {
+                "title": "Aucune lacune critique identifiée",
+                "description": "Félicitations ! Sur la base de vos réponses, aucune faille de sécurité critique n'a été détectée. Votre configuration actuelle respecte les bonnes pratiques.",
+            },
         },
         # ---  PDF Generation Content ---
         "REPORT_PDF": {
@@ -545,6 +553,10 @@ LEXICON = {
             "measure_label": "Misura",
             "priority_label": "PRIORITÀ",
             "priorities": {"high": "ELEVATA", "standard": "STANDARD"},
+            "no_findings": {
+                "title": "Nessuna lacuna critica identificata",
+                "description": "Congratulazioni! Sulla base delle vostre risposte, non sono state rilevate falle di sicurezza critiche. La vostra configurazione attuale rispetta le buone pratiche.",
+            },
         },
         # --- PDF Generation Content ---
         "REPORT_PDF": {

@@ -26,7 +26,7 @@ class Config:
 
     # Environment & Branding
     ENV = os.getenv("ENV", "development")
-    COMPANY_NAME = os.getenv("COMPANY_NAME", "MedSecure Schweiz")
+    COMPANY_NAME = os.getenv("COMPANY_NAME", "MedSecure")
     IBAN = os.getenv("IBAN", "")
 
     # Mail Server (SMTP)

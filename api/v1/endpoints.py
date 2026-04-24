@@ -107,6 +107,9 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     if not audit:
         raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
 
+    # Refresh to get the latest status from the Webhook
+    db.refresh(audit)
+
     # The Gatekeeper Logic if it is not paid
     if not audit.is_paid:
         # Redirect to the pay route if they haven't paid yet
@@ -139,7 +142,7 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         audit_record=audit,
         # Pass the whole localized lexicon to the PDF generator(core/pdf.py)
         lexicon=lex,
-        company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
+        company_name=os.getenv("COMPANY_NAME", "MedSecure"),
         # Passing the filename to the template context
         display_filename=filename,
     )
@@ -308,7 +311,7 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
         template_name="invoice_pdf.html",
         audit_record=audit,
         lexicon=lex,
-        company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
+        company_name=os.getenv("COMPANY_NAME", "MedSecure"),
         # Passing the filename to the template context
         display_filename=filename,
     )
