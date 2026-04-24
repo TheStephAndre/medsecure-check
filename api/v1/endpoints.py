@@ -120,15 +120,18 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     lang = getattr(audit, "lang", "de-CH")
     lex = get_lexicon(lang)  # Returns the full DE/FR/IT dict
 
-    # Create a clean slug for the filename (cast business_name to string for alnum check)
+    # Create a clean business_name to string for alnum check)
     # Removes spaces and special characters from the business name
     biz_name = str(audit.business_name).replace(".", "").replace(" ", "_")
     safe_business_name = "".join(x for x in biz_name if x.isalnum() or x == "_")
+
+    # Construct the localized filename
+    # Result example: Rapport_MedSecure_Clinic_Bern_2026-04-24.pdf
+    report_prefix = lex["REPORT_PDF"]["filename_prefix"]
     date_str = audit.created_at.strftime("%Y-%m-%d")
-    # Localize filename prefix
-    report_prefix = str(lex["REPORT_PDF"]["title_suffix"]).replace(" ", "_")
+
     # Use a simple, professional filename
-    filename = f"{report_prefix}_{safe_business_name}_{date_str}.pdf"
+    filename = f"{report_prefix}_MedSecure_{safe_business_name}_{date_str}.pdf"
 
     # Generate the PDF in memory
     pdf_buffer = generate_pdf(
@@ -137,6 +140,8 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         # Pass the whole localized lexicon to the PDF generator(core/pdf.py)
         lexicon=lex,
         company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
+        # Passing the filename to the template context
+        display_filename=filename,
     )
 
     # Return as a PDF response
@@ -289,17 +294,29 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
             status_code=403, detail="Rechnung nur nach Zahlung verfügbar."
         )
 
+    # Fetch localized wording
+    lang = getattr(audit, "lang", "de-CH")
+    lex = get_lexicon(lang)
+    inv_lex = lex["INVOICE"]
+
+    # Create the dynamic filename here
+    # Use only the first 8 chars of ID for a cleaner look
+    short_id = str(submission_id)[:8]
+    filename = f"{inv_lex['filename_prefix']}_MedSecure_{short_id}.pdf"
+
     pdf_buffer = generate_pdf(
         template_name="invoice_pdf.html",
         audit_record=audit,
+        lexicon=lex,
         company_name=os.getenv("COMPANY_NAME", "MedSecure Schweiz"),
-        iban=os.getenv("IBAN", ""),
+        # Passing the filename to the template context
+        display_filename=filename,
     )
 
     return Response(
         content=pdf_buffer.getvalue(),
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f"attachment; filename=Rechnung_{submission_id}.pdf"
-        },
+        # Use 'inline' so it opens in browser, but 'filename'
+        # tells the browser what to call it when the user clicks 'Save'.
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
     )

@@ -2,7 +2,9 @@
 <html lang="de">
   <head>
     <meta charset="utf-8" />
-    <title>{{ REPORT_PDF.title_suffix }}</title>
+    <title>
+      {{ REPORT_PDF.filename_prefix }}_MedSecure_{{ submission.business_name }}
+    </title>
     <style>
       @page {
         size: A4;

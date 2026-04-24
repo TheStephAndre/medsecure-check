@@ -1,56 +1,119 @@
 <!doctype html>
-<html lang="de">
+<html lang="{{ lexicon.lang }}">
   <head>
     <meta charset="utf-8" />
+    <title>{{ INVOICE.filename_prefix }}_MedSecure_{{ submission.id }}</title>
     <style>
-      body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.6; padding: 40px; }
-      .header { border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 40px; }
-      .company-info { float: left; }
-      .invoice-meta { float: right; text-align: right; }
-      .clear { clear: both; }
-      table { width: 100%; border-collapse: collapse; margin: 40px 0; }
-      th { background: #f8f8f8; text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
-      td { padding: 10px; border-bottom: 1px solid #eee; }
-      .total { font-size: 1.4rem; font-weight: bold; text-align: right; }
-      .footer { margin-top: 60px; font-size: 0.9rem; color: #777; border-top: 1px solid #eee; padding-top: 20px; }
+      body {
+        font-family: "Helvetica", "Arial", sans-serif;
+        color: #333;
+        line-height: 1.6;
+        padding: 40px;
+      }
+      .header {
+        border-bottom: 2px solid #000;
+        padding-bottom: 20px;
+        margin-bottom: 40px;
+      }
+      .company-info {
+        float: left;
+      }
+      .invoice-meta {
+        float: right;
+        text-align: right;
+      }
+      .clear {
+        clear: both;
+      }
+      .paid-stamp {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        border: 3px solid #28a745;
+        color: #28a745;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 8px;
+        transform: rotate(-5deg);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 40px 0;
+      }
+      th {
+        background: #f8f8f8;
+        text-align: left;
+        padding: 12px;
+        border-bottom: 2px solid #333;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+      }
+      .total-section {
+        text-align: right;
+        margin-top: 20px;
+      }
+      .total {
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+      .footer {
+        margin-top: 100px;
+        font-size: 0.85rem;
+        color: #666;
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+      }
     </style>
   </head>
   <body>
     <div class="header">
       <div class="company-info">
         <strong>{{ company }}</strong><br />
-        {{ PRODUCT.name }}
+        {{ PRODUCT.name }}<br />
       </div>
       <div class="invoice-meta">
-        <h1>RECHNUNG</h1>
-        Nr: {{ submission.invoice_number }}<br />
-        Datum: {{ submission.created_at_human }}
+        <h1>{{ INVOICE.title }}</h1>
+        {{ INVOICE.number_label }}: {{ submission.id }}<br />
+        {{ INVOICE.date_label }}: {{ submission.created_at_human }}
       </div>
       <div class="clear"></div>
     </div>
 
+    <div class="paid-stamp">{{ INVOICE.status_paid }}</div>
+
     <table>
       <thead>
         <tr>
-          <th>Leistung</th>
-          <th style="text-align: right;">Betrag</th>
+          <th>{{ INVOICE.service_label }}</th>
+          <th style="text-align: right">{{ INVOICE.amount_label }}</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>{{ PRODUCT.report_name }} (Individuelle Analyse)</td>
-          <td style="text-align: right;">CHF 49.00</td>
+          <td>
+            <strong>{{ PRODUCT.report_name }}</strong><br />
+            <small>{{ INVOICE.description_suffix }}</small>
+          </td>
+          <td style="text-align: right">CHF 49.00</td>
         </tr>
       </tbody>
     </table>
 
-    <p class="total">Gesamtbetrag: CHF 49.00</p>
-    <p><em>Zahlbar innerhalb von 10 Tagen ohne Abzug. Nicht MWST-pflichtig.</em></p>
+    <div class="total-section">
+      <p class="total">{{ INVOICE.total_label }}: CHF 49.00</p>
+      <p><em>{{ INVOICE.vat_note }}</em></p>
+    </div>
 
     <div class="footer">
-      <strong>Zahlungsinformationen:</strong><br />
-      IBAN: {{ IBAN }}<br />
-      Bitte geben Sie die Rechnungsnummer {{ submission.invoice_number }} als Referenz an.
+      <p>{{ INVOICE.thanks_message }}</p>
+      <p>
+        <strong>{{ company }}</strong> | {{ PRODUCT.name }}<br />
+        {{ INVOICE.generated_on }} {{ submission.created_at_human }}
+      </p>
     </div>
   </body>
 </html>

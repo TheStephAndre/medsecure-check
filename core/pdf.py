@@ -29,12 +29,14 @@ def generate_pdf(
     context = {
         "submission": submission_data,
         "company": company_name,
+        "lexicon": lexicon,
         "PRODUCT": lexicon.get("PRODUCT"),
         "RESULT": lexicon.get("RESULT"),
         "RISK_LEVELS": lexicon.get("RISK_LEVELS"),
         "REPORT": lexicon.get("REPORT"),
         "REPORT_PDF": lexicon.get("REPORT_PDF"),
         "DISCLAIMERS": lexicon.get("DISCLAIMERS"),
+        "INVOICE": lexicon.get("INVOICE"),
         **kwargs,  # Captures anything else like IBAN for invoices
     }
 

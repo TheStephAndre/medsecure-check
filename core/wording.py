@@ -169,16 +169,33 @@ LEXICON = {
             "footer_note": "Dieser Bericht dient ausschliesslich als Orientierungshilfe und ersetzt keine individuelle IT- oder Rechtsberatung.",
             "page": "Seite",
             "of": "von",
+            "filename_prefix": "Bericht",
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
             "website": "Dieser Check stellt keine rechtliche, regulatorische oder medizinische Beratung dar.",
             "report": "Dieser Bericht dient ausschliesslich als Orientierungshilfe und ersetzt keine individuelle IT-, Rechts- oder Fachberatung.",
         },
+        # --- Paymeent ---
         "PAYMENT": {
             "price": "CHF 49.-",
             "method": "Kreditkarte / Stripe",
             "delivery": "Sofortiger Zugriff nach erfolgreicher Zahlung.",
+        },
+        # --- Invoice / Receipt (de-CH) ---
+        "INVOICE": {
+            "title": "ZAHLUNGSBESTÄTIGUNG",
+            "date_label": "Datum",
+            "number_label": "Bestellnummer",
+            "service_label": "Leistung",
+            "amount_label": "Betrag",
+            "description_suffix": "(Individuelle Analyse)",
+            "total_label": "Gesamtbetrag (inkl. MwSt)",
+            "status_paid": "BEZAHLT",
+            "thanks_message": "Vielen Dank für Ihr Vertrauen. Dieses Dokument dient als Zahlungsbeleg.",
+            "vat_note": "Nicht MWST-pflichtig.",
+            "generated_on": "Automatisch generiert am",
+            "filename_prefix": "Quittung",
         },
     },
     # ---- SWISS FRENCH ---
@@ -347,16 +364,33 @@ LEXICON = {
             "footer_note": "Ce rapport sert exclusivement de guide d'orientation et ne remplace pas un conseil informatique ou juridique individuel.",
             "page": "Page",
             "of": "sur",
+            "filename_prefix": "Rapport",
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
             "website": "Ce check-up ne constitue pas un conseil juridique, réglementaire ou médical.",
             "report": "Ce rapport sert exclusivement de guide d'orientation et ne remplace pas un conseil informatique, juridique ou technique individuel.",
         },
+        # ---Payment ---
         "PAYMENT": {
             "price": "CHF 49.-",
             "method": "Paiement par carte de crédit / Stripe",
             "delivery": "Accès immédiat : votre rapport PDF est disponible dès la confirmation du paiement.",
+        },
+        # --- Invoice / Receipt ---
+        "INVOICE": {
+            "title": "QUITTANCE DE PAIEMENT",  # "Payment Receipt"
+            "date_label": "Date",
+            "number_label": "No de commande",
+            "service_label": "Prestation",
+            "amount_label": "Montant",
+            "description_suffix": "(Analyse individuelle)",
+            "total_label": "Montant total (TTC)",
+            "status_paid": "PAYÉ",
+            "thanks_message": "Merci de votre confiance. Ce document sert de justificatif de paiement.",
+            "vat_note": "Non soumis à la TVA.",
+            "generated_on": "Généré automatiquement le",
+            "filename_prefix": "Quittance",
         },
     },
     # --- SWISS ITALIAN ---
@@ -520,16 +554,33 @@ LEXICON = {
             "footer_note": "Questo rapporto serve esclusivamente come guida orientativa e non sostituisce una consulenza informatica o legale individuale.",
             "page": "Pagina",
             "of": "di",
+            "filename_prefix": "Rapporto",
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
             "website": "Questo check non costituisce una consulenza legale, normativa o medica.",
             "report": "Questo rapporto serve esclusivamente come guida orientativa e non sostituisce una consulenza individuale informatica, legale o specialistica.",
         },
+        # --- Payment ---
         "PAYMENT": {
             "price": "CHF 49.-",
             "method": "Pagamento tramite carta di credito / Stripe",
             "delivery": "Accesso immediato: il rapporto PDF è disponibile subito dopo la conferma del pagamento.",
+        },
+        # --- Invoice / Receipt (it-CH) ---
+        "INVOICE": {
+            "title": "RICEVUTA DI PAGAMENTO",
+            "date_label": "Data",
+            "number_label": "No. d'ordine",
+            "service_label": "Prestazione",
+            "amount_label": "Importo",
+            "description_suffix": "(Analisi individuale)",
+            "total_label": "Importo totale (IVA incl.)",
+            "status_paid": "PAGATO",
+            "thanks_message": "Grazie per la fiducia. Questo documento funge da giustificativo di pagamento.",
+            "vat_note": "Non soggetto a IVA.",
+            "generated_on": "Generato automaticamente il",
+            "filename_prefix": "Ricevuta",
         },
     },
 }
