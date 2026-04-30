@@ -5,47 +5,67 @@ Locale: de-CH, fr-CH, it-CH
 
 LEXICON = {
     "de-CH": {
-        # --- Questions for audit ---
+        # --- Questions for pre-audit ---
         "QUESTIONS": {
             "q1": {
-                "text": "Verwenden Sie für geschäftliche Konten starke und einzigartige Passwörter?",
-                "remedy": "Verwenden Sie einen Passwort-Manager und für jedes Konto ein eigenes Passwort.",
+                "text": "Verwenden Sie starke und einzigartige Passwörter für Ihre geschäftlichen Konten?",
+                "remedy": "Verwenden Sie einen Passwort-Manager und ein separates Passwort für jedes Konto.",
+                "pillar": "Vertraulichkeit",
+                "standard": "NCSC 5.1.1",
             },
             "q2": {
-                "text": "Nutzen Sie einen Passwort-Manager?",
-                "remedy": "Setzen Sie einen etablierten Passwort-Manager für sich und Ihre Mitarbeitenden ein.",
+                "text": "Wird in der Praxis ein Passwort-Manager eingesetzt?",
+                "remedy": "Führen Sie einen anerkannten Passwort-Manager für sich und Ihre Mitarbeitenden ein.",
+                "pillar": "Vertraulichkeit",
+                "standard": "NCSC 5.1.1",
             },
             "q3": {
-                "text": "Werden Passwörter bei Mitarbeiteraustritt oder Verdacht auf Missbrauch geändert?",
-                "remedy": "Definieren Sie klare Regeln für Passwortänderungen bei Personalwechsel oder Sicherheitsvorfällen.",
+                "text": "Werden Zugriffsrechte beim Austritt von Mitarbeitenden umgehend entzogen?",
+                "remedy": "Definieren Sie klare Regeln für die Änderung von Zugängen bei Personalwechseln.",
+                "pillar": "Rückverfolgbarkeit & Zugriff",
+                "standard": "NCSC 5.1.2",
             },
             "q4": {
-                "text": "Werden Kunden- und Patientendaten sicher gespeichert?",
-                "remedy": "Speichern Sie nur notwendige Personendaten und verwenden Sie wenn möglich verschlüsselte Systeme.",
+                "text": "Sind die Patientendaten auf Ihren Speichermedien verschlüsselt?",
+                "remedy": "Nutzen Sie Verschlüsselungssysteme (wie BitLocker oder FileVault), um Daten im Ruhezustand zu schützen.",
+                "pillar": "Integrität & Schutz",
+                "standard": "DSG Art. 8",
             },
             "q5": {
-                "text": "Erstellen Sie regelmässig automatische Backups Ihrer Geschäftsdaten?",
-                "remedy": "Richten Sie tägliche automatische Backups ein und bewahren Sie mindestens eine Kopie extern auf.",
+                "text": "Führen Sie regelmässig automatische Backups Ihrer Daten durch?",
+                "remedy": "Konfigurieren Sie tägliche automatische Backups und bewahren Sie mindestens eine Kopie extern auf.",
+                "pillar": "Verfügbarkeit",
+                "standard": "NCSC 5.4.1",
             },
             "q6": {
-                "text": "Werden Backups regelmässig getestet?",
-                "remedy": "Testen Sie mindestens vierteljährlich, ob sich Ihre Backups wiederherstellen lassen.",
+                "text": "Werden die Datensicherungen (Backups) regelmässig getestet?",
+                "remedy": "Prüfen Sie mindestens einmal pro Quartal, ob Ihre Backups korrekt wiederhergestellt werden können.",
+                "pillar": "Verfügbarkeit",
+                "standard": "NCSC 5.4.2",
             },
             "q7": {
-                "text": "Ist auf allen Computern ein aktueller Viren- oder Endpunktschutz installiert?",
-                "remedy": "Installieren Sie einen etablierten Endpunktschutz und halten Sie diesen aktuell.",
+                "text": "Ist auf allen Computern ein aktueller Virenschutz installiert?",
+                "remedy": "Installieren Sie eine anerkannte 'Endpoint'-Schutzlösung und stellen Sie sicher, dass diese ständig aktualisiert wird.",
+                "pillar": "Integrität",
+                "standard": "NCSC 5.2.1",
             },
             "q8": {
-                "text": "Ist das Kunden-WLAN vom internen Geschäftsnetz getrennt?",
-                "remedy": "Richten Sie ein separates Gäste-WLAN ein.",
+                "text": "Ist das Patienten-WLAN vom internen Praxisnetzwerk getrennt?",
+                "remedy": "Richten Sie ein separates 'Gast-WLAN' ein, um Patienten vom medizinischen Netzwerk zu isolieren.",
+                "pillar": "Netzwerkschutz",
+                "standard": "NCSC 5.2.3",
             },
             "q9": {
-                "text": "Werden Software-Updates und Sicherheitsupdates regelmässig installiert?",
-                "remedy": "Aktivieren Sie automatische Updates oder planen Sie regelmässige Wartungsfenster ein.",
+                "text": "Werden Software-Updates automatisch installiert?",
+                "remedy": "Aktivieren Sie automatische Updates für das Betriebssystem und die medizinische Software.",
+                "pillar": "Integrität",
+                "standard": "NCSC 5.2.2",
             },
             "q10": {
-                "text": "Nutzen Sie Zwei-Faktor-Authentifizierung (2FA) für E-Mail- und Administrationskonten?",
-                "remedy": "Aktivieren Sie 2FA für E-Mail-, Cloud- und Administrationszugänge.",
+                "text": "Verwenden Sie die Zwei-Faktor-Authentisierung (2FA) für Ihre E-Mails?",
+                "remedy": "Aktivieren Sie 2FA (SMS, App) für alle geschäftlichen Cloud- und E-Mail-Zugänge.",
+                "pillar": "Vertraulichkeit",
+                "standard": "NCSC 5.1.1",
             },
         },
         # --- Product Identity ---
@@ -204,47 +224,67 @@ LEXICON = {
     },
     # ---- SWISS FRENCH ---
     "fr-CH": {
-        # --- Questions for audit ---
+        # --- Questions for pre-audit ---
         "QUESTIONS": {
             "q1": {
                 "text": "Utilisez-vous des mots de passe forts et uniques pour vos comptes professionnels ?",
                 "remedy": "Utilisez un gestionnaire de mots de passe et un mot de passe distinct pour chaque compte.",
+                "pillar": "Confidentialité",
+                "standard": "NCSC 5.1.1",
             },
             "q2": {
                 "text": "Utilisez-vous un gestionnaire de mots de passe au sein du cabinet ?",
                 "remedy": "Mettez en place un gestionnaire de mots de passe reconnu pour vous-même et vos collaborateurs.",
+                "pillar": "Confidentialité",
+                "standard": "NCSC 5.1.1",
             },
             "q3": {
-                "text": "Les mots de passe sont-ils modifiés lors du départ d'un collaborateur ou en cas de suspicion d'abus ?",
-                "remedy": "Définissez des règles claires pour le changement des accès lors de changements de personnel ou d'incidents de sécurité.",
+                "text": "Les accès sont-ils révoqués lors du départ d'un collaborateur ?",
+                "remedy": "Définissez des règles claires pour le changement des accès lors de changements de personnel.",
+                "pillar": "Traçabilité & Accès",
+                "standard": "NCSC 5.1.2",
             },
             "q4": {
-                "text": "Les données des patients sont-elles stockées de manière sécurisée ?",
-                "remedy": "Ne conservez que les données personnelles nécessaires et utilisez, dans la mesure du possible, des systèmes cryptés.",
+                "text": "Les données des patients sont-elles chiffrées sur vos supports de stockage ?",
+                "remedy": "Utilisez des systèmes de chiffrement (type BitLocker ou FileVault) pour protéger les données au repos.",
+                "pillar": "Intégrité & Protection",
+                "standard": "LPD Art. 8",
             },
             "q5": {
-                "text": "Effectuez-vous régulièrement des sauvegardes automatiques de vos données professionnelles ?",
+                "text": "Effectuez-vous régulièrement des sauvegardes automatiques de vos données ?",
                 "remedy": "Configurez des sauvegardes automatiques quotidiennes et conservez au moins une copie hors site.",
+                "pillar": "Disponibilité",
+                "standard": "NCSC 5.4.1",
             },
             "q6": {
                 "text": "Les sauvegardes (backups) sont-elles testées régulièrement ?",
                 "remedy": "Testez au moins une fois par trimestre si vos sauvegardes peuvent être restaurées correctement.",
+                "pillar": "Disponibilité",
+                "standard": "NCSC 5.4.2",
             },
             "q7": {
-                "text": "Une protection antivirus ou « endpoint » à jour est-elle installée sur tous les ordinateurs ?",
-                "remedy": "Installez une solution de protection reconnue et assurez-vous qu'elle soit constamment mise à jour.",
+                "text": "Une protection antivirus à jour est-elle installée sur tous les postes ?",
+                "remedy": "Installez une solution 'Endpoint' reconnue et assurez-vous qu'elle soit constamment mise à jour.",
+                "pillar": "Intégrité",
+                "standard": "NCSC 5.2.1",
             },
             "q8": {
                 "text": "Le Wi-Fi destiné aux patients est-il séparé du réseau interne du cabinet ?",
-                "remedy": "Configurez un réseau Wi-Fi distinct pour les visiteurs et les patients.",
+                "remedy": "Configurez un réseau Wi-Fi 'Invité' distinct pour isoler les patients du réseau médical.",
+                "pillar": "Protection Réseau",
+                "standard": "NCSC 5.2.3",
             },
             "q9": {
-                "text": "Les mises à jour logicielles et de sécurité sont-elles installées régulièrement ?",
-                "remedy": "Activez les mises à jour automatiques ou planifiez des fenêtres de maintenance régulières.",
+                "text": "Les mises à jour logicielles sont-elles installées automatiquement ?",
+                "remedy": "Activez les mises à jour automatiques pour le système d'exploitation et les logiciels médicaux.",
+                "pillar": "Intégrité",
+                "standard": "NCSC 5.2.2",
             },
             "q10": {
-                "text": "Utilisez-vous l'authentification à deux facteurs (2FA) pour vos comptes e-mail et administratifs ?",
-                "remedy": "Activez la 2FA pour les accès e-mail, cloud et les comptes d'administration.",
+                "text": "Utilisez-vous l'authentification à deux facteurs (2FA) pour vos e-mails ?",
+                "remedy": "Activez la 2FA (SMS, Application) pour tous les accès cloud et e-mail professionnels.",
+                "pillar": "Confidentialité",
+                "standard": "NCSC 5.1.1",
             },
         },
         # --- Product Identity ---
@@ -403,47 +443,67 @@ LEXICON = {
     },
     # --- SWISS ITALIAN ---
     "it-CH": {
-        # --- Questions for audit ---
+        # --- Questions for pre-audit ---
         "QUESTIONS": {
             "q1": {
-                "text": "Utilizza password robuste e univoche per i Suoi account professionali?",
-                "remedy": "Utilizzi un gestore di password e una password diversa per ogni account.",
+                "text": "Utilizzate password forti e univoche per i vostri account professionali?",
+                "remedy": "Utilizzate un gestore di password e una password distinta per ogni account.",
+                "pillar": "Riservatezza",
+                "standard": "NCSC 5.1.1",
             },
             "q2": {
-                "text": "Utilizzate un gestore di password (password manager) nello studio?",
-                "remedy": "Adotti un gestore di password affidabile per Lei e per i Suoi collaboratori.",
+                "text": "Utilizzate un gestore di password all'interno dello studio?",
+                "remedy": "Implementate un gestore di password riconosciuto per voi e i vostri collaboratori.",
+                "pillar": "Riservatezza",
+                "standard": "NCSC 5.1.1",
             },
             "q3": {
-                "text": "Le password vengono modificate in caso di uscita di un collaboratore o sospetto abuso?",
-                "remedy": "Definisca regole chiare per la modifica delle password in caso di avvicendamento del personale o incidenti di sicurezza.",
+                "text": "Gli accessi vengono revocati in caso di partenza di un collaboratore?",
+                "remedy": "Definite regole chiare per la modifica degli accessi in caso di cambiamenti di personale.",
+                "pillar": "Tracciabilità e Accesso",
+                "standard": "NCSC 5.1.2",
             },
             "q4": {
-                "text": "I dati dei pazienti vengono archiviati in modo sicuro?",
-                "remedy": "Conservi solo i dati personali necessari e utilizzi, laddove possibile, sistemi crittografati.",
+                "text": "I dati dei pazienti sono crittografati sui vostri supporti di memoria?",
+                "remedy": "Utilizzate sistemi di crittografia (come BitLocker o FileVault) per proteggere i dati a riposo.",
+                "pillar": "Integrità e Protezione",
+                "standard": "LPD Art. 8",
             },
             "q5": {
-                "text": "Esegue regolarmente backup automatici dei dati professionali?",
-                "remedy": "Imposti backup automatici giornalieri e conservi almeno una copia esternamente allo studio.",
+                "text": "Effettuate regolarmente backup automatici dei vostri dati?",
+                "remedy": "Configurate backup automatici giornalieri e conservate almeno una copia fuori sede.",
+                "pillar": "Disponibilità",
+                "standard": "NCSC 5.4.1",
             },
             "q6": {
                 "text": "I backup vengono testati regolarmente?",
-                "remedy": "Verifichi almeno trimestralmente se i backup possono essere ripristinati correttamente.",
+                "remedy": "Verificate almeno una volta a trimestre se i vostri backup possono essere ripristinati correttamente.",
+                "pillar": "Disponibilità",
+                "standard": "NCSC 5.4.2",
             },
             "q7": {
-                "text": "Su tutti i computer è installata una protezione antivirus o endpoint aggiornata?",
-                "remedy": "Installi una protezione endpoint affidabile e la mantenga costantemente aggiornata.",
+                "text": "È installata una protezione antivirus aggiornata su tutti i computer?",
+                "remedy": "Installate una soluzione di protezione 'Endpoint' riconosciuta e assicuratevi che sia costantemente aggiornata.",
+                "pillar": "Integrità",
+                "standard": "NCSC 5.2.1",
             },
             "q8": {
-                "text": "La rete Wi-Fi per i pazienti è separata dalla rete aziendale interna?",
-                "remedy": "Configuri una rete Wi-Fi separata per ospiti e pazienti.",
+                "text": "Il Wi-Fi per i pazienti è separato dalla rete interna dello studio?",
+                "remedy": "Configurate una rete Wi-Fi 'Ospiti' distinta per isolare i pazienti dalla rete medica.",
+                "pillar": "Protezione della rete",
+                "standard": "NCSC 5.2.3",
             },
             "q9": {
-                "text": "Gli aggiornamenti software e di sicurezza vengono installati regolarmente?",
-                "remedy": "Attivi gli aggiornamenti automatici o pianifichi finestre di manutenzione regolari.",
+                "text": "Gli aggiornamenti software vengono installati automaticamente?",
+                "remedy": "Attivate gli aggiornamenti automatici per il sistema operativo e i software medici.",
+                "pillar": "Integrità",
+                "standard": "NCSC 5.2.2",
             },
             "q10": {
-                "text": "Utilizza l'autenticazione a due fattori (2FA) per l'e-mail e gli account amministrativi?",
-                "remedy": "Attivi la 2FA per gli accessi e-mail, i servizi cloud e gli account di amministrazione.",
+                "text": "Utilizzate l'autenticazione a due fattori (2FA) per le vostre e-mail?",
+                "remedy": "Attivate la 2FA (SMS, App) per tutti gli accessi cloud e e-mail professionali.",
+                "pillar": "Riservatezza",
+                "standard": "NCSC 5.1.1",
             },
         },
         # --- Product Identity ---

@@ -1,6 +1,6 @@
 """
-Cyber Risk Scoring Engine - Professional Edition
-Handles assessment logic, confidence penalties, and remediation mapping.
+Cyber Risk Scoring Engine - Pillar Edition
+Aggregates scores by Security Pillar: Confidentiality, Integrity, Availability, Traceability.
 """
 
 from core.wording import get_lexicon
@@ -29,55 +29,87 @@ class AuditEngine:
     def __init__(self, user_answers, lang="de-CH"):
         self.answers = {k: v.lower() for k, v in user_answers.items()}
         self.lang = lang  # Store the language
-        self.earned = 0.0
-        self.possible = 0.0
         self.failed_items = []
         self.na_count = 0
+        # Pillar tracking: { "Pillar Name": {"earned": 0.0, "possible": 0.0} }
+        self.pillars = {}
 
     def compute(self) -> dict:
         """Process all questions and return a detailed assessment dictionary."""
 
         lex = get_lexicon(self.lang)
+        questions_lex = lex["QUESTIONS"]
 
         for cfg in QUESTION_CONFIG:
             q_id = cfg["id"]
             w = cfg["weight"]
-            self.possible += w
+
+            # Identify the pillar for this question from wording.py
+            q_data = questions_lex.get(q_id, {})
+            pillar_name = q_data.get("pillar", "General")
+
+            # Initialize pillar tracking
+            if pillar_name not in self.pillars:
+                self.pillars[pillar_name] = {"earned": 0.0, "possible": 0.0}
+
             ans = self.answers.get(q_id, "na")
 
-            if ans == "yes":
-                self.earned += w
-            elif ans == "no":
-                # Get the translated text for the report
-                q_text = lex["QUESTIONS"][q_id]["text"]
-                q_remedy = lex["QUESTIONS"][q_id]["remedy"]
-                # Pass all 4 required arguments
-                self._record_failure(q_id, q_text, q_remedy, w)
-            elif ans == "na":
+            if ans == "na":
                 self.na_count += 1
-                self.possible -= w
+                continue  # Skip N/A for both earned and possible
+
+            # Update Pillar Totals
+            self.pillars[pillar_name]["possible"] += w
+
+            if ans == "yes":
+                self.pillars[pillar_name]["earned"] += w
+            elif ans == "no":
+                # Record detailed failure for the report
+                self._record_failure(
+                    q_id=q_id,
+                    text=q_data.get("text", ""),
+                    remedy=q_data.get("remedy", ""),
+                    pillar=pillar_name,
+                    standard=q_data.get("standard", ""),
+                    weight=w,
+                )
+
         return self._finalize_results()
 
-    def _record_failure(self, q_id, text, remedy, weight):
+    def _record_failure(self, q_id, text, remedy, pillar, standard, weight):
         """Builds a list of failed items with remediation steps."""
         self.failed_items.append(
             {
                 "id": q_id,
                 "text": text,
                 "remedy": remedy,
+                "pillar": pillar,
+                "standard": standard,
                 "severity_key": "high" if weight >= 2 else "standard",
             }
         )
 
     def _finalize_results(self) -> dict:
         """Applies penalties, determines risk level, and checks data density."""
-        # 1. Calculate raw score
+        # 1. Calculate Per-Pillar Percentages
+        pillar_scores = {}
+        total_earned = 0.0
+        total_possible = 0.0
+
+        for name, scores in self.pillars.items():
+            if scores["possible"] > 0:
+                perc = round((scores["earned"] / scores["possible"]) * 100)
+                pillar_scores[name] = perc
+                total_earned += scores["earned"]
+                total_possible += scores["possible"]
+            else:
+                pillar_scores[name] = 0
+
+        # 2. Overall Score & Penalties
         raw_score = (
-            round((self.earned / self.possible) * 100) if self.possible > 0 else 0
+            round((total_earned / total_possible) * 100) if total_possible > 0 else 0
         )
 
-        # 2. Swiss Confidence Penalty Logic
-        # We still apply penalties, but we add a "Hard Stop" for N/A count
         penalty = 0
         if 3 <= self.na_count <= 5:
             penalty = 5
@@ -94,6 +126,7 @@ class AuditEngine:
             "assessment": final_score,
             "assessment_raw": raw_score,
             "confidence_penalty": penalty,
+            "pillar_scores": pillar_scores,
             # If inconclusive, we override the classification
             "risk_level": (
                 "inconclusive" if is_inconclusive else self._classify_risk(final_score)
