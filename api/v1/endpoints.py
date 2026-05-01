@@ -1,18 +1,9 @@
 import os
 import uuid
-from typing import Dict, Optional
+from typing import Dict
 
 import stripe
-from fastapi import (
-    APIRouter,
-    Depends,
-    Form,
-    Header,
-    HTTPException,
-    Query,
-    Request,
-    Response,
-)
+from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -36,7 +27,7 @@ class AuditSubmissionSchema(BaseModel):
 
 
 # --- Get Lexicon for a specific language ---
-def get_lexicon(lang: str = "de-CH"):
+def get_localized_lexicon(lang: str = "de-CH"):
     """Returns the dictionary for the requested language, fallback to German."""
     return wording.LEXICON.get(lang, wording.LEXICON["de-CH"])
 
@@ -70,18 +61,20 @@ async def web_submit(
         score=results["assessment"],
         risk_level=results["risk_level"],
         failed_items=results["failed"],
+        pillar_scores=results["pillar_scores"],
         is_paid=False,
     )
     db.add(db_entry)
     db.commit()
 
     # Get the specific wording
-    lex = get_lexicon(lang)
+    lex = get_localized_lexicon(lang)
 
     # 4. Render UI
     return templates.TemplateResponse(
-        "result.html",
-        {
+        request=request,
+        name="result.html",
+        context={
             "current_lang": lang,
             "request": request,
             "submission_id": submission_id,
@@ -111,7 +104,7 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     db.refresh(audit)
 
     # The Gatekeeper Logic if it is not paid
-    if not audit.is_paid:
+    if bool(audit.is_paid) is not True:
         # Redirect to the pay route if they haven't paid yet
         return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
 
@@ -120,8 +113,8 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
 
     # Use the language stored in the DB for the PDF
-    lang = getattr(audit, "lang", "de-CH")
-    lex = get_lexicon(lang)  # Returns the full DE/FR/IT dict
+    lang = str(audit.lang) if audit.lang is not None else "de-CH"
+    lex = get_localized_lexicon(lang)  # Returns the full DE/FR/IT dict
 
     # Create a clean business_name to string for alnum check)
     # Removes spaces and special characters from the business name
@@ -171,20 +164,17 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
 
     # Define 'lex' here so it is not undefined
-    lang = str(audit.lang) if audit.lang else "de-CH"
+    lang = str(audit.lang) if audit.lang is not None else "de-CH"
     lex = get_lexicon(lang)
 
     try:
         # request.url_for can return NoneType, cast to str()
-        success_url = (
-            str(request.url_for("payment_success", submission_id=submission_id))
-            + f"?lang={lang}"
-        )
+        success_url = f"{str(request.url_for('payment_success', submission_id=submission_id))}?lang={lang}"
         cancel_url = str(request.url_for("submit"))
 
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
-            customer_email=audit.email,  # Professional touch: pre-fill email
+            customer_email=str(audit.email),  # Professional touch: pre-fill email
             # Add client_reference_id so the Webhook knows which audit to update
             client_reference_id=submission_id,
             line_items=[
@@ -204,7 +194,10 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
             success_url=success_url,
             cancel_url=cancel_url,
         )
-        return RedirectResponse(url=checkout_session.url, status_code=303)
+        return RedirectResponse(
+            url=str(checkout_session.url) if checkout_session.url else "/",
+            status_code=303,
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -221,11 +214,12 @@ async def payment_success(
 
     # Default to de-CH if not found, but use the record's lang if available
     lang = audit.lang if audit else "de-CH"
-    lex = get_lexicon(lang)
+    lex = get_localized_lexicon(str(lang))
 
     return templates.TemplateResponse(
-        "payment_success.html",
-        {
+        request=request,
+        name="payment_success.html",
+        context={
             "request": request,
             "submission_id": submission_id,
             "current_lang": lang,
@@ -276,7 +270,7 @@ async def stripe_webhook(
                 db.query(AuditSubmission).filter(AuditSubmission.id == audit_id).first()
             )
             if audit:
-                audit.is_paid = True
+                setattr(audit, "is_paid", True)
                 db.commit()
                 print(f"Payment confirmed for Audit: {audit_id}")
             else:
@@ -292,7 +286,7 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
         db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
     )
 
-    if not audit or not audit.is_paid:
+    if not audit or bool(audit.is_paid) is not True:
         raise HTTPException(
             status_code=403, detail="Rechnung nur nach Zahlung verfügbar."
         )

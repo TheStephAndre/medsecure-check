@@ -23,6 +23,10 @@ def generate_pdf(
         "failed": audit_record.failed_items,  # JSON list
         "created_at_human": audit_record.created_at.strftime("%d.%m.%Y"),
         "invoice_number": f"RE-{str(audit_record.id)[:8].upper()}",
+        # Ensure the  audit_record has a pillar_scores attribute (JSON/Dict)
+        "pillar_scores": (
+            audit_record.pillar_scores if hasattr(audit_record, "pillar_scores") else {}
+        ),
     }
 
     # 2. Context for Jinja2
@@ -50,6 +54,6 @@ def generate_pdf(
     # 4. Generate PDF(WeasyPrint)
     pdf_file = BytesIO()  # Save data in the RAM
     # base_url allows WeasyPrint to find images/CSS in your static folder
-    HTML(string=html_out).write_pdf(pdf_file)
+    HTML(string=html_out).write_pdf(pdf_file, presentational_hints=True)
     pdf_file.seek(0)
     return pdf_file

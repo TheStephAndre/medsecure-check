@@ -13,150 +13,237 @@
           content: "{{ REPORT_PDF.page }} " counter(page)
             " {{ REPORT_PDF.of }} " counter(pages);
           font-size: 9pt;
-          color: #666; /* Darkened from #888 */
+          color: #666;
         }
       }
       body {
         font-family: "Helvetica", "Arial", sans-serif;
         font-size: 11pt;
-        color: #000000; /* Pure black for maximum legibility */
+        color: #000000;
         line-height: 1.5;
       }
 
       /* Header Layout */
       .header {
         text-align: left;
-        border-bottom: 1pt solid #999; /* Darkened and thickened */
+        border-bottom: 1pt solid #999;
         padding-bottom: 5mm;
         margin-bottom: 10mm;
         font-size: 12pt;
-        color: #444; /* Darkened from #666 */
+        color: #444;
       }
 
       /* Titles */
       h1 {
         font-size: 24pt;
-        color: #004085; /* Deeper blue for print */
+        color: #004085;
         margin-bottom: 2mm;
       }
-
       h2 {
-        border-bottom: 2pt solid #999; /* Much stronger line */
+        border-bottom: 2pt solid #999;
         padding-bottom: 2mm;
         margin-top: 10mm;
         font-size: 14pt;
         color: #004085;
       }
 
-      /* Finding Items (The "Cards") */
-      .finding-item {
-        margin-bottom: 8mm;
-        padding: 4mm;
-        background-color: #f2f2f2; /* Darkened background from #fcfcfc */
-        border: 1pt solid #ccc; /* Darkened border from #eee */
-        page-break-inside: avoid;
+      /* Executive Summary Box */
+      .executive-summary-box {
+        background-color: #f8f9fa;
+        padding: 5mm;
+        border-left: 5px solid #004085;
+        margin-bottom: 10mm;
       }
 
-      .question {
+      /* Table Layouts */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10mm;
+        page-break-inside: auto;
+      }
+      th {
+        background-color: #004085;
+        color: white;
+        text-align: left;
+        padding: 3mm;
+        font-size: 10pt;
+        text-transform: uppercase;
+        -webkit-print-color-adjust: exact;
+      }
+      td {
+        padding: 3mm;
+        border-bottom: 0.5pt solid #ccc;
+        font-size: 10pt;
+        vertical-align: top;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      /* Status Pills */
+      .status-pill {
+        padding: 1mm 3mm;
+        border-radius: 10px;
+        font-size: 9pt;
         font-weight: bold;
-        font-size: 12pt;
-        display: block;
-        margin-bottom: 2mm;
-        color: #000;
+        text-transform: uppercase;
+        white-space: nowrap;
+        -webkit-print-color-adjust: exact;
+      }
+      .bg-success {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .bg-danger {
+        background-color: #f8d7da;
+        color: #721c24;
       }
 
-      .remedy {
-        color: #333; /* Darkened from #555 */
-        font-style: italic;
-        margin-bottom: 2mm;
-      }
-
-      /* Severity Tags - High contrast for print */
+      /* Severity Tags for Roadmap */
       .severity-tag {
         font-size: 8pt;
         font-weight: bold;
         color: white;
-        padding: 3px 10px;
+        padding: 2px 8px;
         border-radius: 3px;
-        text-transform: uppercase;
-        /* Standard property first, then the prefixed one, for PDF layout compatibility (printers)*/
-        print-color-adjust: exact;
-        /* Forces background color in some engines */
         -webkit-print-color-adjust: exact;
       }
-      /* Deep Red*/
       .high {
         background-color: #a94442;
       }
-      /* Deeper blue/teal */
       .standard {
         background-color: #31708f;
       }
 
-      /* Input Lines for handwritten notes */
-      .lines {
-        border-bottom: 1.5pt solid #888;
-        height: 0; /* Let the margin handle the height */
-        width: 100%;
-        display: block;
-        clear: both;
+      /* Disclaimer & Methodology */
+      .disclaimer-box {
+        margin-top: 10mm;
+        padding: 4mm;
+        border: 1pt dashed #999;
+        background-color: #fffaf0;
+        font-size: 9pt;
       }
-
+      .methodology-box {
+        margin-top: 10mm;
+        padding-top: 5mm;
+        border-top: 0.5pt solid #999;
+        font-size: 8.5pt;
+        color: #555;
+      }
+      .methodology-title {
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 1mm;
+        display: block;
+      }
       .footer-note {
         font-size: 8.5pt;
         color: #444;
         font-style: italic;
         border-top: 1pt solid #999;
         padding-top: 5mm;
-        margin-top: 10mm; /* Extra safety gap */
+        margin-top: 5mm;
         display: block;
+      }
+
+      .lines {
+        border-bottom: 1.5pt solid #888;
+        height: 10mm;
         width: 100%;
+        display: block;
       }
     </style>
   </head>
   <body>
     <div class="header">
-      <span class="header-line"><strong>{{ company }}</strong></span>
-      <span class="header-line">{{ REPORT_PDF.header_suffix }}</span>
-      <span class="header-line"
-        >{{ REPORT_PDF.generated_on }} {{ submission.created_at_human }}</span
-      >
+      <strong>{{ company }}</strong> | {{ REPORT_PDF.header_suffix }}<br />
+      {{ REPORT_PDF.generated_on }} {{ submission.created_at_human }}
     </div>
 
-    <div class="title-block">
-      <h1>{{ submission.business_name }}</h1>
-      <div class="score-display">
-        {{ REPORT.score_label }}:
-        <span class="score-value">{{ submission.assessment }}/100</span>
-      </div>
+    <h1>{{ submission.business_name }}</h1>
+
+    <!-- Executive Summary (Moved from <head> to <body>) -->
+    <div class="executive-summary-box">
+      <p>
+        <strong>{{ REPORT.sections.classification }}:</strong><br />
+        {{ REPORT.executive_summary.format(percentage=submission.assessment) }}
+      </p>
     </div>
 
+    <!-- Table A: The "Shield" (Technical Measures), it shows what is under control -->
     <section>
-      <h2>{{ REPORT.sections.classification }}</h2>
-      <p>{{ RISK_LEVELS[submission.risk_level].pdf_text }}</p>
+      <h2>{{ REPORT.sections.table_a_title }}</h2>
+      <p>{{ REPORT.status_labels.shield_intro }}</p>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50%">{{ REPORT.table_headers.pillar }}</th>
+            <th style="width: 25%">{{ REPORT.table_headers.maturity }}</th>
+            <th style="width: 25%">{{ REPORT.table_headers.status }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pillar, score in submission.pillar_scores.items() %}
+          <tr>
+            <td><strong>{{ pillar }}</strong></td>
+            <td>{{ score }}%</td>
+            <td>
+              {% if score >= 80 %}
+              <span class="status-pill bg-success"
+                >{{ REPORT.status_labels.optimal }}</span
+              >
+              {% elif score > 0 %}
+              <span class="status-pill bg-danger"
+                >{{ REPORT.status_labels.partial }}</span
+              >
+              {% else %}
+              <span class="status-pill bg-danger"
+                >{{ REPORT.status_labels.review }}</span
+              >
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </section>
 
+    <!-- Table B: The "Roadmap" (Improvement Plan)-->
     <section>
-      <h2>{{ REPORT.sections.measures }}</h2>
+      <h2>{{ REPORT.sections.table_b_title }}</h2>
       {% if submission.failed|length == 0 %}
       <p>{{ REPORT.no_findings.description }}</p>
       {% else %}
-      <div class="findings-list">
-        {% for f in submission.failed %}
-        <div class="finding-item">
-          <span class="question">{{ f.text }}</span>
-          <p class="remedy">
-            <strong>{{ REPORT.measure_label }}:</strong> {{ f.remedy }}
-          </p>
-          <span class="severity-tag {{ f.severity_key }}">
-            {{ REPORT.priority_label }}: {{ REPORT.priorities[f.severity_key] }}
-          </span>
-        </div>
-        {% endfor %}
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 15%">{{ REPORT.table_headers.priority }}</th>
+            <th style="width: 45%">{{ REPORT.table_headers.gap }}</th>
+            <th style="width: 40%">{{ REPORT.table_headers.remedy }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in submission.failed %}
+          <tr>
+            <td>
+              <span class="severity-tag {{ f.severity_key }}">
+                {{ REPORT.priorities[f.severity_key] }}
+              </span>
+            </td>
+            <td>
+              <strong>{{ f.text }}</strong><br />
+              <small style="color: #666">Standard: {{ f.standard }}</small>
+            </td>
+            <td>{{ f.remedy }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
       {% endif %}
     </section>
 
+    <!-- Section of lines for handwriting-->
     <section style="page-break-inside: avoid; margin-bottom: 10mm">
       <h2>{{ REPORT.sections.next_steps }}</h2>
       <p style="margin-bottom: 8mm">{{ REPORT.next_steps.orientation }}</p>
@@ -167,7 +254,22 @@
       <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
     </section>
 
+    <!-- Space between the last line of handwriting and the footer-->
     <div style="clear: both; margin-top: 20mm"></div>
+
+    <!-- Legal & Methodology -->
+    <div class="disclaimer-box">
+      <strong
+        >{{ REPORT.status_labels.optimal if lang == 'it-CH' else 'AVVISO'
+        }}:</strong
+      >
+      {{ DISCLAIMERS.non_certification }}
+    </div>
+
+    <div class="methodology-box">
+      <span class="methodology-title">{{ REPORT_PDF.methodology_label }}</span>
+      <p>{{ REPORT_PDF.methodology_text }}</p>
+    </div>
 
     <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>
   </body>

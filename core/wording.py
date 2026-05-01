@@ -161,14 +161,30 @@ LEXICON = {
         "REPORT": {
             "print_cta": "Als PDF speichern",
             "date_label": "Datum",
-            "assessment_title": "IT-Sicherheits-Einordnung",
+            "assessment_title": "IT-Sicherheitsklassifizierung",
             "sections": {
-                "classification": "Einordnung",
+                "classification": "Bewertung",
                 "measures": "Empfohlene Massnahmen",
                 "next_steps": "Nächste Schritte",
+                "table_a_title": 'Tabelle A: Umgesetzte technische Massnahmen (Der "Schutzschild")',
+                "table_b_title": 'Tabelle B: Erforderlicher Verbesserungsplan (Die "Roadmap")',
+            },
+            "table_headers": {
+                "pillar": "Säule",
+                "maturity": "Reifegrad",
+                "status": "Status",
+                "priority": "Priorität",
+                "gap": "Identifizierte Lücke / Standard",
+                "remedy": "Empfohlene Abhilfe",
+            },
+            "status_labels": {
+                "optimal": "Optimal",
+                "partial": "Teilweise",
+                "review": "Überprüfen",
+                "shield_intro": "Die folgende Tabelle fasst die Sicherheitsbereiche zusammen, in denen Ihre Praxis gemäss NCSC-Standards Sorgfalt walten lässt.",
             },
             "next_steps": {
-                "orientation": "Notieren Sie hier Ihre nächsten geplanten Schritte oder Anmerkungen für Ihr Team:",
+                "orientation": "Notieren Sie hier Ihre geplanten nächsten Schritte oder Anmerkungen für Ihr Team:",
             },
             "unclear": {
                 "title": "Unklare Risikolage",
@@ -194,6 +210,12 @@ LEXICON = {
             "page": "Seite",
             "of": "von",
             "filename_prefix": "Bericht",
+            "methodology_label": "Methodik",
+            "methodology_text": (
+                "Diese Bewertung folgt den 'Minimalstandards für Cybersicherheit' des "
+                "Nationalen Zentrums für Cybersicherheit (NCSC) und orientiert sich an den "
+                "technischen Anforderungen von Art. 8 nDSG."
+            ),
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
@@ -385,6 +407,22 @@ LEXICON = {
                 "classification": "Évaluation",
                 "measures": "Mesures recommandées",
                 "next_steps": "Prochaines étapes",
+                "table_a_title": 'Tableau A : Mesures Techniques en Place (Le "Bouclier")',
+                "table_b_title": 'Tableau B : Plan d\'Amélioration Requis (La "Feuille de Route")',
+            },
+            "table_headers": {
+                "pillar": "Pilier",
+                "maturity": "Maturité",
+                "status": "Statut",
+                "priority": "Priorité",
+                "gap": "Lacune Identifiée / Standard",
+                "remedy": "Remède Préconisé",
+            },
+            "status_labels": {
+                "optimal": "Optimal",
+                "partial": "Partiel",
+                "review": "À revoir",
+                "shield_intro": "Le tableau suivant récapitule les domaines de sécurité où votre cabinet fait preuve de diligence conformément aux standards NCSC.",
             },
             "next_steps": {
                 "orientation": "Notez ici vos prochaines étapes prévues ou des remarques pour votre équipe :",
@@ -403,6 +441,9 @@ LEXICON = {
                 "title": "Aucune lacune critique identifiée",
                 "description": "Félicitations ! Sur la base de vos réponses, aucune faille de sécurité critique n'a été détectée. Votre configuration actuelle respecte les bonnes pratiques.",
             },
+            "executive_summary": "Sur la base de vos réponses, votre cabinet a mis en œuvre {percentage}% des mesures techniques requises par le droit suisse.",
+            "status_implemented": "Implémenté",
+            "status_improvement": "À améliorer",
         },
         # ---  PDF Generation Content ---
         "REPORT_PDF": {
@@ -413,11 +454,21 @@ LEXICON = {
             "page": "Page",
             "of": "sur",
             "filename_prefix": "Rapport",
+            "methodology_label": "Méthodologie",
+            "methodology_text": (
+                "Cette évaluation suit les 'Standards minimaux de cybersécurité' émis par le "
+                "Centre national pour la cybersécurité (NCSC) et s'aligne sur les exigences "
+                "techniques de l'Art. 8 nDSG."
+            ),
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
             "website": "Ce check-up ne constitue pas un conseil juridique, réglementaire ou médical.",
             "report": "Ce rapport sert exclusivement de guide d'orientation et ne remplace pas un conseil informatique, juridique ou technique individuel.",
+            "non_certification": (
+                "IMPORTANT : Ce rapport constitue une auto-évaluation technique et ne constitue pas "
+                "une certification officielle de conformité à la LPD ou aux normes NCSC."
+            ),
         },
         # ---Payment ---
         "PAYMENT": {
@@ -592,16 +643,32 @@ LEXICON = {
         },
         # --- Report  ---
         "REPORT": {
-            "print_cta": "Salva come PDF",
+            "print_cta": "Salva in PDF",
             "date_label": "Data",
             "assessment_title": "Classificazione della sicurezza informatica",
             "sections": {
                 "classification": "Valutazione",
                 "measures": "Misure raccomandate",
                 "next_steps": "Prossimi passi",
+                "table_a_title": 'Tabella A: Misure tecniche implementate (Lo "Scudo")',
+                "table_b_title": 'Tabella B: Piano di miglioramento richiesto (La "Roadmap")',
+            },
+            "table_headers": {
+                "pillar": "Pilastro",
+                "maturity": "Maturità",
+                "status": "Stato",
+                "priority": "Priorità",
+                "gap": "Lacuna identificata / Standard",
+                "remedy": "Rimedio raccomandato",
+            },
+            "status_labels": {
+                "optimal": "Ottimale",
+                "partial": "Parziale",
+                "review": "Da rivedere",
+                "shield_intro": "La seguente tabella riassume i settori di sicurezza in cui il vostro studio dimostra diligenza in conformità con gli standard NCSC.",
             },
             "next_steps": {
-                "orientation": "Annotate qui i prossimi passi pianificati o le note per il vostro team:",
+                "orientation": "Annotate qui i vostri prossimi passi pianificati o note per il vostro team:",
             },
             "unclear": {
                 "title": "Situazione di rischio incerta",
@@ -627,6 +694,12 @@ LEXICON = {
             "page": "Pagina",
             "of": "di",
             "filename_prefix": "Rapporto",
+            "methodology_label": "Metodologia",
+            "methodology_text": (
+                "Questa valutazione segue gli 'Standard minimi di cibersicurezza' emessi dal "
+                "Centro nazionale per la cibersicurezza (NCSC) e si allinea ai requisiti "
+                "tecnici dell'Art. 8 nLPD."
+            ),
         },
         # --- Legal & Positioning ---
         "DISCLAIMERS": {
