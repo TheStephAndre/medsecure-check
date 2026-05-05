@@ -27,9 +27,9 @@ class AuditSubmissionSchema(BaseModel):
 
 
 # --- Get Lexicon for a specific language ---
-def get_localized_lexicon(lang: str = "de-CH"):
-    """Returns the dictionary for the requested language, fallback to German."""
-    return wording.LEXICON.get(lang, wording.LEXICON["de-CH"])
+def get_localized_lexicon(lang: str = "fr-CH"):
+    """Returns the dictionary for the requested language, fallback to French."""
+    return wording.LEXICON.get(lang, wording.LEXICON["fr-CH"])
 
 
 # --- WEB ENDPOINT (The UI Form) ---
@@ -39,7 +39,7 @@ async def web_submit(
     business_name: str = Form(...),
     email: str = Form(...),
     # Capture language form a hidden form field
-    lang: str = Form("de-CH"),
+    lang: str = Form("fr-CH"),
     db: Session = Depends(get_db),
 ):
     form_data = await request.form()
@@ -113,7 +113,7 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
 
     # Use the language stored in the DB for the PDF
-    lang = str(audit.lang) if audit.lang is not None else "de-CH"
+    lang = str(audit.lang) if audit.lang is not None else "fr-CH"
     lex = get_localized_lexicon(lang)  # Returns the full DE/FR/IT dict
 
     # Create a clean business_name to string for alnum check)
@@ -164,7 +164,7 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
         raise HTTPException(status_code=404, detail="Audit nicht gefunden.")
 
     # Define 'lex' here so it is not undefined
-    lang = str(audit.lang) if audit.lang is not None else "de-CH"
+    lang = str(audit.lang) if audit.lang is not None else "fr-CH"
     lex = get_lexicon(lang)
 
     try:
@@ -212,8 +212,8 @@ async def payment_success(
         db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
     )
 
-    # Default to de-CH if not found, but use the record's lang if available
-    lang = audit.lang if audit else "de-CH"
+    # Default to fr-CH if not found, but use the record's lang if available
+    lang = audit.lang if audit else "fr-CH"
     lex = get_localized_lexicon(str(lang))
 
     return templates.TemplateResponse(
@@ -292,7 +292,7 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
         )
 
     # Fetch localized wording
-    lang = getattr(audit, "lang", "de-CH")
+    lang = getattr(audit, "lang", "fr-CH")
     lex = get_lexicon(lang)
     inv_lex = lex["INVOICE"]
 

@@ -13,7 +13,7 @@ class AuditSubmission(Base):
     email = Column(String, nullable=False)
 
     # Language of the user - 'fr-CH', 'it-CH'
-    lang = Column(String, default="de-CH", nullable=False)
+    lang = Column(String, default="fr-CH", nullable=False)
 
     score = Column(Integer)
     risk_level = Column(String)

@@ -26,7 +26,7 @@ class AuditEngine:
     Separates calculation from the web delivery layer.
     """
 
-    def __init__(self, user_answers, lang="de-CH"):
+    def __init__(self, user_answers, lang="fr-CH"):
         self.answers = {k: v.lower() for k, v in user_answers.items()}
         self.lang = lang  # Store the language
         self.failed_items = []

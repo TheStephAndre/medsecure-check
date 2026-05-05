@@ -4,8 +4,6 @@ from fastapi import FastAPI, Request, Response
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-import core.models as models  # Ensure models are loaded
-import core.wording as wording
 from api.v1.endpoints import router as api_v1_router
 from core.database import Base, engine  # New: Database imports
 from core.scoring import QUESTION_CONFIG
@@ -40,26 +38,19 @@ app.include_router(api_v1_router, prefix="/api/v1")
 
 # --- HOME ROUTE ---
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, lang: str = "de-CH"):
+async def index(request: Request, lang: str = "fr-CH"):
 
     # Get the correct dictionary based on the URL parameter
     lex = get_lexicon(lang)
 
     return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "current_lang": lang,
-            "LANDING": lex["LANDING"],
-            "PRODUCT": lex["PRODUCT"],
-            "DISCLAIMERS": lex["DISCLAIMERS"],
-        },
+        request=request, name="index.html", context={"current_lang": lang, "lex": lex}
     )
 
 
 # --- AUDIT ROUTE ---
 @app.get("/audit", response_class=HTMLResponse, name="audit")
-async def audit(request: Request, lang: str = "de-CH"):
+async def audit(request: Request, lang: str = "fr-CH"):
 
     # Get the localized text
     lex = get_lexicon(lang)
@@ -72,13 +63,11 @@ async def audit(request: Request, lang: str = "de-CH"):
         localized_questions.append({"id": q_id, "text": lex["QUESTIONS"][q_id]["text"]})
 
     return templates.TemplateResponse(
-        "audit.html",
-        {
-            "request": request,
-            "questions": localized_questions,  # Pass the translated questions
+        request=request,
+        name="audit.html",
+        context={
             "current_lang": lang,
-            "AUDIT": lex["AUDIT"],
-            "PRODUCT": lex["PRODUCT"],
-            "DISCLAIMERS": lex["DISCLAIMERS"],
+            "questions": localized_questions,  # This was showing as 'undefined'
+            "lex": lex,
         },
     )
