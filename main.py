@@ -44,7 +44,15 @@ async def index(request: Request, lang: str = "fr-CH"):
     lex = get_lexicon(lang)
 
     return templates.TemplateResponse(
-        request=request, name="index.html", context={"current_lang": lang, "lex": lex}
+        request=request,
+        name="index.html",
+        context={
+            "current_lang": lang,
+            "lex": lex,
+            "LANDING": lex["LANDING"],
+            "PRODUCT": lex["PRODUCT"],
+            "DISCLAIMERS": lex["DISCLAIMERS"],
+        },
     )
 
 
@@ -69,5 +77,8 @@ async def audit(request: Request, lang: str = "fr-CH"):
             "current_lang": lang,
             "questions": localized_questions,  # This was showing as 'undefined'
             "lex": lex,
+            "AUDIT": lex["AUDIT"],
+            "PRODUCT": lex["PRODUCT"],
+            "DISCLAIMERS": lex["DISCLAIMERS"],
         },
     )

@@ -17,6 +17,10 @@ class AuditSubmission(Base):
 
     score = Column(Integer)
     risk_level = Column(String)
+
+    pillar_scores = Column(JSON, nullable=True)
+    executive_summary = Column(String, nullable=True)
+
     failed_items = Column(JSON)  # Stores the list of security gaps
 
     is_paid = Column(Boolean, default=False)
