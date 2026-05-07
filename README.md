@@ -10,51 +10,49 @@
 
 ## 🎯 Product Vision
 
-MedSecure-Check is a professional Micro-SaaS prototype designed to solve "compliance anxiety" for small Swiss medical clinics (dentists, physiotherapists, chiropractors). It automates the gap between a security audit and a formal, actionable PDF report, specifically aligned with the technical expectations of the Swiss **nDSG** (Federal Act on Data Protection).
+MedSecure-Check is a professional Micro-SaaS designed to bridge the gap between technical security audits and formal compliance for Swiss medical clinics (dentists, physiotherapists, chiropractors). It automates the generation of actionable PDF reports specifically aligned with the Swiss **nDSG** (Federal Act on Data Protection) and **NCSC** standards.
 
 ### Why this project stands out:
 
-- **Domain Specific**: Built for a high-stakes niche (Healthcare) with strict data privacy requirements.
-- **Zero-Touch Automation**: 100% automated flow from user input to Stripe payment and PDF delivery.
-- **Swiss-Native UX**: Built for the Swiss market with CHF currency, Swiss date formats (DD.MM.YYYY), and full **trilingual support** (de-CH, fr-CH, it-CH).
+- **Domain Specific**: Tailored for Healthcare providers with strict data privacy requirements.
+- **Zero-Touch Automation**: 100% automated flow from user input to Stripe payment and immediate PDF delivery.
+- **Swiss-Native UX**: Multi-dialect support (**de-CH, fr-CH, it-CH**) with CHF currency and Swiss-standard date formatting.
 
 ## 🏗️ Technical Architecture
 
-The application follows **Clean Architecture** principles, ensuring that business logic remains independent of the web framework.
+The application follows **Clean Architecture** principles, ensuring core business logic remains independent of the web framework.
 
-- **Logic Engine (`scoring.py`)**: A decoupled, Object-Oriented engine that identifies vulnerabilities and applies a _Confidence Penalty_ algorithm (adjusting scores based on "N/A" answer frequency).
-- **Single Source of Truth (`wording.py`)**: A centralized localization system managing three languages. A single change here updates the Web UI, PDF reports, and Invoices across all linguistic regions simultaneously.
-- **Document Orchestration**: Server-side PDF generation using **WeasyPrint** with custom CSS optimized for A4 print standards, featuring dynamic metadata injection for professional document naming.
-- **Secure Payment Flow**: Integration with **Stripe Checkout** utilizing **Webhooks** and direct API verification to prevent race conditions during payment state management.
+- **Logic Engine (`scoring.py`)**: A decoupled, Object-Oriented engine that identifies vulnerabilities, calculates pillar-based maturity scores, and handles "Inconclusive" states for incomplete assessments.
+- **Dynamic Data Reconciliation**: A PostgreSQL backend tracks audit history and payment status, allowing for reliable asynchronous reconciliation via Stripe Webhooks and direct API verification.
+- **Intelligent PDF Orchestration**: A custom-built engine using **WeasyPrint** and advanced CSS Paged Media rules. It features dynamic pagination logic (using `page-break-inside: avoid`) to prevent orphaned text and logically group legal disclaimers.
+- **Single Source of Truth (`wording.py`)**: A centralized localization system. A single change updates the Web UI, PDF reports, and database-stored JSON findings across all three languages.
 
 ## 🛠️ Tech Stack
 
-| Layer          | Technology                                                 |
-| :------------- | :--------------------------------------------------------- |
-| **Backend**    | Python 3.12, **FastAPI**                                   |
-| **Server**     | Uvicorn / Gunicorn (optimized worker/thread configuration) |
-| **Database**   | PostgreSQL (SQLAlchemy ORM)                                |
-| **PDF Engine** | WeasyPrint 68.0, Jinja2, HTML5/CSS3                        |
-| **Payments**   | Stripe API 14.3+                                           |
-| **Frontend**   | Pico.css (Semantic HTML & Minimalist UI)                   |
-| **DevOps**     | Pydantic (Data validation), Dotenv (Secret masking)        |
+| Layer          | Technology                                                |
+| :------------- | :-------------------------------------------------------- |
+| **Backend**    | Python 3.12, **FastAPI**                                  |
+| **Database**   | **PostgreSQL** (SQLAlchemy ORM) with JSONB for audit logs |
+| **PDF Engine** | WeasyPrint 68.0, Jinja2, HTML5/CSS3 (Paged Media)         |
+| **Payments**   | Stripe API 14.3+ (Checkout & Webhooks)                    |
+| **Frontend**   | Pico.css (Semantic HTML & Minimalist UI)                  |
+| **DevOps**     | Pydantic (Data validation), Dotenv (Secret masking)       |
+
+## 🚀 Advanced Features
+
+- **Dynamic Pagination Engine**: Solved complex PDF layout issues using CSS Paged Media rules. The engine automatically ensures methodology sections and legal disclaimers stay grouped, moving them to a 3rd page only when necessary to maintain professional readability.
+- **Localized JSON Schema**: The database stores assessment results, pillar scores, and failed items as JSON objects, preserving the linguistic context and specific standards (e.g., DSG Art. 8 or NCSC 5.1.1) used during the audit.
+- **Transaction Integrity**: Dual-layer verification (Webhook + Direct Session Check) ensures reports are only generated and persistent data is updated after a successful Stripe transaction.
 
 ## 📂 Project Structure
 
-- `api/v1/endpoints.py`: Web routing, Stripe orchestration, and PDF delivery.
-- `core/scoring.py`: Core risk-assessment logic (Decoupled from FastAPI).
-- `core/wording.py`: SSOT (Single Source of Truth) for de-CH, fr-CH, and it-CH copy.
+- `api/v1/endpoints.py`: Web routing, Stripe orchestration, and report delivery.
+- `core/scoring.py`: Core risk-assessment logic and confidence algorithms.
+- `core/wording.py`: SSOT (Single Source of Truth) for de-CH, fr-CH, and it-CH.
 - `core/models.py`: Database schema for persistent audit and payment tracking.
-- `core/pdf.py`: Centralized PDF generation logic using WeasyPrint.
-- `templates/`: Jinja2 templates for localized UI, Reports, and Invoices.
-
-## 🛡️ Security & Reliability
-
-- **Secret Isolation**: Total masking of Stripe and Database credentials via environment variables.
-- **Robust Verification**: Dual-layer payment confirmation (Webhook + Direct Session Check) to ensure zero-latency report unlocking.
-- **Privacy by Design**: Strict `.gitignore` policy ensuring no sensitive patient-related data or generated reports enter version control.
-- **Swiss-Optimized Layout**: Specialized CSS to handle long compound words (e.g., _Zahlungsbestätigung_) across professional PDF exports.
+- `core/pdf.py`: Enhanced PDF generation logic and layout management.
+- `templates/`: Localized Jinja2 templates for UI, Reports, and Invoices.
 
 ---
 
-_Disclaimer: This tool provides general guidance aligned with Swiss technical standards. It does not replace professional legal or IT advice._
+_Disclaimer: This tool provides guidance based on Swiss technical standards. It does not replace professional legal or IT forensic advice._

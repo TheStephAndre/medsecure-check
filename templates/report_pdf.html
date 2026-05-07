@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="{{ lang[:2] }}">
   <head>
     <meta charset="utf-8" />
     <title>
@@ -60,7 +60,6 @@
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 10mm;
-        page-break-inside: auto;
       }
       th {
         background-color: #004085;
@@ -102,7 +101,7 @@
         color: #721c24;
       }
 
-      /* Severity Tags for Roadmap */
+      /* Severity Tags */
       .severity-tag {
         font-size: 8pt;
         font-weight: bold;
@@ -119,26 +118,21 @@
         background-color: #31708f;
       }
 
-      /* Disclaimer & Methodology */
+      /* Footer Elements  */
       .disclaimer-box {
         margin-top: 10mm;
-        padding: 4mm;
-        border: 1pt dashed #999;
-        background-color: #fffaf0;
-        font-size: 9pt;
+        padding: 3mm;
+        border: 0.5pt solid #d9534f;
+        background-color: #fff5f5;
+        font-size: 8.5pt;
+        page-break-inside: avoid;
       }
       .methodology-box {
-        margin-top: 10mm;
-        padding-top: 5mm;
-        border-top: 0.5pt solid #999;
-        font-size: 8.5pt;
-        color: #555;
-      }
-      .methodology-title {
-        font-weight: bold;
-        text-transform: uppercase;
-        margin-bottom: 1mm;
-        display: block;
+        margin-top: 8mm;
+        font-size: 8pt;
+        color: #777;
+        border-top: 0.5pt solid #ccc;
+        padding-top: 4mm;
       }
       .footer-note {
         font-size: 8.5pt;
@@ -149,12 +143,28 @@
         margin-top: 5mm;
         display: block;
       }
-
       .lines {
-        border-bottom: 1.5pt solid #888;
-        height: 10mm;
+        border-bottom: 0.5pt solid #ccc;
+        height: 8mm;
         width: 100%;
-        display: block;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      .footer-container {
+        /* Tells the PDF engine: if this block starts at the bottom of a page 
+       and doesn't fit, move the entire block to the next page. */
+        page-break-inside: avoid;
+        margin-top: 10mm;
+      }
+
+      /* Ensure the methodology box doesn't get separated from the disclaimer */
+      .disclaimer-box,
+      .methodology-box {
+        page-break-inside: avoid;
+        page-break-after: avoid;
       }
     </style>
   </head>
@@ -166,7 +176,6 @@
 
     <h1>{{ submission.business_name }}</h1>
 
-    <!-- Executive Summary (Moved from <head> to <body>) -->
     <div class="executive-summary-box">
       <p>
         <strong>{{ REPORT.sections.classification }}:</strong><br />
@@ -174,7 +183,6 @@
       </p>
     </div>
 
-    <!-- Table A: The "Shield" (Technical Measures), it shows what is under control -->
     <section>
       <h2>{{ REPORT.sections.table_a_title }}</h2>
       <p>{{ REPORT.status_labels.shield_intro }}</p>
@@ -212,8 +220,7 @@
       </table>
     </section>
 
-    <!-- Table B: The "Roadmap" (Improvement Plan)-->
-    <section>
+    <section class="page-break">
       <h2>{{ REPORT.sections.table_b_title }}</h2>
       {% if submission.failed|length == 0 %}
       <p>{{ REPORT.no_findings.description }}</p>
@@ -246,34 +253,33 @@
       {% endif %}
     </section>
 
-    <!-- Section of lines for handwriting-->
-    <section style="page-break-inside: avoid; margin-bottom: 10mm">
+    <section style="page-break-inside: avoid">
       <h2>{{ REPORT.sections.next_steps }}</h2>
-      <p style="margin-bottom: 8mm">{{ REPORT.next_steps.orientation }}</p>
-
-      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
-      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
-      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
-      <div class="lines" style="margin-bottom: 10mm">&nbsp;</div>
+      <p><small>{{ REPORT.next_steps.orientation }}</small></p>
+      <div class="lines"></div>
+      <div class="lines"></div>
+      <div class="lines"></div>
+      <div class="lines"></div>
     </section>
 
-    <!-- Space between the last line of handwriting and the footer-->
-    <div style="clear: both; margin-top: 20mm"></div>
+    <!-- Add space -->
+    <div style="clear: both; margin-top: 15mm"></div>
 
-    <!-- Legal & Methodology -->
-    <div class="disclaimer-box">
-      <strong
-        >{{ REPORT.status_labels.optimal if lang == 'it-CH' else 'AVVISO'
-        }}:</strong
-      >
-      {{ DISCLAIMERS.non_certification }}
+    <div class="footer-container">
+      <div class="disclaimer-box">
+        <strong
+          >{{ REPORT.status_labels.important if REPORT.status_labels.important
+          else 'AVVISO' }}:</strong
+        >
+        {{ DISCLAIMERS.non_certification }}
+      </div>
+
+      <div class="methodology-box">
+        <strong>{{ REPORT_PDF.methodology_label }}</strong>
+        <p>{{ REPORT_PDF.methodology_text }}</p>
+      </div>
+
+      <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>
     </div>
-
-    <div class="methodology-box">
-      <span class="methodology-title">{{ REPORT_PDF.methodology_label }}</span>
-      <p>{{ REPORT_PDF.methodology_text }}</p>
-    </div>
-
-    <div class="footer-note">{{ REPORT_PDF.footer_note }}</div>
   </body>
 </html>

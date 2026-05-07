@@ -6,7 +6,12 @@ from core.ui import templates
 
 
 def generate_pdf(
-    template_name: str, audit_record, lexicon, company_name: str, **kwargs
+    template_name: str,
+    audit_record,
+    lexicon,
+    company_name: str,
+    lang: str = "fr-CH",
+    **kwargs,
 ):
     """
     Generic PDF generator for Reports and Invoices.
@@ -40,6 +45,7 @@ def generate_pdf(
         "REPORT_PDF": lexicon.get("REPORT_PDF"),
         "DISCLAIMERS": lexicon.get("DISCLAIMERS"),
         "INVOICE": lexicon.get("INVOICE"),
+        "lang": lang,
         **kwargs,  # Captures anything else like IBAN for invoices
     }
 

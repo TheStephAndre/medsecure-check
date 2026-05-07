@@ -135,6 +135,7 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         audit_record=audit,
         # Pass the whole localized lexicon to the PDF generator(core/pdf.py)
         lexicon=lex,
+        lang=lang,
         company_name=os.getenv("COMPANY_NAME", "MedSecure"),
         # Passing the filename to the template context
         display_filename=filename,
@@ -262,7 +263,7 @@ async def stripe_webhook(
         session = event["data"]["object"]
 
         # This ID must be passed when you create the Checkout Session initially
-        audit_id = session.get("client_reference_id")
+        audit_id = session.client_reference_id
 
         if audit_id:
             # 3. Update your PostgreSQL record
@@ -305,6 +306,7 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
         template_name="invoice_pdf.html",
         audit_record=audit,
         lexicon=lex,
+        lang=lang,
         company_name=os.getenv("COMPANY_NAME", "MedSecure"),
         # Passing the filename to the template context
         display_filename=filename,

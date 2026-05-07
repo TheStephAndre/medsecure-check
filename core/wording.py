@@ -181,6 +181,7 @@ LEXICON = {
                 "optimal": "Optimal",
                 "partial": "Teilweise",
                 "review": "Überprüfen",
+                "important": "WICHTIG",
                 "shield_intro": "Die folgende Tabelle fasst die Sicherheitsbereiche zusammen, in denen Ihre Praxis gemäss NCSC-Standards Sorgfalt walten lässt.",
             },
             "next_steps": {
@@ -200,6 +201,9 @@ LEXICON = {
                 "title": "Keine kritischen Schwachstellen identifiziert",
                 "description": "Herzlichen Glückwunsch! Auf Basis Ihrer Antworten wurden keine kritischen Sicherheitslücken festgestellt. Ihre aktuelle Konfiguration entspricht den gängigen Best Practices.",
             },
+            "executive_summary": "Basierend auf Ihren Antworten hat Ihre Praxis {percentage}% der technischen Massnahmen umgesetzt, die nach Schweizer Recht erforderlich sind.",
+            "status_implemented": "Umgesetzt",
+            "status_improvement": "Verbesserungsbedarf",
         },
         # --- PDF Generation Content ---
         "REPORT_PDF": {
@@ -221,6 +225,10 @@ LEXICON = {
         "DISCLAIMERS": {
             "website": "Dieser Check stellt keine rechtliche, regulatorische oder medizinische Beratung dar.",
             "report": "Dieser Bericht dient ausschliesslich als Orientierungshilfe und ersetzt keine individuelle IT-, Rechts- oder Fachberatung.",
+            "non_certification": (
+                "Dieser Bericht stellt eine technische Selbsteinschätzung dar und ist keine "
+                "offizielle Zertifizierung der Konformität mit dem DSG oder den NCSC-Standards."
+            ),
         },
         # --- Paymeent ---
         "PAYMENT": {
@@ -422,6 +430,7 @@ LEXICON = {
                 "optimal": "Optimal",
                 "partial": "Partiel",
                 "review": "À revoir",
+                "important": "IMPORTANT",
                 "shield_intro": "Le tableau suivant récapitule les domaines de sécurité où votre cabinet fait preuve de diligence conformément aux standards NCSC.",
             },
             "next_steps": {
@@ -458,7 +467,7 @@ LEXICON = {
             "methodology_text": (
                 "Cette évaluation suit les 'Standards minimaux de cybersécurité' émis par le "
                 "Centre national pour la cybersécurité (NCSC) et s'aligne sur les exigences "
-                "techniques de l'Art. 8 nDSG."
+                "techniques de l'Art. 8 LPD."
             ),
         },
         # --- Legal & Positioning ---
@@ -466,7 +475,7 @@ LEXICON = {
             "website": "Ce check-up ne constitue pas un conseil juridique, réglementaire ou médical.",
             "report": "Ce rapport sert exclusivement de guide d'orientation et ne remplace pas un conseil informatique, juridique ou technique individuel.",
             "non_certification": (
-                "IMPORTANT : Ce rapport constitue une auto-évaluation technique et ne constitue pas "
+                "Ce rapport constitue une auto-évaluation technique et ne constitue pas "
                 "une certification officielle de conformité à la LPD ou aux normes NCSC."
             ),
         },
@@ -627,6 +636,12 @@ LEXICON = {
             ],
             "value_explanation": "Il rapporto è stato sviluppato specificamente per le strutture sanitarie in Svizzera. Non sostituisce una consulenza specialistica, ma offre una prima valutazione indipendente.",
             "cta_button": "Sblocca il rapporto completo ora (Stripe)",
+            "inconclusive": {
+                "label": "Avviso",
+                "title": "Valutazione non conclusiva",
+                "text": "Il vostro audit contiene troppe risposte 'N/A' per una valutazione precisa.",
+                "button": "Completare l'audit",
+            },
             "delivery": "Download immediato: dopo il pagamento, il rapporto PDF sarà sbloccato istantaneamente.",
             "payment_note": "Pagamento unico per la valutazione completa",
             "preview_cta": "Visualizza il rapporto PDF",
@@ -665,6 +680,7 @@ LEXICON = {
                 "optimal": "Ottimale",
                 "partial": "Parziale",
                 "review": "Da rivedere",
+                "important": "AVVISO",
                 "shield_intro": "La seguente tabella riassume i settori di sicurezza in cui il vostro studio dimostra diligenza in conformità con gli standard NCSC.",
             },
             "next_steps": {
@@ -684,6 +700,9 @@ LEXICON = {
                 "title": "Nessuna lacuna critica identificata",
                 "description": "Congratulazioni! Sulla base delle vostre risposte, non sono state rilevate falle di sicurezza critiche. La vostra configurazione attuale rispetta le buone pratiche.",
             },
+            "executive_summary": "Sulla base delle vostre risposte, il vostro studio ha implementato il {percentage}% delle misure tecniche richieste dalla legislazione svizzera.",
+            "status_implemented": "Implementato",
+            "status_improvement": "Da migliorare",
         },
         # --- PDF Generation Content ---
         "REPORT_PDF": {
@@ -705,6 +724,10 @@ LEXICON = {
         "DISCLAIMERS": {
             "website": "Questo check non costituisce una consulenza legale, normativa o medica.",
             "report": "Questo rapporto serve esclusivamente come guida orientativa e non sostituisce una consulenza individuale informatica, legale o specialistica.",
+            "non_certification": (
+                "Questo rapporto costituisce un'autovalutazione tecnica e non rappresenta "
+                "una certificazione ufficiale di conformità alla LPD o agli standard NCSC."
+            ),
         },
         # --- Payment ---
         "PAYMENT": {
