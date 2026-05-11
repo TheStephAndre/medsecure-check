@@ -11,14 +11,8 @@ from dotenv import load_dotenv
 # Initialize environment variables
 load_dotenv()
 
-# Project Root and Data Directory Mapping
+# Project Root
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
-LOG_DIR = BASE_DIR / "logs"
-
-# Ensure runtime directories exist
-for folder in [DATA_DIR / "submissions", DATA_DIR / "pdfs", LOG_DIR]:
-    folder.mkdir(parents=True, exist_ok=True)
 
 
 class Config:
@@ -35,11 +29,6 @@ class Config:
     SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
     SMTP_USER = os.getenv("SMTP_USER")
     SMTP_PASS = os.getenv("SMTP_PASS")
-
-    # Storage Paths
-    SUBMISSIONS_DIR = DATA_DIR / "submissions"
-    PDF_DIR = DATA_DIR / "pdfs"
-    LOG_FILE = LOG_DIR / "submissions.log"
 
     # Stripe Integration
     STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
