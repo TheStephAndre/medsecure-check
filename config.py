@@ -23,7 +23,7 @@ class Config:
     COMPANY_NAME = os.getenv("COMPANY_NAME", "MedSecure")
     IBAN = os.getenv("IBAN", "")
 
-    # Mail Server (SMTP)
+    # Mail Server - (SMTP)
     EMAIL_FROM = os.getenv("EMAIL_FROM")
     SMTP_HOST = os.getenv("SMTP_HOST")
     SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
