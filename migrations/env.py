@@ -1,4 +1,5 @@
 import os
+import sys
 from logging.config import fileConfig
 
 from alembic import context
@@ -7,24 +8,30 @@ from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
+# Fix E402: Move sys.path manipulation to the top.
+# This allows Python to find the 'core' module
+sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), "..")))
+
 # Load environment variables from .env
 load_dotenv()
 
-# Import the Base and Models
-from core.database import Base
-from core.models import AuditSubmission
+# Fix E402 & F401: Add noqa to intentional but "unused" imports
+# Need to import AuditSubmission so Alembic's autogenerate can see the models and tables
+from core.database import Base  # noqa: E402
+from core.models import AuditSubmission  # noqa: E402, F401
 
 # IN CASE: Points to the Base metadata
 # target_metadata = Base.metadata
 
-# this is the Alembic Config object, which provides
+# This is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# Dynamically set the sqlalchemy.url from the .env so you don't
-# have to hardcode it in alembic.ini
-if os.getenv("DATABASE_URL"):
-    config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+# Pylance reportArgumentType: Add 'or ""' to ensure a string is passed
+# Pylance warns because getenv can return None; set_main_option requires a str.
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url or "")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
