@@ -251,6 +251,21 @@ LEXICON = {
             "generated_on": "Automatisch generiert am",
             "filename_prefix": "Quittung",
         },
+        # --- Email Templates ---
+        "EMAIL": {
+            "subject": "Ihr DSG-Konformitätsbericht - MedSecure",
+            "body": (
+                "Guten Tag,\n\n"
+                "Vielen Dank, dass Sie MedSecure verwendet haben, um die Cyber-Sicherheit Ihrer Praxis zu überprüfen.\n\n"
+                "Im Anhang dieser E-Mail finden Sie:\n"
+                "1. Ihren detaillierten technischen Audit-Bericht, abgestimmt auf die Anforderungen des neuen DSG und die NCSC-Standards.\n"
+                "2. Ihren Beleg über die erfolgte Zahlung.\n\n"
+                "Sollten Sie Fragen zu den in Ihrem Fahrplan empfohlenen Massnahmen haben, steht Ihnen unser Team "
+                "jederzeit gerne zur Verfügung.\n\n"
+                "Freundliche Grüsse,\n"
+                "Ihr MedSecure Schweiz Team"
+            ),
+        },
     },
     # ---- SWISS FRENCH ---
     "fr-CH": {
@@ -499,6 +514,21 @@ LEXICON = {
             "vat_note": "Non soumis à la TVA.",
             "generated_on": "Généré automatiquement le",
             "filename_prefix": "Quittance",
+        },
+        # --- Email Templates ---
+        "EMAIL": {
+            "subject": "Votre Rapport de Conformité nDSG - MedSecure",
+            "body": (
+                "Bonjour,\n\n"
+                "Nous vous remercions d'avoir utilisé MedSecure pour évaluer la maturité cyber de votre cabinet.\n\n"
+                "Vous trouverez en pièces jointes de cet e-mail :\n"
+                "1. Votre rapport technique d'audit détaillé, aligné sur les exigences de la nDSG et des standards NCSC.\n"
+                "2. Votre quittance de paiement pour vos dossiers.\n\n"
+                "Si vous avez des questions concernant les remèdes préconisés dans votre feuille de route, "
+                "notre équipe reste à votre entière disposition.\n\n"
+                "Cordiales salutations,\n"
+                "L'équipe MedSecure Suisse"
+            ),
         },
     },
     # --- SWISS ITALIAN ---
@@ -749,6 +779,21 @@ LEXICON = {
             "vat_note": "Non soggetto a IVA.",
             "generated_on": "Generato automaticamente il",
             "filename_prefix": "Ricevuta",
+        },
+        # --- Email Templates ---
+        "EMAIL": {
+            "subject": "Il vostro Rapporto di Conformità nLPD - MedSecure",
+            "body": (
+                "Gentile Utente,\n\n"
+                "La ringraziamo per aver utilizzato MedSecure per valutare la sicurezza informatica del Suo studio.\n\n"
+                "In allegato a questa e-mail troverà:\n"
+                "1. Il Suo rapporto tecnico di audit dettagliato, allineato ai requisiti della nLPD e agli standard NCSC.\n"
+                "2. La ricevuta di pagamento per la contabilità.\n\n"
+                "Se ha domande relative alle soluzioni raccomandate nella Sua tabella di marcia, il nostro team "
+                "rimane a Sua completa disposizione.\n\n"
+                "Cordiali saluti,\n"
+                "Il team MedSecure Svizzera"
+            ),
         },
     },
 }

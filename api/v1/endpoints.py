@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 import core.wording as wording
 from core.database import get_db
+from core.email import send_audit_results_email
 from core.models import AuditSubmission
 from core.pdf import generate_pdf
 from core.scoring import AuditEngine
@@ -247,7 +248,7 @@ async def stripe_webhook(
     payload = await request.body()
 
     try:
-        # 1. Verify the event integrity
+        # Verify the event integrity
         event = stripe.Webhook.construct_event(
             payload, stripe_signature, STRIPE_WEBHOOK_SECRET
         )
@@ -258,7 +259,7 @@ async def stripe_webhook(
         # Invalid signature
         raise HTTPException(status_code=400, detail="Invalid signature")
 
-    # 2. Handle the specific event
+    # Handle the specific event
     if event["type"] == "checkout.session.completed":
         session = event["data"]["object"]
 
@@ -266,7 +267,7 @@ async def stripe_webhook(
         audit_id = session.client_reference_id
 
         if audit_id:
-            # 3. Update your PostgreSQL record
+            #  Update your PostgreSQL record
             audit = (
                 db.query(AuditSubmission).filter(AuditSubmission.id == audit_id).first()
             )
@@ -274,6 +275,8 @@ async def stripe_webhook(
                 setattr(audit, "is_paid", True)
                 db.commit()
                 print(f"Payment confirmed for Audit: {audit_id}")
+                # Email
+                send_audit_results_email(audit_id, db)
             else:
                 print(f"Webhook received for unknown Audit ID: {audit_id}")
 
