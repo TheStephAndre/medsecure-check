@@ -3,7 +3,16 @@ import uuid
 from typing import Dict
 
 import stripe
-from fastapi import APIRouter, Depends, Form, Header, HTTPException, Request, Response
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    Form,
+    Header,
+    HTTPException,
+    Request,
+    Response,
+)
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -46,14 +55,14 @@ async def web_submit(
     form_data = await request.form()
     answers = {k: v for k, v in form_data.items() if k.startswith("q")}
 
-    # 1. Run the Scoring Engine
+    # Run the Scoring Engine
     engine = AuditEngine(answers, lang=lang)
     results = engine.compute()
 
-    # 2. Generate persistent ID
+    # Generate persistent ID
     submission_id = str(uuid.uuid4())[:16]
 
-    # 3. Save to PostgreSQL
+    # Save to PostgreSQL
     db_entry = AuditSubmission(
         id=submission_id,
         business_name=business_name,
@@ -71,7 +80,7 @@ async def web_submit(
     # Get the specific wording
     lex = get_localized_lexicon(lang)
 
-    # 4. Render UI
+    # Render UI
     return templates.TemplateResponse(
         request=request,
         name="result.html",
@@ -242,6 +251,7 @@ STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
 @router.post("/webhook/stripe")
 async def stripe_webhook(
     request: Request,
+    background_tasks: BackgroundTasks,
     stripe_signature: str = Header(None),
     db: Session = Depends(get_db),
 ):
@@ -267,7 +277,7 @@ async def stripe_webhook(
         audit_id = session.client_reference_id
 
         if audit_id:
-            #  Update your PostgreSQL record
+            #  Update the PostgreSQL record
             audit = (
                 db.query(AuditSubmission).filter(AuditSubmission.id == audit_id).first()
             )
@@ -275,11 +285,15 @@ async def stripe_webhook(
                 setattr(audit, "is_paid", True)
                 db.commit()
                 print(f"Payment confirmed for Audit: {audit_id}")
-                # Email
-                send_audit_results_email(audit_id, db)
+                # --- ASYNCHRONOUS BACKGROUND THREAD OFFSITE ---
+                # Pushes the processing down to the application's task manager in FastAPI
+                # instead of blocking the execution thread while dealing with network connectivity loops(Stripe and SMTP server).
+                background_tasks.add_task(send_audit_results_email, audit_id, db)
             else:
                 print(f"Webhook received for unknown Audit ID: {audit_id}")
 
+    # Response to Stripe to confirm payment receipt and close the connection.
+    # Fast execution, completely secure against Stripe's 10-second timeout.
     return {"status": "success"}
 
 
