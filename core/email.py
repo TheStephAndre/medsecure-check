@@ -32,9 +32,38 @@ def send_audit_results_email(submission_id: str, db: Session):
     lex = get_lexicon(lang)
     company_name = os.getenv("COMPANY_NAME", "MedSecure")
 
-    # Generate PDF Attachments in memory (with safe string passing)
-    report_pdf = generate_pdf("report_pdf.html", audit, lex, lang, company_name)
-    invoice_pdf = generate_pdf("invoice_pdf.html", audit, lex, lang, company_name)
+    # Clean the business name for a professional attachment filename
+    biz_name_clean = business_name.replace(".", "").replace(" ", "_")
+    safe_business_name = "".join(x for x in biz_name_clean if x.isalnum() or x == "_")
+
+    # Extract creation date string (e.g., 2026-05-26)
+    date_str = audit.created_at.strftime("%Y-%m-%d")
+
+    # --- DYNAMIC FILENAMES (Matched to endpoints.py) ---
+    report_prefix = lex["REPORT_PDF"]["filename_prefix"]
+    report_filename = f"{report_prefix}_MedSecure_{safe_business_name}_{date_str}.pdf"
+
+    inv_lex = lex["INVOICE"]
+    short_id = str(submission_id)[:8]
+    invoice_filename = f"{inv_lex['filename_prefix']}_MedSecure_{short_id}.pdf"
+
+    # Generate PDF Attachments in memory
+    report_pdf = generate_pdf(
+        "report_pdf.html",
+        audit,
+        lex,
+        lang,
+        company_name,
+        display_filename=report_filename,
+    )
+    invoice_pdf = generate_pdf(
+        "invoice_pdf.html",
+        audit,
+        lex,
+        lang,
+        company_name,
+        display_filename=invoice_filename,
+    )
 
     # Build Email using the newly isolated EMAIL mapping dictionary
     msg = EmailMessage()
@@ -43,22 +72,18 @@ def send_audit_results_email(submission_id: str, db: Session):
     msg["To"] = recipient_email
     msg.set_content(lex["EMAIL"]["body"])
 
-    # Clean the business name for a professional attachment filename
-    biz_name_clean = business_name.replace(".", "").replace(" ", "_")
-    safe_business_name = "".join(x for x in biz_name_clean if x.isalnum() or x == "_")
-
     #  Attach Files
     msg.add_attachment(
         report_pdf.getvalue(),
         maintype="application",
         subtype="pdf",
-        filename=f"Rapport_MedSecure_{safe_business_name}.pdf",
+        filename=report_filename,
     )
     msg.add_attachment(
         invoice_pdf.getvalue(),
         maintype="application",
         subtype="pdf",
-        filename=f"Quittance_MedSecure_{safe_business_name}.pdf",
+        filename=invoice_filename,
     )
 
     #  Send via SMTP securely using environment configs
@@ -72,10 +97,20 @@ def send_audit_results_email(submission_id: str, db: Session):
     smtp_pass = os.getenv("SMTP_PASS", "")
 
     try:
-        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
-            if smtp_user and smtp_pass:
-                server.login(smtp_user, smtp_pass)
-            server.send_message(msg)
+        # LOCAL DEV ENVIRONMENT: Use normal unencrypted SMTP connection for testing tool pipelines (e.g., Mailpit)
+        if smtp_port == 1025:
+            with smtplib.SMTP(smtp_host, smtp_port) as server:
+                if smtp_user and smtp_pass:
+                    server.login(smtp_user, smtp_pass)
+                server.send_message(msg)
+
+        # PRODUCTION ENVIRONMENT: Enforce implicit structural SSL encryption for Infomaniak stacks
+        else:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+                if smtp_user and smtp_pass:
+                    server.login(smtp_user, smtp_pass)
+                server.send_message(msg)
+
         print(f"Email successfully sent to {recipient_email}")
     except Exception as e:
         print(f"Failed to send email via SMTP {smtp_host}: {e}")

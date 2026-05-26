@@ -136,7 +136,7 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     report_prefix = lex["REPORT_PDF"]["filename_prefix"]
     date_str = audit.created_at.strftime("%Y-%m-%d")
 
-    # Use a simple, professional filename
+    # Use a simple, professional filename for report
     filename = f"{report_prefix}_MedSecure_{safe_business_name}_{date_str}.pdf"
 
     # Generate the PDF in memory
@@ -312,11 +312,13 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
     # Fetch localized wording
     lang = getattr(audit, "lang", "fr-CH")
     lex = get_lexicon(lang)
-    inv_lex = lex["INVOICE"]
 
+    # Construct the localized filename
+    inv_lex = lex["INVOICE"]
     # Create the dynamic filename here
     # Use only the first 8 chars of ID for a cleaner look
     short_id = str(submission_id)[:8]
+    # Use a simple, professional filename for invoice
     filename = f"{inv_lex['filename_prefix']}_MedSecure_{short_id}.pdf"
 
     pdf_buffer = generate_pdf(
