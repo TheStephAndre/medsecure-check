@@ -47,28 +47,28 @@ def send_audit_results_email(submission_id: str, db: Session):
     short_id = str(submission_id)[:8]
     invoice_filename = f"{inv_lex['filename_prefix']}_MedSecure_{short_id}.pdf"
 
-    # Generate PDF Attachments in memory
+    # Generate PDF Attachments in memory using explicit keyword arguments
     report_pdf = generate_pdf(
-        "report_pdf.html",
-        audit,
-        lex,
-        lang,
-        company_name,
+        template_name="report_pdf.html",
+        audit_record=audit,
+        lexicon=lex,
+        company_name=company_name,
+        lang=lang,
         display_filename=report_filename,
     )
     invoice_pdf = generate_pdf(
-        "invoice_pdf.html",
-        audit,
-        lex,
-        lang,
-        company_name,
+        template_name="invoice_pdf.html",
+        audit_record=audit,
+        lexicon=lex,
+        company_name=company_name,
+        lang=lang,
         display_filename=invoice_filename,
     )
 
     # Build Email using the newly isolated EMAIL mapping dictionary
     msg = EmailMessage()
     msg["Subject"] = lex["EMAIL"]["subject"]
-    msg["From"] = os.getenv("EMAIL_FROM", "info@medsecure-check.ch")
+    msg["From"] = os.getenv("EMAIL_FROM", "info@medsecure.ch")
     msg["To"] = recipient_email
     msg.set_content(lex["EMAIL"]["body"])
 

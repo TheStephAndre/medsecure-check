@@ -517,7 +517,7 @@ LEXICON = {
         },
         # --- Email Templates ---
         "EMAIL": {
-            "subject": "Votre Rapport de Conformité nDSG - MedSecure",
+            "subject": "Votre Rapport de Conformité LPD - MedSecure",
             "body": (
                 "Bonjour,\n\n"
                 "Nous vous remercions d'avoir utilisé MedSecure pour évaluer la maturité cyber de votre cabinet.\n\n"
@@ -782,7 +782,7 @@ LEXICON = {
         },
         # --- Email Templates ---
         "EMAIL": {
-            "subject": "Il vostro Rapporto di Conformità nLPD - MedSecure",
+            "subject": "Il vostro Rapporto di Conformità LPD - MedSecure",
             "body": (
                 "Gentile Utente,\n\n"
                 "La ringraziamo per aver utilizzato MedSecure per valutare la sicurezza informatica del Suo studio.\n\n"

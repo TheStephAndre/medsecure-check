@@ -17,7 +17,7 @@ def generate_pdf(
     Generic PDF generator for Reports and Invoices.
     Maps SQLAlchemy model fields to Template expectations.
     """
-    # 1. Prepare the 'submission' object as the templates expect it
+    # Prepare the 'submission' object as the templates expect it
     # We map 'score' -> 'assessment' and 'failed_items' -> 'failed'
     submission_data = {
         "id": str(audit_record.id),
@@ -33,7 +33,7 @@ def generate_pdf(
         ),
     }
 
-    # 2. Context for Jinja2
+    # Context for Jinja2
     context = {
         "submission": submission_data,
         "company": company_name,
@@ -50,7 +50,8 @@ def generate_pdf(
     }
 
     # This merges extra stuff (like IBAN) into the context IF it exists
-    context.update(kwargs)
+    if kwargs:
+        context.update(kwargs)
 
     # 3. Render HTML
     template = templates.get_template(template_name)
