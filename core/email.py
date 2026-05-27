@@ -1,22 +1,26 @@
-import os
 import smtplib
+from contextlib import contextmanager
 from email.message import EmailMessage
 
-from sqlalchemy.orm import Session
-
+from core import config
 from core.models import AuditSubmission
 from core.pdf import generate_pdf
 from core.wording import get_lexicon
 
 
-def send_audit_results_email(submission_id: str, db: Session):
+def send_audit_results_email(submission_id: str, db_factory):
     # Fetch data safely
-    audit = (
-        db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
-    )
-    if not audit:
-        print(f"Email error: Submission {submission_id} not found.")
-        return
+    # Create an independent context-managed session
+    # handles open/close routines safely off the main request thread
+    with contextmanager(db_factory)() as db:
+        audit = (
+            db.query(AuditSubmission)
+            .filter(AuditSubmission.id == submission_id)
+            .first()
+        )
+        if not audit:
+            print(f"Email error: Submission {submission_id} not found.")
+            return
 
     # Extract and strictly type-cast variables to satisfy Pylance
     lang = str(audit.lang) if audit.lang is not None else "fr-CH"
@@ -30,7 +34,6 @@ def send_audit_results_email(submission_id: str, db: Session):
         return
 
     lex = get_lexicon(lang)
-    company_name = os.getenv("COMPANY_NAME", "MedSecure")
 
     # Clean the business name for a professional attachment filename
     biz_name_clean = business_name.replace(".", "").replace(" ", "_")
@@ -52,7 +55,7 @@ def send_audit_results_email(submission_id: str, db: Session):
         template_name="report_pdf.html",
         audit_record=audit,
         lexicon=lex,
-        company_name=company_name,
+        company_name=config.COMPANY_NAME,
         lang=lang,
         display_filename=report_filename,
     )
@@ -60,7 +63,7 @@ def send_audit_results_email(submission_id: str, db: Session):
         template_name="invoice_pdf.html",
         audit_record=audit,
         lexicon=lex,
-        company_name=company_name,
+        company_name=config.COMPANY_NAME,
         lang=lang,
         display_filename=invoice_filename,
     )
@@ -68,7 +71,7 @@ def send_audit_results_email(submission_id: str, db: Session):
     # Build Email using the newly isolated EMAIL mapping dictionary
     msg = EmailMessage()
     msg["Subject"] = lex["EMAIL"]["subject"]
-    msg["From"] = os.getenv("EMAIL_FROM", "info@medsecure.ch")
+    msg["From"] = config.EMAIL_FROM
     msg["To"] = recipient_email
     msg.set_content(lex["EMAIL"]["body"])
 
@@ -86,31 +89,21 @@ def send_audit_results_email(submission_id: str, db: Session):
         filename=invoice_filename,
     )
 
-    #  Send via SMTP securely using environment configs
-    smtp_host = os.getenv("SMTP_HOST", "localhost")
-    try:
-        smtp_port = int(os.getenv("SMTP_PORT", "465"))
-    except ValueError:
-        smtp_port = 465
-
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-
     try:
         # LOCAL DEV ENVIRONMENT: Use normal unencrypted SMTP connection for testing tool pipelines (e.g., Mailpit)
-        if smtp_port == 1025:
-            with smtplib.SMTP(smtp_host, smtp_port) as server:
-                if smtp_user and smtp_pass:
-                    server.login(smtp_user, smtp_pass)
+        if config.SMTP_PORT == 1025:
+            with smtplib.SMTP(config.SMTP_HOST, config.SMTP_PORT) as server:
+                if config.SMTP_USER and config.SMTP_PASS:
+                    server.login(config.SMTP_USER, config.SMTP_PASS)
                 server.send_message(msg)
 
         # PRODUCTION ENVIRONMENT: Enforce implicit structural SSL encryption for Infomaniak stacks
         else:
-            with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
-                if smtp_user and smtp_pass:
-                    server.login(smtp_user, smtp_pass)
+            with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT) as server:
+                if config.SMTP_USER and config.SMTP_PASS:
+                    server.login(config.SMTP_USER, config.SMTP_PASS)
                 server.send_message(msg)
 
         print(f"Email successfully sent to {recipient_email}")
     except Exception as e:
-        print(f"Failed to send email via SMTP {smtp_host}: {e}")
+        print(f"Failed to send email via SMTP {config.SMTP_HOST}: {e}")

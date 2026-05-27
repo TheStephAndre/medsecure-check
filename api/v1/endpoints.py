@@ -1,4 +1,3 @@
-import os
 import uuid
 from typing import Dict
 
@@ -18,6 +17,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
 import core.wording as wording
+from core import config
 from core.database import get_db
 from core.email import send_audit_results_email
 from core.models import AuditSubmission
@@ -27,6 +27,9 @@ from core.ui import templates
 from core.wording import get_lexicon
 
 router = APIRouter()
+
+# Global context security configuration initialization
+stripe.api_key = config.STRIPE_SECRET_KEY
 
 
 # --- RaaS SCHEMA ---
@@ -146,7 +149,7 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
         # Pass the whole localized lexicon to the PDF generator(core/pdf.py)
         lexicon=lex,
         lang=lang,
-        company_name=os.getenv("COMPANY_NAME", "MedSecure"),
+        company_name=config.COMPANY_NAME,
         # Passing the filename to the template context
         display_filename=filename,
     )
@@ -192,7 +195,7 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
                 {
                     "price_data": {
                         "currency": "chf",
-                        "unit_amount": 4900,
+                        "unit_amount": config.STRIPE_PRICE_CHF,
                         "product_data": {
                             # Localized Stripe product name
                             "name": f"{lex['PRODUCT']['report_name']}: {audit.business_name}"
@@ -243,10 +246,6 @@ async def payment_success(
 
 # --- STRIPE WEBHOOK ---
 
-# Ensure your Stripe API Key is set (Secret Key from Dashboard, starts with sk_test_)
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET")
-
 
 @router.post("/webhook/stripe")
 async def stripe_webhook(
@@ -260,7 +259,7 @@ async def stripe_webhook(
     try:
         # Verify the event integrity
         event = stripe.Webhook.construct_event(
-            payload, stripe_signature, STRIPE_WEBHOOK_SECRET
+            payload, stripe_signature, config.STRIPE_WEBHOOK_SECRET
         )
     except ValueError:
         # Invalid payload
@@ -288,7 +287,7 @@ async def stripe_webhook(
                 # --- ASYNCHRONOUS BACKGROUND THREAD OFFSITE ---
                 # Pushes the processing down to the application's task manager in FastAPI
                 # instead of blocking the execution thread while dealing with network connectivity loops(Stripe and SMTP server).
-                background_tasks.add_task(send_audit_results_email, audit_id, db)
+                background_tasks.add_task(send_audit_results_email, audit_id, get_db)
             else:
                 print(f"Webhook received for unknown Audit ID: {audit_id}")
 
@@ -326,7 +325,7 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
         audit_record=audit,
         lexicon=lex,
         lang=lang,
-        company_name=os.getenv("COMPANY_NAME", "MedSecure"),
+        company_name=config.COMPANY_NAME,
         # Passing the filename to the template context
         display_filename=filename,
     )
