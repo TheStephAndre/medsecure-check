@@ -18,13 +18,12 @@ from sqlalchemy.orm import Session
 
 import core.wording as wording
 from core import config
-from core.database import get_db
+from core.database import SessionLocal, get_db
 from core.email import send_audit_results_email
 from core.models import AuditSubmission
 from core.pdf import generate_pdf
 from core.scoring import AuditEngine
 from core.ui import templates
-from core.wording import get_lexicon
 
 router = APIRouter()
 
@@ -40,7 +39,7 @@ class AuditSubmissionSchema(BaseModel):
 
 
 # --- Get Lexicon for a specific language ---
-def get_localized_lexicon(lang: str = "fr-CH"):
+def get_localized_lexicon(lang: str = "fr-CH") -> dict:
     """Returns the dictionary for the requested language, fallback to French."""
     return wording.LEXICON.get(lang, wording.LEXICON["fr-CH"])
 
@@ -56,7 +55,17 @@ async def web_submit(
     db: Session = Depends(get_db),
 ):
     form_data = await request.form()
-    answers = {k: v for k, v in form_data.items() if k.startswith("q")}
+    form_dict = dict(form_data)
+
+    # Force build an invariant, comprehensive 10-key answer dictionary,
+    # If the browser or network miss a key/value because of a bug,
+    # while the audit strictly requires 10 questions from q1 to q10,
+    # this loop is going to build that dictionary layout manually,
+    # by replacing the value of the key missing by 'na'.
+    answers = {}
+    for i in range(1, 11):
+        q_key = f"q{i}"
+        answers[q_key] = form_dict.get(q_key, "na")
 
     # Run the Scoring Engine
     engine = AuditEngine(answers, lang=lang)
@@ -117,12 +126,8 @@ async def view_report(submission_id: str, db: Session = Depends(get_db)):
     db.refresh(audit)
 
     # The Gatekeeper Logic if it is not paid
-    if bool(audit.is_paid) is not True:
+    if audit.is_paid is not True:
         # Redirect to the pay route if they haven't paid yet
-        return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
-
-    # Pylance check (ensures audit is not None)
-    if not bool(audit.is_paid):
         return RedirectResponse(url=f"/api/v1/pay/{submission_id}")
 
     # Use the language stored in the DB for the PDF
@@ -179,7 +184,7 @@ async def pay(request: Request, submission_id: str, db: Session = Depends(get_db
 
     # Define 'lex' here so it is not undefined
     lang = str(audit.lang) if audit.lang is not None else "fr-CH"
-    lex = get_lexicon(lang)
+    lex = get_localized_lexicon(lang)
 
     try:
         # request.url_for can return NoneType, cast to str()
@@ -287,7 +292,9 @@ async def stripe_webhook(
                 # --- ASYNCHRONOUS BACKGROUND THREAD OFFSITE ---
                 # Pushes the processing down to the application's task manager in FastAPI
                 # instead of blocking the execution thread while dealing with network connectivity loops(Stripe and SMTP server).
-                background_tasks.add_task(send_audit_results_email, audit_id, get_db)
+                background_tasks.add_task(
+                    send_audit_results_email, audit_id, SessionLocal
+                )
             else:
                 print(f"Webhook received for unknown Audit ID: {audit_id}")
 
@@ -303,14 +310,14 @@ async def view_invoice(submission_id: str, db: Session = Depends(get_db)):
         db.query(AuditSubmission).filter(AuditSubmission.id == submission_id).first()
     )
 
-    if not audit or bool(audit.is_paid) is not True:
+    if not audit or audit.is_paid is not True:
         raise HTTPException(
-            status_code=403, detail="Rechnung nur nach Zahlung verfügbar."
+            status_code=403, detail="Invoice available only after payment."
         )
 
     # Fetch localized wording
     lang = getattr(audit, "lang", "fr-CH")
-    lex = get_lexicon(lang)
+    lex = get_localized_lexicon(lang)
 
     # Construct the localized filename
     inv_lex = lex["INVOICE"]

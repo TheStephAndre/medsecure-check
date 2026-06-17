@@ -1,5 +1,4 @@
 import smtplib
-from contextlib import contextmanager
 from email.message import EmailMessage
 
 from core import config
@@ -10,9 +9,9 @@ from core.wording import get_lexicon
 
 def send_audit_results_email(submission_id: str, db_factory):
     # Fetch data safely
-    # Create an independent context-managed session
-    # handles open/close routines safely off the main request thread
-    with contextmanager(db_factory)() as db:
+    # Keep the session active for data reading and PDF generation
+    # using native SQLAlchemy session context management.
+    with db_factory() as db:
         audit = (
             db.query(AuditSubmission)
             .filter(AuditSubmission.id == submission_id)
@@ -22,51 +21,55 @@ def send_audit_results_email(submission_id: str, db_factory):
             print(f"Email error: Submission {submission_id} not found.")
             return
 
-    # Extract and strictly type-cast variables to satisfy Pylance
-    lang = str(audit.lang) if audit.lang is not None else "fr-CH"
-    business_name = (
-        str(audit.business_name) if audit.business_name is not None else "Cabinet"
-    )
-    recipient_email = str(audit.email) if audit.email is not None else ""
+        # Extract and strictly type-cast variables to satisfy Pylance
+        lang = str(audit.lang) if audit.lang is not None else "fr-CH"
+        business_name = (
+            str(audit.business_name) if audit.business_name is not None else "Cabinet"
+        )
+        recipient_email = str(audit.email) if audit.email is not None else ""
 
-    if not recipient_email:
-        print(f"Email error: No email address bound to submission {submission_id}.")
-        return
+        if not recipient_email:
+            print(f"Email error: No email address bound to submission {submission_id}.")
+            return
 
-    lex = get_lexicon(lang)
+        lex = get_lexicon(lang)
 
-    # Clean the business name for a professional attachment filename
-    biz_name_clean = business_name.replace(".", "").replace(" ", "_")
-    safe_business_name = "".join(x for x in biz_name_clean if x.isalnum() or x == "_")
+        # Clean the business name for a professional attachment filename
+        biz_name_clean = business_name.replace(".", "").replace(" ", "_")
+        safe_business_name = "".join(
+            x for x in biz_name_clean if x.isalnum() or x == "_"
+        )
 
-    # Extract creation date string (e.g., 2026-05-26)
-    date_str = audit.created_at.strftime("%Y-%m-%d")
+        # Extract creation date string (e.g., 2026-05-26)
+        date_str = audit.created_at.strftime("%Y-%m-%d")
 
-    # --- DYNAMIC FILENAMES (Matched to endpoints.py) ---
-    report_prefix = lex["REPORT_PDF"]["filename_prefix"]
-    report_filename = f"{report_prefix}_MedSecure_{safe_business_name}_{date_str}.pdf"
+        # --- DYNAMIC FILENAMES (Matched to endpoints.py) ---
+        report_prefix = lex["REPORT_PDF"]["filename_prefix"]
+        report_filename = (
+            f"{report_prefix}_MedSecure_{safe_business_name}_{date_str}.pdf"
+        )
 
-    inv_lex = lex["INVOICE"]
-    short_id = str(submission_id)[:8]
-    invoice_filename = f"{inv_lex['filename_prefix']}_MedSecure_{short_id}.pdf"
+        inv_lex = lex["INVOICE"]
+        short_id = str(submission_id)[:8]
+        invoice_filename = f"{inv_lex['filename_prefix']}_MedSecure_{short_id}.pdf"
 
-    # Generate PDF Attachments in memory using explicit keyword arguments
-    report_pdf = generate_pdf(
-        template_name="report_pdf.html",
-        audit_record=audit,
-        lexicon=lex,
-        company_name=config.COMPANY_NAME,
-        lang=lang,
-        display_filename=report_filename,
-    )
-    invoice_pdf = generate_pdf(
-        template_name="invoice_pdf.html",
-        audit_record=audit,
-        lexicon=lex,
-        company_name=config.COMPANY_NAME,
-        lang=lang,
-        display_filename=invoice_filename,
-    )
+        # Generate PDF Attachments in memory using explicit keyword arguments
+        report_pdf = generate_pdf(
+            template_name="report_pdf.html",
+            audit_record=audit,
+            lexicon=lex,
+            company_name=config.COMPANY_NAME,
+            lang=lang,
+            display_filename=report_filename,
+        )
+        invoice_pdf = generate_pdf(
+            template_name="invoice_pdf.html",
+            audit_record=audit,
+            lexicon=lex,
+            company_name=config.COMPANY_NAME,
+            lang=lang,
+            display_filename=invoice_filename,
+        )
 
     # Build Email using the newly isolated EMAIL mapping dictionary
     msg = EmailMessage()

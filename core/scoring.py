@@ -32,7 +32,14 @@ class AuditEngine:
         self.failed_items = []
         self.na_count = 0
         # Pillar tracking: { "Pillar Name": {"earned": 0.0, "possible": 0.0} }
-        self.pillars = {}
+        # Enforce an explicit, unchanging structural master schema profile.
+        # This guarantees the output format never shifts or breaks downstream lookups.
+        self.pillars = {
+            "confidentiality": {"earned": 0.0, "possible": 0.0},
+            "integrity": {"earned": 0.0, "possible": 0.0},
+            "availability": {"earned": 0.0, "possible": 0.0},
+            "traceability": {"earned": 0.0, "possible": 0.0},
+        }
 
     def compute(self) -> dict:
         """Process all questions and return a detailed assessment dictionary."""
@@ -40,17 +47,27 @@ class AuditEngine:
         lex = get_lexicon(self.lang)
         questions_lex = lex["QUESTIONS"]
 
+        # Structural routing map: normalizes granular wording tags into core architectural pillars
+        pillar_routing = {
+            "confidentiality": "confidentiality",
+            "integrity": "integrity",
+            "integrity_protection": "integrity",
+            "network_protection": "integrity",
+            "availability": "availability",
+            "traceability_access": "traceability",
+            "traceability": "traceability",
+        }
+
         for cfg in QUESTION_CONFIG:
             q_id = cfg["id"]
             w = cfg["weight"]
 
-            # Identify the pillar for this question from wording.py
+            # Identify the pillar for this question from wording.py(invariant string identifier)
             q_data = questions_lex.get(q_id, {})
-            pillar_name = q_data.get("pillar", "General")
+            wording_pillar = q_data.get("pillar_id", "confidentiality")
 
-            # Initialize pillar tracking
-            if pillar_name not in self.pillars:
-                self.pillars[pillar_name] = {"earned": 0.0, "possible": 0.0}
+            # Map the wording key to our structured core pillars, defaulting safely to confidentiality
+            pillar_id = pillar_routing.get(wording_pillar, "confidentiality")
 
             ans = self.answers.get(q_id, "na")
 
@@ -59,17 +76,17 @@ class AuditEngine:
                 continue  # Skip N/A for both earned and possible
 
             # Update Pillar Totals
-            self.pillars[pillar_name]["possible"] += w
+            self.pillars[pillar_id]["possible"] += w
 
             if ans == "yes":
-                self.pillars[pillar_name]["earned"] += w
+                self.pillars[pillar_id]["earned"] += w
             elif ans == "no":
-                # Record detailed failure for the report
+                # Record detailed failure for the report(UI labels for presentation parity)
                 self._record_failure(
                     q_id=q_id,
                     text=q_data.get("text", ""),
                     remedy=q_data.get("remedy", ""),
-                    pillar=pillar_name,
+                    pillar=q_data.get("pillar", "General"),
                     standard=q_data.get("standard", ""),
                     weight=w,
                 )
@@ -91,11 +108,12 @@ class AuditEngine:
 
     def _finalize_results(self) -> dict:
         """Applies penalties, determines risk level, and checks data density."""
-        # 1. Calculate Per-Pillar Percentages
+
         pillar_scores = {}
         total_earned = 0.0
         total_possible = 0.0
 
+        # Calculate Per-Pillar Percentages
         for name, scores in self.pillars.items():
             if scores["possible"] > 0:
                 perc = round((scores["earned"] / scores["possible"]) * 100)
@@ -103,22 +121,28 @@ class AuditEngine:
                 total_earned += scores["earned"]
                 total_possible += scores["possible"]
             else:
-                pillar_scores[name] = 0
+                # Explicitly flag omitted pillars as null
+                pillar_scores[name] = None
 
-        # 2. Overall Score & Penalties
-        raw_score = (
-            round((total_earned / total_possible) * 100) if total_possible > 0 else 0
-        )
+        # Establish Base Metrics Separately From Flags
+        if total_possible > 0:
+            raw_score = round((total_earned / total_possible) * 100)
 
-        penalty = 0
-        if 3 <= self.na_count <= 5:
-            penalty = 5
-        elif self.na_count > 5:
-            penalty = 10
+            # Compute confidence penalty deduction
+            if 3 <= self.na_count <= 5:
+                penalty = 5
+            elif self.na_count > 5:
+                penalty = 10
+            else:
+                penalty = 0
 
-        final_score = max(raw_score - penalty, 0)
+            final_score = max(raw_score - penalty, 0)
+        else:
+            raw_score = 0
+            penalty = 0
+            final_score = 0
 
-        # 3. Data Density Check (The "Insufficient Data" Flag)
+        # Data Density Check (The "Insufficient Data" Flag)
         # If > 70% of the audit is skipped, we flag the result as inconclusive.
         is_inconclusive = self.na_count > 7
 
