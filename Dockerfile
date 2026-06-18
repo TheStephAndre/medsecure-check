@@ -28,8 +28,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the modern FastAPI application structure
 COPY . .
 
-# Expose port 8080 (standard, highly reliable port mapping on Jelastic)
+# Expose port 8080 (preferred standard, highly reliable port mapping on Jelastic)
 EXPOSE 8080
 
-# Spin up the Uvicorn engine pointing to your actual main entrypoint
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Spin up the Uvicorn engine pointing to the actual main entrypoint.
+# Use a shell execution wrapper to read Jelastic's dynamic $PORT variable.
+# If $PORT is empty or missing, it safely falls back to 8080.
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]

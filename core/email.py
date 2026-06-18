@@ -107,6 +107,6 @@ def send_audit_results_email(submission_id: str, db_factory):
                     server.login(config.SMTP_USER, config.SMTP_PASS)
                 server.send_message(msg)
 
-        print(f"Email successfully sent to {recipient_email}")
+        print(f"Email successfully sent for submission ID: {submission_id}")
     except Exception as e:
-        print(f"Failed to send email via SMTP {config.SMTP_HOST}: {e}")
+        print(f"Failed to send email for submission ID {submission_id}: {e}")
