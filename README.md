@@ -55,4 +55,26 @@ The application follows **Clean Architecture** principles, ensuring core busines
 
 ---
 
+## 🛠️ Getting Started & Local Development
+
+### 1. Prerequisites
+
+Ensure you have Python 3.12+ installed locally. If you run the application outside of Docker, you must install the system layout engines required by WeasyPrint 68+:
+
+- **macOS**: `brew install pango libffi`
+- **Ubuntu/Debian**: `sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 shared-mime-info`
+- **Windows**: Follow the official WeasyPrint installation guide to install the GTK+ libraries.
+
+### 2. Installation
+
+Clone the repository and install the Python dependencies inside a clean virtual environment:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+---
+
 _Disclaimer: This tool provides guidance based on Swiss technical standards. It does not replace professional legal or IT forensic advice._
+```

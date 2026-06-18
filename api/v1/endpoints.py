@@ -9,6 +9,7 @@ from fastapi import (
     Form,
     Header,
     HTTPException,
+    Query,
     Request,
     Response,
 )
@@ -244,6 +245,52 @@ async def payment_success(
             "current_lang": lang,
             "PRODUCT": lex["PRODUCT"],
             "SUCCESS": lex["SUCCESS"],
+            "DISCLAIMERS": lex["DISCLAIMERS"],
+        },
+    )
+
+
+# --- LEGAL COMPLIANCE & PRIVACY ---
+
+
+@router.get("/privacy", response_class=HTMLResponse, name="privacy")
+async def get_privacy_page(
+    request: Request, lang: str = Query("fr-CH", regex="^(de-CH|fr-CH|it-CH)$")
+):
+    """
+    Renders the Swiss FADP / revDSG compliant privacy policy page.
+    Accepts URL dialect query parameters (?lang=de, ?lang=fr, ?lang=it).
+    """
+    lex = get_localized_lexicon(lang)
+    return templates.TemplateResponse(
+        request=request,
+        name="privacy.html",
+        context={
+            "request": request,
+            "current_lang": lang,
+            "config": wording.LEGAL_CONFIG,
+            "PRODUCT": lex["PRODUCT"],
+            "DISCLAIMERS": lex["DISCLAIMERS"],
+        },
+    )
+
+
+@router.get("/terms", response_class=HTMLResponse, name="terms")
+async def get_terms_page(
+    request: Request, lang: str = Query("fr-CH", regex="^(de-CH|fr-CH|it-CH)$")
+):
+    """
+    Renders the General Terms and Conditions (AGB / CGV / CGA) page with core disclaimers.
+    """
+    lex = get_localized_lexicon(lang)
+    return templates.TemplateResponse(
+        request=request,
+        name="terms.html",
+        context={
+            "request": request,
+            "current_lang": lang,  # Unified variable name
+            "config": wording.LEGAL_CONFIG,
+            "PRODUCT": lex["PRODUCT"],
             "DISCLAIMERS": lex["DISCLAIMERS"],
         },
     )

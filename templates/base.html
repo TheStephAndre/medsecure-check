@@ -158,9 +158,19 @@
 
       {% block content %}{% endblock %}
 
-      <footer class="no-print">
+      <footer
+        class="no-print"
+        style="margin-top: 4rem; text-align: center; font-size: 0.9rem"
+      >
         <hr />
-        <small>{{ DISCLAIMERS.website }}</small>
+        <p>&copy; 2026 {{ PRODUCT.name }}. Tous droits réservés.</p>
+        <p>
+          {# Directly pass current_lang (e.g. de-CH, fr-CH, it-CH) without any
+          slicing #}
+          <a href="/privacy?lang={{ current_lang }}">Privacy Policy</a> |
+          <a href="/terms?lang={{ current_lang }}">Terms & Conditions</a>
+        </p>
+        <p><small>{{ DISCLAIMERS.website }}</small></p>
       </footer>
     </main>
   </body>

@@ -828,6 +828,14 @@ LEXICON = {
     },
 }
 
+# Legal configuration for privacy and terms
+LEGAL_CONFIG = {
+    "company_name": "MedSecure",
+    "address": "Rue Peillonnex 26, 1225 Genève",
+    "email": "compliance@medsecure.ch",
+    "hosting_provider": "Infomaniak Network SA (Genève/Winterthur)",
+}
+
 
 # --- Helper function for the OS language of the user ---
 def get_lexicon(lang: str = "de-CH"):
