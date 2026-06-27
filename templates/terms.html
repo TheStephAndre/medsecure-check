@@ -1,183 +1,132 @@
 <!-- templates/terms.html -->
-<!doctype html>
-<html lang="{{ lang }}">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Terms & Conditions - MedSecure</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
-    />
-  </head>
-  <body class="container" style="padding-top: 2rem; padding-bottom: 4rem">
-    <header>
-      <nav>
-        <ul>
-          <li>
-            <strong
-              ><a href="/?lang={{ lang }}" style="text-decoration: none"
-                >MedSecure-Check 🇨🇭</a
-              ></strong
-            >
-          </li>
-        </ul>
-        <ul>
-          <li><a href="/terms?lang=de-CH" class="secondary">DE</a></li>
-          <li><a href="/terms?lang=fr-CH" class="secondary">FR</a></li>
-          <li><a href="/terms?lang=it-CH" class="secondary">IT</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <main>
-      {% if lang == "fr" %}
-      <h1>Conditions Générales de Vente (CGV)</h1>
-      <section>
-        <h2>1. Objet du contrat</h2>
-        <p>
-          MedSecure fournit un service automatisé d'auto-évaluation de la
-          cybersécurité (Report-as-a-Service). L'utilisateur répond à un
-          questionnaire en ligne et reçoit, contre paiement, un rapport PDF
-          généré ainsi qu'une facture par e-mail.
-        </p>
-      </section>
-      <section
-        style="
-          background-color: rgba(255, 0, 0, 0.05);
-          padding: 1rem;
-          border-left: 4px solid red;
-        "
+{% extends "base.html" %} {% block content %}
+<article>
+  {% if current_lang == "fr-CH" %}
+  <h1>Conditions Générales de Vente (CGV)</h1>
+  <section>
+    <h2>1. Objet du contrat</h2>
+    <p>
+      MedSecure fournit un service automatisé d'auto-évaluation de la
+      cybersécurité (Report-as-a-Service). L'utilisateur répond à un
+      questionnaire en ligne et reçoit, contre paiement, un rapport PDF généré
+      ainsi qu'une facture par e-mail.
+    </p>
+  </section>
+  <section class="warning-box">
+    <h2>2. Exclusion de responsabilité</h2>
+    <p>
+      <strong
+        >Le rapport généré par MedSecure est une analyse automatisée basée
+        uniquement sur les déclarations non vérifiées de l'utilisateur. Ce
+        rapport ne constitue pas un conseil juridique formal, une certification
+        de conformité à la nDSG, ou un audit informatique médico-légal complet.
+        L'utilisation de cet outil ne remplace en aucun cas une consultation
+        personnalisée auprès d'experts qualifiés en sécurité informatique ou en
+        droit.</strong
       >
-        <h2>2. Exclusion de responsabilité</h2>
-        <p>
-          <strong
-            >Le rapport généré par MedSecure est une analyse automatisée basée
-            uniquement sur les déclarations non vérifiées de l'utilisateur. Ce
-            rapport ne constitue pas un conseil juridique formel, une
-            certification de conformité à la nDSG, ou un audit informatique
-            médico-légal complet. L'utilisation de cet outil ne remplace en
-            aucun cas une consultation personnalisée auprès d'experts qualifiés
-            en sécurité informatique ou en droit.</strong
-          >
-        </p>
-      </section>
-      <section>
-        <h2>3. Prix et conditions de paiement</h2>
-        <p>
-          Tous les prix sont indiqués en Francs Suisses (CHF). L'accès au
-          rapport PDF est débloqué immédiatement après la confirmation du
-          paiement par le prestataire de services (Stripe).
-        </p>
-      </section>
-      <section>
-        <h2>4. Droit de rétractation et remboursement</h2>
-        <p>
-          S'agissant d'un contenu numérique fourni instantanément après
-          confirmation du paiement, tout droit de rétractation ou de
-          remboursement est expressément exclu. Toutes les ventes sont
-          définitives.
-        </p>
-      </section>
+    </p>
+  </section>
+  <section>
+    <h2>3. Prix et conditions de paiement</h2>
+    <p>
+      Tous les prix sont indiqués en Francs Suisses (CHF). L'accès au rapport
+      PDF est débloqué immédiatement après la confirmation du paiement par le
+      prestataire de services (Stripe).
+    </p>
+  </section>
+  <section>
+    <h2>4. Droit de rétractation et remboursement</h2>
+    <p>
+      S'agissant d'un contenu numérique fourni instantanément après confirmation
+      du paiement, tout droit de rétractation ou de remboursement est
+      expressément exclu. Toutes les ventes sont définitives.
+    </p>
+  </section>
 
-      {% elif lang == "it" %}
-      <h1>Condizioni Generali di Contratto (CGA)</h1>
-      <section>
-        <h2>1. Oggetto del contratto</h2>
-        <p>
-          MedSecure fornisce un servizio automatizzato di autovalutazione della
-          sicurezza informatica (Report-as-a-Service). L'utente risponde a un
-          questionario online e riceve, a pagamento, un report PDF generato e la
-          relativa fattura via e-mail.
-        </p>
-      </section>
-      <section
-        style="
-          background-color: rgba(255, 0, 0, 0.05);
-          padding: 1rem;
-          border-left: 4px solid red;
-        "
+  {% elif current_lang == "it-CH" %}
+  <h1>Condizioni Generali di Contratto (CGA)</h1>
+  <section>
+    <h2>1. Oggetto del contratto</h2>
+    <p>
+      MedSecure fornisce un servizio automatizzato di autovalutazione della
+      sicurezza informatica (Report-as-a-Service). L'utente risponde a un
+      questionario online e riceve, a pagamento, un report PDF generato e la
+      relativa fattura via e-mail.
+    </p>
+  </section>
+  <section class="warning-box">
+    <h2>2. Esclusione di responsabilità</h2>
+    <p>
+      <strong
+        >Il report generato da MedSecure è un'analisi automatizzata basata
+        esclusivamente sulle dichiarazioni non verificate fornite dall'utente.
+        Il report non costituisce una consulenza legale formale, una
+        certificazione di conformità alla LPD o un audit informatico forense
+        completo. L'uso di questo strumento non sostituisce una consulenza
+        personalizzata da parte di esperti qualificati in sicurezza informatica
+        o esperti legali.</strong
       >
-        <h2>2. Esclusione di responsabilità</h2>
-        <p>
-          <strong
-            >Il report generato da MedSecure è un'analisi automatizzata basata
-            esclusivamente sulle dichiarazioni non verificate fornite
-            dall'utente. Il report non costituisce una consulenza legale
-            formale, una certificazione di conformità alla LPD o un audit
-            informatico forense completo. L'uso di questo strumento non
-            sostituisce una consulenza personalizzata da parte di esperti
-            qualificati in sicurezza informatica o esperti legali.</strong
-          >
-        </p>
-      </section>
-      <section>
-        <h2>3. Prezzi e condizioni di pagamento</h2>
-        <p>
-          Tutti i prezzi sono espressi in Franchi Svizzeri (CHF). L'accesso al
-          report PDF viene sbloccato solo dopo la conferma del pagamento da
-          parte del gestore dei pagamenti (Stripe).
-        </p>
-      </section>
-      <section>
-        <h2>4. Diritto di recesso e rimborso</h2>
-        <p>
-          Trattandosi di beni digitali generati e consegnati immediatamente via
-          e-mail dopo la transazione, il diritto di recesso o rimborso è
-          completamente escluso. Tutte le vendite sono definitive.
-        </p>
-      </section>
+    </p>
+  </section>
+  <section>
+    <h2>3. Prezzi e condizioni di pagamento</h2>
+    <p>
+      Tutti i prezzi sono espressi in Franchi Svizzeri (CHF). L'accesso al
+      report PDF viene sbloccato solo dopo la conferma del pagamento da parte
+      del gestore dei pagamenti (Stripe).
+    </p>
+  </section>
+  <section>
+    <h2>4. Diritto di recesso e rimborso</h2>
+    <p>
+      Trattandosi di beni digitali generati e consegnati immediatamente via
+      e-mail dopo la transazione, il diritto di recesso o rimborso è
+      completamente escluso. Tutte le vendite sono definitive.
+    </p>
+  </section>
 
-      {% else %}
-      <!-- Default Fallback: de-CH -->
-      <h1>Allgemeine Geschäftsbedingungen (AGB)</h1>
-      <section>
-        <h2>1. Gegenstand des Vertrages</h2>
-        <p>
-          MedSecure bietet einen automatisierten Service zur Selbsteinschätzung
-          der Cybersicherheit (Report-as-a-Service). Der Nutzer beantwortet
-          Fragen online und erhält gegen Gebühr einen generierten PDF-Bericht
-          sowie eine Rechung per E-Mail.
-        </p>
-      </section>
-      <section
-        style="
-          background-color: rgba(255, 0, 0, 0.05);
-          padding: 1rem;
-          border-left: 4px solid red;
-        "
+  {% else %}
+  <!-- Default Fallback: de-CH -->
+  <h1>Allgemeine Geschäftsbedingungen (AGB)</h1>
+  <section>
+    <h2>1. Gegenstand des Vertrages</h2>
+    <p>
+      MedSecure bietet einen automatisierten Service zur Selbsteinschätzung der
+      Cybersicherheit (Report-as-a-Service). Der Nutzer beantwortet Fragen
+      online und erhält gegen Gebühr einen generierten PDF-Bericht allein sowie
+      eine Rechnung per E-Mail.
+    </p>
+  </section>
+  <section class="warning-box">
+    <h2>2. Haftungsausschluss</h2>
+    <p>
+      <strong
+        >Der durch MedSecure generierte Bericht stellt eine automatisierte
+        Auswertung dar, die ausschliesslich auf den unüberprüften Angaben des
+        Nutzers basiert. Der Bericht stellt keine formelle Rechtsberatung,
+        nDSG-Konformitätszertifizierung oder umfassende IT-Forensik-Prüfung dar.
+        Die Nutzung des Berichts ersetzt nicht die individuelle Beratung durch
+        qualifizierte IT-Sicherheits- oder Rechtsexperten.</strong
       >
-        <h2>2. Haftungsausschluss</h2>
-        <p>
-          <strong
-            >Der durch MedSecure generierte Bericht stellt eine automatisierte
-            Auswertung dar, die ausschliesslich auf den unüberprüften Angaben
-            des Nutzers basiert. Der Bericht stellt keine formelle
-            Rechtsberatung, nDSG-Konformitätszertifizierung oder umfassende
-            IT-Forensik-Prüfung dar. Die Nutzung des Berichts ersetzt nicht die
-            individuelle Beratung durch qualifizierte IT-Sicherheits- oder
-            Rechtsexperten.</strong
-          >
-        </p>
-      </section>
-      <section>
-        <h2>3. Preise und Zahlungsbedingungen</h2>
-        <p>
-          Alle Preise verstehen sich in Schweizer Franken (CHF). Der Zugang zum
-          PDF-Bericht wird erst nach erfolgreicher Zahlungsfreigabe durch den
-          Zahlungsdienstleister (Stripe) freigeschaltet.
-        </p>
-      </section>
-      <section>
-        <h2>4. Widerrufs- und Rückgaberecht</h2>
-        <p>
-          Da es sich um die Bereitstellung digitaler Güter handelt, die
-          unmittelbar nach der Zahlung generiert und per E-Mail zugestellt
-          werden, ist das Rückgabe- und Widerrufsrecht vollständig
-          ausgeschlossen. Sämtliche Käufe sind final.
-        </p>
-      </section>
-      {% endif %}
-    </main>
-  </body>
-</html>
+    </p>
+  </section>
+  <section>
+    <h2>3. Preise und Zahlungsbedingungen</h2>
+    <p>
+      Alle Preise verstehen sich in Schweizer Franken (CHF). Der Zugang zum
+      PDF-Bericht wird erst nach erfolgreicher Zahlungsfreigabe durch den
+      Zahlungsdienstleister (Stripe) freigeschaltet.
+    </p>
+  </section>
+  <section>
+    <h2>4. Widerrufs- und Rückgaberecht</h2>
+    <p>
+      Da es sich um die Bereitstellung digitaler Güter handelt, die unmittelbar
+      nach der Zahlung generiert und per E-Mail zugestellt werden, ist das
+      Rückgabe- und Widerrufsrecht vollständig ausgeschlossen. Sämtliche Käufe
+      sind final.
+    </p>
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

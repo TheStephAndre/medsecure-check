@@ -1,241 +1,203 @@
-<!-- templates/privacy.html -->
-<!doctype html>
-<html lang="{{ lang }}">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Privacy Policy - MedSecure</title>
-    <!-- Leverages your existing global style definitions -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"
-    />
-  </head>
-  <body class="container" style="padding-top: 2rem; padding-bottom: 4rem">
-    <header>
-      <nav>
-        <ul>
-          <li>
-            <strong
-              ><a href="/?lang={{ lang }}" style="text-decoration: none"
-                >MedSecure-Check 🇨🇭</a
-              ></strong
-            >
-          </li>
-        </ul>
-        <ul>
-          <li><a href="/privacy?lang=de-CH" class="secondary">DE</a></li>
-          <li><a href="/privacy?lang=fr-CH" class="secondary">FR</a></li>
-          <li><a href="/privacy?lang=it-CH" class="secondary">IT</a></li>
-        </ul>
-      </nav>
-    </header>
+{% extends "base.html" %} {% block content %}
+<article>
+  {% if current_lang == "fr-CH" %}
+  <h1>Déclaration de Confidentialité</h1>
+  <section>
+    <h2>1. Responsable du traitement</h2>
+    <address>
+      <strong>{{ config.company_name }}</strong><br />
+      {{ config.address }}<br />
+      Suisse<br />
+      E-mail : <a href="mailto:{{ config.email }}">{{ config.email }}</a>
+    </address>
+  </section>
+  <section>
+    <h2>2. Données collectées et finalité du traitement</h2>
+    <p>
+      Nous collectons et traitons uniquement les données nécessaires à la
+      fournitures de l'audit de sécurité automatisé (Report-as-a-Service) :
+    </p>
+    <ul>
+      <li>Nom de l'établissement médical / de l'entreprise</li>
+      <li>Adresse e-mail de l'utilisateur</li>
+      <li>Réponses aux 10 questions du questionnaire de risque</li>
+    </ul>
+    <p>
+      Ces données sont utilisées exclusivement pour calculer le score de
+      maturité, générer le rapport PDF, et envoyer le rapport ainsi que la
+      facture par e-mail.
+    </p>
+  </section>
+  <section>
+    <h2>3. Traitement des paiements (Stripe)</h2>
+    <p>
+      Les paiements sont traités par le prestataire Stripe Inc. Vos données de
+      carte de crédit sont collectées directement par Stripe via une interface
+      sécurisée et cryptée. À aucun moment vos données bancaires complètes ne
+      sont stockées ou traitées sur les serveurs de MedSecure.
+    </p>
+  </section>
+  <section>
+    <h2>4. Hébergement et souveraineté des données (Suisse)</h2>
+    <p>
+      Tous les serveurs applicatifs, bases de données et flux de rapports PDF
+      générés par MedSecure sont hébergés exclusivement en Suisse sur
+      l'infrastructure de <strong>{{ config.hosting_provider }}</strong>. Aucune
+      donnée opérationnelle n'est exportée à l'étranger.
+    </p>
+  </section>
+  <section>
+    <h2>5. Journaux système et minimisation des données</h2>
+    <p>
+      Conformément à la nDSG, aucun paramètre contenant des données personnelles
+      (telles que les adresses e-mail) n'est enregistré en texte clair dans les
+      journaux d'exécutions du serveur. Le suivi s'effectue uniquement via des
+      identifiants anonymes (IDs).
+    </p>
+  </section>
+  <section>
+    <h2>6. Vos droits</h2>
+    <p>
+      Vous disposez d'un droit d'accès, de rectification, de portabilité ou de
+      suppression définitive de vos données. Pour exercer ces droits,
+      contactez-nous à :
+      <a href="mailto:{{ config.email }}">{{ config.email }}</a>.
+    </p>
+  </section>
 
-    <main>
-      {% if lang == "fr" %}
-      <h1>Déclaration de Confidentialité</h1>
-      <section>
-        <h2>1. Responsable du traitement</h2>
-        <address>
-          <strong>{{ config.company_name }}</strong><br />
-          {{ config.address }}<br />
-          Suisse<br />
-          E-mail : <a href="mailto:{{ config.email }}">{{ config.email }}</a>
-        </address>
-      </section>
-      <section>
-        <h2>2. Données collectées et finalité du traitement</h2>
-        <p>
-          Nous collectons et traitons uniquement les données nécessaires à la
-          fourniture de l'audit de sécurité automatisé (Report-as-a-Service) :
-        </p>
-        <ul>
-          <li>Nom de l'établissement médical / de l'entreprise</li>
-          <li>Adresse e-mail de l'utilisateur</li>
-          <li>Réponses aux 10 questions du questionnaire de risque</li>
-        </ul>
-        <p>
-          Ces données sont utilisées exclusivement pour calculer le score de
-          maturité, générer le rapport PDF, et envoyer le rapport ainsi que la
-          facture par e-mail.
-        </p>
-      </section>
-      <section>
-        <h2>3. Traitement des paiements (Stripe)</h2>
-        <p>
-          Les paiements sont traités par le prestataire Stripe Inc. Vos données
-          de carte de crédit sont collectées directement par Stripe via une
-          interface sécurisée et cryptée. À aucun moment vos données bancaires
-          complètes ne sont stockées ou traitées sur les serveurs de MedSecure.
-        </p>
-      </section>
-      <section>
-        <h2>4. Hébergement et souveraineté des données (Suisse)</h2>
-        <p>
-          Tous les serveurs applicatifs, bases de données et flux de rapports
-          PDF générés par MedSecure sont hébergés exclusivement en Suisse sur
-          l'infrastructure de <strong>{{ config.hosting_provider }}</strong>.
-          Aucune donnée opérationnelle n'est exportée à l'étranger.
-        </p>
-      </section>
-      <section>
-        <h2>5. Journaux système et minimisation des données</h2>
-        <p>
-          Conformément à la nDSG, aucun paramètre contenant des données
-          personnelles (telles que les adresses e-mail) n'est enregistré en
-          texte clair dans les journaux d'exécutions du serveur. Le suivi
-          s'effectue uniquement via des identifiants anonymes (IDs).
-        </p>
-      </section>
-      <section>
-        <h2>6. Vos droits</h2>
-        <p>
-          Vous disposez d'un droit d'accès, de rectification, de portabilité ou
-          de suppression définitive de vos données. Pour exercer ces droits,
-          contactez-nous à :
-          <a href="mailto:{{ config.email }}">{{ config.email }}</a>.
-        </p>
-      </section>
+  {% elif current_lang == "it-CH" %}
+  <h1>Dichiarazione sulla Protezione dei Dati</h1>
+  <section>
+    <h2>1. Titolare del trattamento</h2>
+    <address>
+      <strong>{{ config.company_name }}</strong><br />
+      {{ config.address }}<br />
+      Svizzera<br />
+      E-mail: <a href="mailto:{{ config.email }}">{{ config.email }}</a>
+    </address>
+  </section>
+  <section>
+    <h2>2. Dati raccolti e finalità del trattamento</h2>
+    <p>
+      Raccogliamo e trattiamo esclusivamente i dati necessari per l'erogazione
+      dell'audit di sicurezza automatizzato (Report-as-a-Service):
+    </p>
+    <ul>
+      <li>Nome della struttura medica / dell'azienda</li>
+      <li>Indirizzo e-mail dell'utente</li>
+      <li>Risposte alle 10 domande del questionario di rischio</li>
+    </ul>
+    <p>
+      Questi dati vengono utilizzati unicamente per calcolare il punteggio di
+      maturità, generare il report PDF e inviare il report e la fattura via
+      e-mail.
+    </p>
+  </section>
+  <section>
+    <h2>3. Gestione dei pagamenti (Stripe)</h2>
+    <p>
+      I pagamenti sono gestiti dal fornitore Stripe Inc. I dati della carta di
+      credito vengono raccolti direttamente da Stripe tramite un'interfaccia
+      crittografata. In nessun momento i dati di pagamento completi vengono
+      memorizzati o trattati sui server di MedSecure.
+    </p>
+  </section>
+  <section>
+    <h2>4. Sede dei dati e Hosting (Svizzera)</h2>
+    <p>
+      Tutti i server applicativi, i database e i report PDF generati in memoria
+      da MedSecure sono ospitati esclusivamente in Svizzera sull'infrastruttura
+      di <strong>{{ config.hosting_provider }}</strong>. Non viene effettuata
+      alcuna esportazione di dati aziendali o medici all'estero.
+    </p>
+  </section>
+  <section>
+    <h2>5. Log di sistema e minimizzazione dei dati</h2>
+    <p>
+      In conformità con la LPD revisionata, nessun dato personale (come gli
+      indirizzi e-mail) viene registrato in chiaro nei log di sistema del
+      container. Il monitoraggio avviene esclusivamente tramite codici
+      identificativi anonimi (ID).
+    </p>
+  </section>
+  <section>
+    <h2>6. I vostri diritti</h2>
+    <p>
+      Avete il diritto di richiedere l'accesso, la rettifica, la portabilità o
+      la cancellazione definitiva dei vostri dati memorizzati. Potete
+      contattarci all'indirizzo:
+      <a href="mailto:{{ config.email }}">{{ config.email }}</a>.
+    </p>
+  </section>
 
-      {% elif lang == "it" %}
-      <h1>Dichiarazione sulla Protezione dei Dati</h1>
-      <section>
-        <h2>1. Titolare del trattamento</h2>
-        <address>
-          <strong>{{ config.company_name }}</strong><br />
-          {{ config.address }}<br />
-          Svizzera<br />
-          E-mail: <a href="mailto:{{ config.email }}">{{ config.email }}</a>
-        </address>
-      </section>
-      <section>
-        <h2>2. Dati raccolti e finalità del trattamento</h2>
-        <p>
-          Raccogliamo e trattiamo esclusivamente i dati necessari per
-          l'erogazione dell'audit di sicurezza automatizzato
-          (Report-as-a-Service):
-        </p>
-        <ul>
-          <li>Nome della struttura medica / dell'azienda</li>
-          <li>Indirizzo e-mail dell'utente</li>
-          <li>Risposte alle 10 domande del questionario di rischio</li>
-        </ul>
-        <p>
-          Questi dati vengono utilizzati unicamente per calcolare il punteggio
-          di maturità, generare il report PDF e inviare il report e la fattura
-          via e-mail.
-        </p>
-      </section>
-      <section>
-        <h2>3. Gestione dei pagamenti (Stripe)</h2>
-        <p>
-          I pagamenti sono gestiti dal fornitore Stripe Inc. I dati della carta
-          di credito vengono raccolti direttamente da Stripe tramite
-          un'interfaccia crittografata. In nessun momento i dati di pagamento
-          completi vengono memorizzati o trattati sui server di MedSecure.
-        </p>
-      </section>
-      <section>
-        <h2>4. Sede dei dati e Hosting (Svizzera)</h2>
-        <p>
-          Tutti i server applicativi, i database e i report PDF generati in
-          memoria da MedSecure sono ospitati esclusivamente in Svizzera
-          sull'infrastruttura di <strong>{{ config.hosting_provider }}</strong>.
-          Non viene effettuata alcuna esportazione di dati aziendali o medici
-          all'estero.
-        </p>
-      </section>
-      <section>
-        <h2>5. Log di sistema e minimizzazione dei dati</h2>
-        <p>
-          In conformità con la LPD revisionata, nessun dato personale (come gli
-          indirizzi e-mail) viene registrato in chiaro nei log di sistema del
-          container. Il monitoraggio avviene esclusivamente tramite codici
-          identificativi anonimi (ID).
-        </p>
-      </section>
-      <section>
-        <h2>6. I vostri diritti</h2>
-        <p>
-          Avete il diritto di richiedere l'accesso, la rettifica, la portabilità
-          o la cancellazione definitiva dei vostri dati memorizzati. Potete
-          contattarci all'indirizzo:
-          <a href="mailto:{{ config.email }}">{{ config.email }}</a>.
-        </p>
-      </section>
-
-      {% else %}
-      <!-- Default Fallback: de-CH -->
-      <h1>Datenschutzerklärung</h1>
-      <section>
-        <h2>1. Verantwortlicher</h2>
-        <address>
-          <strong>{{ config.company_name }}</strong><br />
-          {{ config.address }}<br />
-          Schweiz<br />
-          E-Mail: <a href="mailto:{{ config.email }}">{{ config.email }}</a>
-        </address>
-      </section>
-      <section>
-        <h2>2. Erhobene Daten und Zweck der Verarbeitung</h2>
-        <p>
-          Wir erheben und verarbeiten ausschliesslich Daten, die für die
-          Bereitstellung des automatisierten Sicherheitsaudits
-          (Report-as-a-Service) erforderlich sind:
-        </p>
-        <ul>
-          <li>Name der medizinischen Einrichtung / des Unternehmens</li>
-          <li>E-Mail-Adresse des Nutzers</li>
-          <li>Antworten auf die 10 Fragen des Risiko-Fragebogens</li>
-        </ul>
-        <p>
-          Diese Daten dienen ausschliesslich der Berechnung des
-          Reifegrad-Scores, der Erstellung des PDF-Berichts sowie dem Versand
-          des Berichts und der Rechnung per E-Mail.
-        </p>
-      </section>
-      <section>
-        <h2>3. Zahlungsabwicklung (Stripe)</h2>
-        <p>
-          Die Zahlungsabwicklung erfolgt über den Zahlungsdienstleister Stripe
-          Inc. Ihre Kreditkartendaten werden über eine verschlüsselte
-          Schnittstelle (Iframe/Elements) direkt von Stripe erhoben. Zu keinem
-          Zeitpunkt werden Ihre vollständigen Zahlungsdaten auf den Servern von
-          MedSecure gespeichert oder verarbeitet.
-        </p>
-      </section>
-      <section>
-        <h2>4. Datenstandort und Hosting (Schweiz)</h2>
-        <p>
-          Sämtliche von MedSecure betriebenen Anwendungsserver,
-          Datenbankstrukturen und die im Arbeitsspeicher generierten
-          PDF-Berichte werden ausschliesslich in der Schweiz auf der
-          Infrastruktur von
-          <strong>{{ config.hosting_provider }}</strong> gehostet. Es findet
-          kein Export von medizinischen oder betrieblichen Daten ins Ausland
-          statt.
-        </p>
-      </section>
-      <section>
-        <h2>5. Protokollierung und Datensparsamkeit</h2>
-        <p>
-          Zur Einhaltung des revDSG werden in den Systemprotokollen (Logs) des
-          Servers keine personenbezogenen Daten (wie z.B. E-Mail-Adressen) im
-          Klartext gespeichert. Fortschritte und Transaktionen werden
-          ausschliesslich über anonymisierte Identifikationsnummern (IDs)
-          nachverfolgt.
-        </p>
-      </section>
-      <section>
-        <h2>6. Ihre Rechte</h2>
-        <p>
-          Sie haben das Recht auf Auskunft, Berichtigung, Übertragung oder
-          dauerhafte Löschung Ihrer gespeicherten Daten. Wenden Sie sich hierzu
-          formlos an:
-          <a href="mailto:{{ config.email }}">{{ config.email }}</a>.
-        </p>
-      </section>
-      {% endif %}
-    </main>
-  </body>
-</html>
+  {% else %}
+  <h1>Datenschutzerklärung</h1>
+  <section>
+    <h2>1. Verantwortlicher</h2>
+    <address>
+      <strong>{{ config.company_name }}</strong><br />
+      {{ config.address }}<br />
+      Schweiz<br />
+      E-Mail: <a href="mailto:{{ config.email }}">{{ config.email }}</a>
+    </address>
+  </section>
+  <section>
+    <h2>2. Erhobene Daten und Zweck der Verarbeitung</h2>
+    <p>
+      Wir erheben und verarbeiten ausschliesslich Daten, die für die
+      Bereitstellung des automatisierten Sicherheitsaudits (Report-as-a-Service)
+      erforderlich sind:
+    </p>
+    <ul>
+      <li>Name der medizinischen Einrichtung / des Unternehmens</li>
+      <li>E-Mail-Adresse des Nutzers</li>
+      <li>Antworten auf die 10 Fragen des Risiko-Fragebogens</li>
+    </ul>
+    <p>
+      Diese Daten dienen ausschliesslich der Berechnung des Reifegrad-Scores,
+      der Erstellung des PDF-Berichts sowie dem Versand des Berichts und der
+      Rechnung per E-Mail.
+    </p>
+  </section>
+  <section>
+    <h2>3. Zahlungsabwicklung (Stripe)</h2>
+    <p>
+      Die Zahlungsabwicklung erfolgt über den Zahlungsdienstleister Stripe Inc.
+      Ihre Kreditkartendaten werden über eine verschlüsselte Schnittstelle
+      (Iframe/Elements) direkt von Stripe erhoben. Zu keinem Zeitpunkt werden
+      Ihre vollständigen Zahlungsdaten auf den Servern von MedSecure gespeichert
+      oder verarbeitet.
+    </p>
+  </section>
+  <section>
+    <h2>4. Datenstandort und Hosting (Schweiz)</h2>
+    <p>
+      Sämtliche von MedSecure betriebenen Anwendungsserver, Datenbankstrukturen
+      und die im Arbeitsspeicher generierten PDF-Berichte werden ausschliesslich
+      in der Schweiz auf der Infrastruktur von
+      <strong>{{ config.hosting_provider }}</strong> gehostet. Es findet kein
+      Export von medizinischen oder betrieblichen Daten ins Ausland statt.
+    </p>
+  </section>
+  <section>
+    <h2>5. Protokollierung und Datensparsamkeit</h2>
+    <p>
+      Zur Einhaltung des revDSG werden in den Systemprotokollen (Logs) des
+      Servers keine personenbezogenen Daten (wie z.B. E-Mail-Adressen) im
+      Klartext gespeichert. Fortschritte und Transaktionen werden
+      ausschliesslich über anonymisierte Identifikationsnummern (IDs)
+      nachverfolgt.
+    </p>
+  </section>
+  <section>
+    <h2>6. Ihre Rechte</h2>
+    <p>
+      Sie haben das Recht auf Auskunft, Berichtigung, Übertragung oder
+      dauerhafte Löschung Ihrer gespeicherten Daten. Wenden Sie sich hierzu
+      formlos an:
+      <a href="mailto:{{ config.email }}">{{ config.email }}</a>.
+    </p>
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

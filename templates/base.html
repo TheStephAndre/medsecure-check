@@ -151,7 +151,14 @@
         </nav>
 
         <hgroup>
-          <h1>{{ PRODUCT.name }}</h1>
+          <h1>
+            <a
+              href="/?lang={{ current_lang }}"
+              style="text-decoration: none; color: inherit"
+            >
+              {{ PRODUCT.name }}
+            </a>
+          </h1>
           <h2>{{ PRODUCT.tagline }}</h2>
         </hgroup>
       </header>
@@ -167,8 +174,8 @@
         <p>
           {# Directly pass current_lang (e.g. de-CH, fr-CH, it-CH) without any
           slicing #}
-          <a href="/privacy?lang={{ current_lang }}">Privacy Policy</a> |
-          <a href="/terms?lang={{ current_lang }}">Terms & Conditions</a>
+          <a href="/api/v1/privacy?lang={{ current_lang }}">Privacy Policy</a> |
+          <a href="/api/v1/terms?lang={{ current_lang }}">Terms & Conditions</a>
         </p>
         <p><small>{{ DISCLAIMERS.website }}</small></p>
       </footer>
