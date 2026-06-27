@@ -207,6 +207,7 @@
           {% for pillar, score in submission.pillar_scores.items() %}
           <tr>
             <td><strong>{{ pillar }}</strong></td>
+            {# Check if the score is not None #} {% if score is not none %}
             <td>{{ score }}%</td>
             <td>
               {% if score >= 80 %}
@@ -223,6 +224,18 @@
               >
               {% endif %}
             </td>
+            {% else %} {#Fallback design for omitted pillars (N/A) #}
+            <td>—</td>
+            <td>
+              <span
+                class="status-pill"
+                style="background-color: #e9ecef; color: #6c757d"
+              >
+                {{ REPORT.status_labels.na if REPORT.status_labels.na else 'N/A'
+                }}
+              </span>
+            </td>
+            {% endif %}
           </tr>
           {% endfor %}
         </tbody>
